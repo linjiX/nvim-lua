@@ -38,6 +38,27 @@ return {
                 mode = "i",
                 desc = "Dismiss Copilot Suggestion",
             },
+            {
+                "[rg",
+                function()
+                    require("copilot.command").enable()
+                end,
+                desc = "Enable Copilot",
+            },
+            {
+                "]rg",
+                function()
+                    require("copilot.command").disable()
+                end,
+                desc = "Disable Copilot",
+            },
+            {
+                "yrg",
+                function()
+                    require("copilot.command").toggle()
+                end,
+                desc = "Toggle Copilot",
+            },
         },
         opts = {
             panel = {
