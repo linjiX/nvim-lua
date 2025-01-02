@@ -1,7 +1,21 @@
+local function hijack_find_textobject()
+    local miniai = require("mini.ai")
+    local find_textobject = miniai.find_textobject
+    miniai.find_textobject = function(ai_type, id, opts)
+        local result = find_textobject(ai_type, id, opts)
+        if result ~= nil then
+            result.from, result.to = result.to, result.from
+        end
+        return result
+    end
+end
+
 return {
     "echasnovski/mini.ai",
     event = "VeryLazy",
     opts = function()
+        hijack_find_textobject()
+
         return {
             mappings = {
                 around_next = "an",
