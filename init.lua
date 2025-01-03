@@ -133,6 +133,25 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
+-- Restore cursor to the last position
+vim.api.nvim_create_autocmd("BufReadPost", {
+    group = vim.api.nvim_create_augroup("MyCursor", { clear = true }),
+    pattern = "*",
+    callback = function(args)
+        local exclude = { "gitcommit" }
+        local buf = args.buf
+        if vim.tbl_contains(exclude, vim.bo[buf].filetype) or vim.b[buf].cursor_restored then
+            return
+        end
+        vim.b[buf].cursor_restored = true
+        local mark = vim.api.nvim_buf_get_mark(buf, '"')
+        local line_count = vim.api.nvim_buf_line_count(buf)
+        if mark[1] > 0 and mark[1] <= line_count then
+            pcall(vim.api.nvim_win_set_cursor, 0, mark)
+        end
+    end,
+})
+
 require("config.lazy")
 
 vim.cmd.colorscheme("tokyonight-night")
