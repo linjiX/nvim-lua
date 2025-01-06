@@ -1,6 +1,16 @@
 return {
     "stevearc/conform.nvim",
     cmd = "ConformInfo",
+    keys = {
+        {
+            "<Leader>a",
+            function()
+                require("conform").format({ async = true, lsp_fallback = true })
+            end,
+            mode = { "n", "v" },
+            desc = "Format buffer",
+        },
+    },
     opts = {
         formatters_by_ft = {
             lua = { "stylua" },
@@ -17,16 +27,6 @@ return {
             css = { "prettierd" },
             scss = { "prettierd" },
             markdown = { "prettierd" },
-        },
-    },
-    keys = {
-        {
-            "<Leader>a",
-            function()
-                require("conform").format({ async = true, lsp_fallback = true })
-            end,
-            mode = { "n", "v" },
-            desc = "Format buffer",
         },
     },
 }
