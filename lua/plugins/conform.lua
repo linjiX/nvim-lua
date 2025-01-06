@@ -14,9 +14,7 @@ return {
     opts = {
         formatters_by_ft = {
             lua = { "stylua" },
-            -- Conform will run multiple formatters sequentially
-            python = { "isort", "pyupgade", "black" },
-            -- You can customize some of the format options for the filetype (:help conform.format)
+            python = { "isort", "pyupgrade", "black" },
             javascript = { "prettierd" },
             typescript = { "prettierd" },
             vue = { "prettierd" },
@@ -27,6 +25,12 @@ return {
             css = { "prettierd" },
             scss = { "prettierd" },
             markdown = { "prettierd" },
+        },
+        formatters = {
+            pyupgrade = {
+                command = "pyupgrade",
+                args = { "--exit-zero-even-if-changed", "-" },
+            },
         },
     },
 }
