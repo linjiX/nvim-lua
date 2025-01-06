@@ -5,7 +5,7 @@ return {
     opts = {
         registries = {
             "github:mason-org/mason-registry",
-            ("file:%s/mason-registry"):format(vim.fn.stdpath("config")),
+            "lua:registry",
         },
         ui = { border = "rounded" },
     },
