@@ -30,15 +30,6 @@ return {
             messages = {
                 view_search = false, -- 禁用默认的搜索视图
             },
-            routes = {
-                {
-                    filter = {
-                        event = "msg_show",
-                        kind = "search_count",
-                    },
-                    view = "virtualtext",
-                },
-            },
         }
     end,
     dependencies = {
