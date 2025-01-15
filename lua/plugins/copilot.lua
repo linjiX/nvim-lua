@@ -89,13 +89,25 @@ return {
             },
         },
     },
-    -- {
-    --     "zbirenbaum/copilot-cmp",
-    --     event = "InsertEnter",
-    --     dependencies = { "zbirenbaum/copilot.lua" },
-    --     opts = {},
-    -- },
     {
         "AndreM222/copilot-lualine",
+    },
+    {
+        "CopilotC-Nvim/CopilotChat.nvim",
+        dependencies = {
+            { "zbirenbaum/copilot.lua" },
+            { "nvim-lua/plenary.nvim" },
+        },
+        build = "make tiktoken",
+        keys = {
+            {
+                "<Leader>a",
+                function()
+                    require("CopilotChat").toggle()
+                end,
+                desc = "Toggle Copilot Chat",
+            },
+        },
+        opts = {},
     },
 }
