@@ -1,27 +1,34 @@
 return {
     "nvim-telescope/telescope.nvim",
     branch = "0.1.x",
-    dependencies = { "nvim-lua/plenary.nvim" },
+    dependencies = {
+        "nvim-lua/plenary.nvim",
+        { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+    },
     cmd = "Telescope",
-    opts = {
-        defaults = {
-            mappings = {
-                i = {
-                    ["<ESC>"] = "close",
+    opts = function()
+        require("telescope").load_extension("fzf")
 
-                    ["<C-a>"] = { "<HOME>", type = "command" },
-                    ["<C-e>"] = { "<END>", type = "command" },
+        return {
+            defaults = {
+                mappings = {
+                    i = {
+                        ["<ESC>"] = "close",
 
-                    ["<C-j>"] = "move_selection_next",
-                    ["<C-k>"] = "move_selection_previous",
-                },
-                n = {
-                    ["<C-j>"] = "move_selection_next",
-                    ["<C-k>"] = "move_selection_previous",
+                        ["<C-a>"] = { "<HOME>", type = "command" },
+                        ["<C-e>"] = { "<END>", type = "command" },
+
+                        ["<C-j>"] = "move_selection_next",
+                        ["<C-k>"] = "move_selection_previous",
+                    },
+                    n = {
+                        ["<C-j>"] = "move_selection_next",
+                        ["<C-k>"] = "move_selection_previous",
+                    },
                 },
             },
-        },
-    },
+        }
+    end,
     keys = {
         { "<Leader>ff", require("telescope.builtin").find_files },
         { "<Leader>fm", require("telescope.builtin").oldfiles },
