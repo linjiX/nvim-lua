@@ -8,6 +8,7 @@ return {
     cmd = "Telescope",
     opts = function()
         require("telescope").load_extension("fzf")
+        local open_with_trouble = require("trouble.sources.telescope").open
 
         return {
             defaults = {
@@ -20,6 +21,8 @@ return {
 
                         ["<C-j>"] = "move_selection_next",
                         ["<C-k>"] = "move_selection_previous",
+
+                        ["<C-l>"] = open_with_trouble,
                     },
                     n = {
                         ["<C-j>"] = "move_selection_next",
