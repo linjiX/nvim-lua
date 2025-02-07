@@ -152,6 +152,20 @@ vim.api.nvim_create_autocmd("BufReadPost", {
     end,
 })
 
+-- Diagnostic
+vim.keymap.set("n", "<leader>K", vim.diagnostic.open_float, { noremap = true, silent = true })
+
+vim.diagnostic.config({
+    float = {
+        border = "rounded",
+        source = true,
+    },
+    virtual_text = {
+        prefix = "●",
+        source = true,
+    },
+})
+
 require("config.lazy")
 
 vim.cmd.colorscheme("tokyonight-night")
