@@ -51,6 +51,7 @@ return {
         },
     },
     opts = function()
+        vim.api.nvim_set_hl(0, "HlSearchNear", { link = "None", default = true })
         vim.api.nvim_set_hl(0, "HlSearchLens", { link = "DiagnosticUnnecessary", default = true })
         vim.api.nvim_set_hl(0, "HlSearchLensNear", { link = "DiagnosticInfo", default = true })
 
