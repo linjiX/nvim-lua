@@ -16,6 +16,15 @@ return {
         })
 
         return {
+            options = {
+                disabled_filetypes = {
+                    statusline = {
+                        "snacks_dashboard",
+                        "NvimTree",
+                        "trouble",
+                    },
+                },
+            },
             sections = {
                 lualine_b = {
                     "branch",
@@ -45,6 +54,7 @@ return {
                     "filetype",
                 },
             },
+            extensions = { "quickfix", "fugitive" },
         }
     end,
 }
