@@ -11,6 +11,8 @@ return {
         -- "L3MON4D3/LuaSnip",
     },
     config = function()
+        vim.opt.shortmess:append("c")
+
         local cmp = require("cmp")
         cmp.setup({
             -- window = {
