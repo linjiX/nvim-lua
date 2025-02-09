@@ -16,6 +16,7 @@ return {
                 "scss",
                 "python",
                 "markdown",
+                "markdown_inline",
                 "json",
                 "jsonc",
                 "yaml",
