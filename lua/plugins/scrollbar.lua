@@ -5,6 +5,7 @@ return {
             excluded_buftypes = {
                 "nofile",
                 "terminal",
+                "prompt",
             },
             excluded_filetypes = {
                 "fugitiveblame",
