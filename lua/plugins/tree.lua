@@ -10,6 +10,10 @@ return {
     opts = function()
         vim.opt.termguicolors = true
 
-        return {}
+        return {
+            diagnostics = {
+                enable = true,
+            },
+        }
     end,
 }
