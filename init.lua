@@ -111,25 +111,16 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
             vim.cmd("wincmd L")
             vim.keymap.set("n", "q", ":helpclose<CR>", { buffer = args.buf, silent = true })
             vim.keymap.set("n", "<Leader>q", ":helpclose<CR>", { buffer = args.buf, silent = true })
+            vim.keymap.set("n", "K", "K", { buffer = args.buf })
         end
     end,
 })
 
-local MyFiletype = vim.api.nvim_create_augroup("MyFiletype", { clear = true })
-
 vim.api.nvim_create_autocmd("FileType", {
-    group = MyFiletype,
+    group = vim.api.nvim_create_augroup("MyFiletype", { clear = true }),
     pattern = "*",
     callback = function()
         vim.opt_local.formatoptions:remove({ "c", "r", "o" })
-    end,
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-    group = MyFiletype,
-    pattern = "help",
-    callback = function()
-        vim.keymap.set("n", "K", "K", { buffer = true, remap = false })
     end,
 })
 
