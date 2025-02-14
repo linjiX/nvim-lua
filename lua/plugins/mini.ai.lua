@@ -28,6 +28,16 @@ return {
             },
 
             custom_textobjects = {
+                r = {
+                    {
+                        "%f[%w]%w-[-_#]",
+                        "[-_#]%w-%f[^%w]",
+                        "%f[-_#%w]%w-%f[^-_#%w]",
+                        "%f[-_#%w]%w-%f[^-_#%l%d]",
+                        "%f[-_#%u]%u%w-%f[^-_#%l%d]",
+                    },
+                    "^[-_#]?()%w*()[-_#]?$",
+                },
                 l = gen_ai_spec.line(),
                 d = gen_ai_spec.number(),
                 e = function()
