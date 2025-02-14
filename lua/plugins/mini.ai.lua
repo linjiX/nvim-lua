@@ -12,9 +12,12 @@ end
 
 return {
     "echasnovski/mini.ai",
+    dependencies = "echasnovski/mini.extra",
     event = "VeryLazy",
     opts = function()
         hijack_find_textobject()
+
+        local gen_ai_spec = require("mini.extra").gen_ai_spec
 
         return {
             mappings = {
@@ -25,21 +28,8 @@ return {
             },
 
             custom_textobjects = {
-                l = function()
-                    local line = vim.fn.line(".")
-                    local text = vim.fn.getline(".")
-
-                    return {
-                        from = {
-                            line = line,
-                            col = vim.fn.match(text, "\\S") + 1,
-                        },
-                        to = {
-                            line = line,
-                            col = vim.fn.match(text, "\\s*$"),
-                        },
-                    }
-                end,
+                l = gen_ai_spec.line(),
+                d = gen_ai_spec.number(),
                 e = function()
                     return {
                         from = { line = 1, col = 1 },
@@ -47,7 +37,6 @@ return {
                         vis_mode = "V",
                     }
                 end,
-                d = { "%f[%d]%d+" },
             },
             n_lines = 500,
         }
