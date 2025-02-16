@@ -22,6 +22,8 @@ return {
                         "snacks_dashboard",
                         "NvimTree",
                         "trouble",
+                        "Avante",
+                        "AvanteSelectedFiles",
                     },
                 },
             },
@@ -54,7 +56,18 @@ return {
                     "filetype",
                 },
             },
-            extensions = { "quickfix", "fugitive" },
+            extensions = {
+                "quickfix",
+                "fugitive",
+                {
+                    filetypes = { "AvanteInput" },
+                    sections = {
+                        lualine_a = { "mode" },
+                        lualine_y = { "progress" },
+                        lualine_z = { "location" },
+                    },
+                },
+            },
         }
     end,
 }
