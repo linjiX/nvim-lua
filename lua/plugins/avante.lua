@@ -38,6 +38,16 @@ return {
             ft = { "markdown", "Avante" },
         },
     },
+    keys = function()
+        local avante = require("avante")
+
+        return {
+            { "<Leader>aa", vim.cmd.AvanteAsk },
+            { "<Leader>ac", vim.cmd.AvanteChat },
+            { "<Leader>al", vim.cmd.AvanteClear },
+            { "<Leader>aq", avante.close_sidebar },
+        }
+    end,
     opts = {
         provider = "copilot",
         auto_suggestions_provider = "copilot",
@@ -55,7 +65,11 @@ return {
             },
             sidebar = {
                 add_file = "a",
+                remove_file = "dd",
                 close = "q",
+            },
+            files = {
+                add_current = "<Leader>A",
             },
         },
         windows = {
