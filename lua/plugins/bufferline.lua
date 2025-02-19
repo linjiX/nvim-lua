@@ -1,28 +1,28 @@
 local function get_keys()
     local keys = {
         {
-            "<M-[>",
+            "<M-h>",
             ":<C-u>BufferLineCyclePrev<CR>",
             mode = { "n", "x" },
             silent = true,
             desc = "Prev Buffer",
         },
         {
-            "<M-]>",
+            "<M-l>",
             ":<C-u>BufferLineCycleNext<CR>",
             mode = { "n", "x" },
             silent = true,
             desc = "Next Buffer",
         },
         {
-            "<M-{>",
+            "<M-H>",
             ":<C-u>BufferLineMovePrev<CR>",
             mode = { "n", "x" },
             silent = true,
             desc = "Move buffer prev",
         },
         {
-            "<M-}>",
+            "<M-L>",
             ":<C-u>BufferLineMoveNext<CR>",
             mode = { "n", "x" },
             silent = true,

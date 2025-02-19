@@ -30,8 +30,8 @@ vim.keymap.set("n", "<C-l>", "<C-w>l")
 
 vim.keymap.set({ "n", "x" }, "<C-p>", '"0p')
 
-vim.keymap.set("n", "<M-]>", ":bnext<CR>")
-vim.keymap.set("n", "<M-[>", ":bprevious<CR>")
+vim.keymap.set("n", "<M-l>", ":bnext<CR>")
+vim.keymap.set("n", "<M-h>", ":bprevious<CR>")
 vim.keymap.set("n", "<Leader>q", ":bwipeout<CR>")
 vim.keymap.set("n", "<Leader>`", "<C-^>")
 
