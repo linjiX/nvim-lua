@@ -58,10 +58,6 @@ vim.keymap.set("n", "<Leader>jk", vim.lsp.buf.signature_help)
 vim.keymap.set("n", "K", vim.lsp.buf.hover)
 vim.keymap.set("n", "<Leader>lr", vim.lsp.buf.rename)
 
-vim.keymap.set("n", "[oj", ":LspStart<CR>")
-vim.keymap.set("n", "]oj", ":LspStop<CR>")
-vim.keymap.set("n", "yoJ", ":LspRestart<CR>")
-
 local function get_buflisted_wins()
     local wins = {}
     local current_win = vim.api.nvim_get_current_win()

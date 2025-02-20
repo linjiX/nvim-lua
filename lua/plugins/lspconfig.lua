@@ -21,6 +21,12 @@ return {
             "williamboman/mason.nvim",
             "neovim/nvim-lspconfig",
         },
+        lazy = false,
+        keys = {
+            { "[oj", vim.cmd.LspStart },
+            { "]oj", vim.cmd.LspStop },
+            { "yoJ", vim.cmd.LspRestart },
+        },
         opts = {
             ensure_installed = { "lua_ls", "pyright" },
         },
