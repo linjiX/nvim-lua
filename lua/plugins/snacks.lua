@@ -2,14 +2,33 @@ return {
     "folke/snacks.nvim",
     priority = 1000,
     lazy = false,
-    keys = {
-        {
-            "<Leader>q",
-            function()
-                require("snacks").bufdelete.delete()
-            end,
-        },
-    },
+    keys = function()
+        local snacks = require("snacks")
+        return {
+            {
+                "<Leader>q",
+                snacks.bufdelete.delete,
+            },
+            {
+                "[rw",
+                snacks.words.enable,
+            },
+            {
+                "]rw",
+                snacks.words.disable,
+            },
+            {
+                "yrw",
+                function()
+                    if snacks.words.is_enabled() then
+                        snacks.words.disable()
+                    else
+                        snacks.words.enable()
+                    end
+                end,
+            },
+        }
+    end,
     opts = function()
         vim.opt.shortmess:append("I")
 
@@ -19,7 +38,7 @@ return {
             notifier = { enabled = true },
             quickfile = { enabled = true },
             statuscolumn = { enabled = true },
-            words = { enabled = false },
+            words = { enabled = true },
             indent = { enabled = true },
         }
     end,
