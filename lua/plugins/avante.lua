@@ -5,7 +5,6 @@ return {
     version = false,
     build = "make",
     dependencies = {
-        "stevearc/dressing.nvim",
         "nvim-lua/plenary.nvim",
         "MunifTanjim/nui.nvim",
         "nvim-telescope/telescope.nvim",
@@ -46,6 +45,8 @@ return {
             { "<Leader>ac", vim.cmd.AvanteChat },
             { "<Leader>al", vim.cmd.AvanteClear },
             { "<Leader>aq", avante.close_sidebar },
+            { "<C-a>", "<HOME>", mode = "i", ft = { "AvanteInput" } },
+            { "<C-e>", "<END>", mode = "i", ft = { "AvanteInput" } },
         }
     end,
     opts = {

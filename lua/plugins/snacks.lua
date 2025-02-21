@@ -40,6 +40,32 @@ return {
             statuscolumn = { enabled = true },
             words = { enabled = true },
             indent = { enabled = true },
+            input = { enabled = true },
+            picker = {
+                enabled = true,
+                win = {
+                    input = {
+                        keys = {
+                            ["<ESC>"] = { "close", mode = { "n", "i" } },
+                            ["<C-a>"] = { "<HOME>", mode = "i", expr = true },
+                            ["<C-e>"] = { "<END>", mode = "i", expr = true },
+                        },
+                    },
+                },
+            },
+
+            styles = {
+                input = {
+                    relative = "cursor",
+                    row = -3,
+                    col = -5,
+                    keys = {
+                        i_esc = { "<ESC>", { "cmp_close", "cancel" }, mode = "i", expr = true },
+                        i_ctrl_a = { "<C-a>", "<HOME>", mode = "i", expr = true },
+                        i_ctrl_e = { "<C-e>", "<END>", mode = "i", expr = true },
+                    },
+                },
+            },
         }
     end,
 }
