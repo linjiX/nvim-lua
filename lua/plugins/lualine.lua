@@ -67,6 +67,18 @@ return {
                         lualine_z = { "location" },
                     },
                 },
+                {
+                    filetypes = { "undotree" },
+                    sections = {
+                        lualine_a = {
+                            function()
+                                return "Undotree"
+                            end,
+                        },
+                        lualine_y = { "progress" },
+                        lualine_z = { "location" },
+                    },
+                },
             },
         }
     end,
