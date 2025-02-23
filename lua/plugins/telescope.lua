@@ -9,11 +9,23 @@ return {
     keys = {
         { "<Leader>ff", require("telescope.builtin").find_files },
         { "<Leader>fm", require("telescope.builtin").oldfiles },
-        { "<Leader>fr", require("telescope.builtin").live_grep },
+        { "<Leader>fg", require("telescope.builtin").live_grep },
         { "<Leader>fb", require("telescope.builtin").buffers },
         { "<Leader>fh", require("telescope.builtin").help_tags },
         { "<Leader>fe", require("telescope.builtin").filetypes },
         { "<Leader>fc", require("telescope.builtin").colorscheme },
+        { "<Leader>fw", require("telescope.builtin").grep_string },
+        { "<Leader>fs", require("telescope.builtin").builtin },
+        { "<Leader>fd", require("telescope.builtin").diagnostics },
+        { "<Leader>fl", require("telescope.builtin").current_buffer_fuzzy_find },
+        { "<Leader>fr", require("telescope.builtin").resume },
+
+        { "<Leader>gb", require("telescope.builtin").git_branches },
+        { "<Leader>gl", require("telescope.builtin").git_bcommits },
+        { "<Leader>gL", require("telescope.builtin").git_commits },
+        { "<Leader>gf", require("telescope.builtin").git_status },
+        { "<Leader>gF", require("telescope.builtin").git_files },
+        { "<Leader>gs", require("telescope.builtin").git_stash },
 
         { "gd", require("telescope.builtin").lsp_definitions },
         { "<Leader>jj", require("telescope.builtin").lsp_definitions },
@@ -25,8 +37,6 @@ return {
         },
         { "<Leader>ji", require("telescope.builtin").lsp_implementations },
         { "<Leader>jt", require("telescope.builtin").lsp_type_definitions },
-
-        { "<Leader>fo", require("telescope.builtin").resume },
     },
     opts = function()
         require("telescope").load_extension("fzf")

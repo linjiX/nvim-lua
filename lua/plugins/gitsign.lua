@@ -46,10 +46,10 @@ return {
             map("n", "<Leader>gp", gs.preview_hunk, "Preview Hunk")
             map("n", "<Leader>gP", gs.preview_hunk_inline, "Preview Hunk Inline")
 
-            map("n", "<Leader>gb", function()
+            map("n", "<Leader>gm", function()
                 gs.blame_line({ full = true })
             end, "Blame Line")
-            map("n", "<Leader>gB", function()
+            map("n", "<Leader>gM", function()
                 gs.blame()
             end, "Blame Buffer")
 
