@@ -5,12 +5,14 @@ vim.opt.number = true
 vim.opt.wrap = false
 vim.opt.confirm = true
 vim.opt.scrolloff = 1
+vim.opt.sidescrolloff = 8
 
 vim.opt.cursorline = true
 vim.opt.cursorcolumn = true
 vim.opt.colorcolumn = "100"
 
 vim.opt.splitright = true
+vim.opt.splitkeep = "screen"
 vim.opt.mouse = ""
 
 vim.opt.expandtab = true
