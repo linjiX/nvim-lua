@@ -10,6 +10,16 @@ return {
         { "<Leader>ff", require("telescope.builtin").find_files },
         { "<Leader>fm", require("telescope.builtin").oldfiles },
         { "<Leader>fg", require("telescope.builtin").live_grep },
+        {
+            "<Leader>fG",
+            function()
+                require("telescope.builtin").grep_string({
+                    search = "",
+                    word_match = "-w",
+                    only_sort_text = true,
+                })
+            end,
+        },
         { "<Leader>fb", require("telescope.builtin").buffers },
         { "<Leader>fh", require("telescope.builtin").help_tags },
         { "<Leader>fe", require("telescope.builtin").filetypes },
@@ -59,6 +69,13 @@ return {
                     n = {
                         ["<C-j>"] = "move_selection_next",
                         ["<C-k>"] = "move_selection_previous",
+                    },
+                },
+            },
+            pickers = {
+                live_grep = {
+                    mappings = {
+                        i = { ["<C-f>"] = require("telescope.actions").to_fuzzy_refine },
                     },
                 },
             },
