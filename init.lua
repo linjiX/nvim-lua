@@ -57,6 +57,8 @@ vim.keymap.set("n", "<Leader>ji", vim.lsp.buf.implementation)
 vim.keymap.set("n", "<Leader>jt", vim.lsp.buf.type_definition)
 vim.keymap.set("n", "<Leader>jh", vim.lsp.buf.typehierarchy)
 vim.keymap.set("n", "<Leader>jk", vim.lsp.buf.signature_help)
+vim.keymap.set("n", "<Leader>js", vim.lsp.buf.document_symbol)
+vim.keymap.set("n", "<Leader>jS", vim.lsp.buf.workspace_symbol)
 vim.keymap.set("n", "K", vim.lsp.buf.hover)
 vim.keymap.set("n", "<Leader>lr", vim.lsp.buf.rename)
 

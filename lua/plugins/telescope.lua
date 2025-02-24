@@ -45,6 +45,28 @@ return {
                 require("telescope.builtin").lsp_references({ include_declaration = false })
             end,
         },
+        {
+            "<Leader>js",
+            function()
+                require("telescope.builtin").lsp_document_symbols({
+                    symbols = {
+                        "function",
+                        "class",
+                    },
+                })
+            end,
+        },
+        {
+            "<Leader>jS",
+            function()
+                require("telescope.builtin").lsp_dynamic_workspace_symbols({
+                    symbols = {
+                        "function",
+                        "class",
+                    },
+                })
+            end,
+        },
         { "<Leader>ji", require("telescope.builtin").lsp_implementations },
         { "<Leader>jt", require("telescope.builtin").lsp_type_definitions },
     },
