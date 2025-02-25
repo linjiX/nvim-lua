@@ -7,7 +7,7 @@ return {
         lint.linters_by_ft = {
             lua = { "luacheck" },
             python = { "mypy" },
-            html = { "htmllint" },
+            html = { "htmlhint" },
             javascript = { "eslint_d" },
             typescript = { "eslint_d" },
             vue = { "eslint_d" },
