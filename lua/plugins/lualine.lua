@@ -79,6 +79,25 @@ return {
                         lualine_z = { "location" },
                     },
                 },
+                {
+                    filetypes = { "diff", "man" },
+                    sections = {
+                        lualine_a = { "mode" },
+                        lualine_x = { "filetype" },
+                        lualine_y = { "progress" },
+                        lualine_z = { "location" },
+                    },
+                },
+                {
+                    filetypes = { "help" },
+                    sections = {
+                        lualine_a = { "mode" },
+                        lualine_c = { "filename" },
+                        lualine_x = { "filetype" },
+                        lualine_y = { "progress" },
+                        lualine_z = { "location" },
+                    },
+                },
             },
         }
     end,
