@@ -4,6 +4,7 @@ return {
     dependencies = {
         "nvim-lua/plenary.nvim",
         { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+        { "nvim-telescope/telescope-smart-history.nvim", dependencies = "kkharji/sqlite.lua" },
     },
     cmd = "Telescope",
     keys = {
@@ -72,6 +73,7 @@ return {
     },
     opts = function()
         require("telescope").load_extension("fzf")
+        require("telescope").load_extension("smart_history")
         local open_with_trouble = require("trouble.sources.telescope").open
 
         return {
@@ -85,6 +87,9 @@ return {
 
                         ["<C-j>"] = "move_selection_next",
                         ["<C-k>"] = "move_selection_previous",
+
+                        ["<C-n>"] = "cycle_history_next",
+                        ["<C-p>"] = "cycle_history_prev",
 
                         ["<C-l>"] = open_with_trouble,
                     },
