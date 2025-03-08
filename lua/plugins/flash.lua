@@ -24,7 +24,7 @@ return {
             desc = "Toggle Flash",
         },
         {
-            "<C-s>",
+            "<C-x>",
             function()
                 require("flash").toggle()
             end,

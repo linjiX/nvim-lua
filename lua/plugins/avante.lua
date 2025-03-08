@@ -1,7 +1,7 @@
 return {
     "yetone/avante.nvim",
-    event = "VeryLazy",
-    lazy = false,
+    -- event = "VeryLazy",
+    -- lazy = false,
     version = false,
     build = "make",
     dependencies = {
@@ -37,23 +37,36 @@ return {
             ft = { "markdown", "Avante" },
         },
     },
-    keys = function()
-        local avante = require("avante")
-
-        return {
-            { "<Leader>aa", vim.cmd.AvanteAsk },
-            { "<Leader>ac", vim.cmd.AvanteChat },
-            { "<Leader>al", vim.cmd.AvanteClear },
-            { "<Leader>aq", avante.close_sidebar },
-            { "<C-a>", "<HOME>", mode = "i", ft = { "AvanteInput" } },
-            { "<C-e>", "<END>", mode = "i", ft = { "AvanteInput" } },
-        }
-    end,
+    keys = {
+        { "<Leader>aa", vim.cmd.AvanteAsk, mode = { "n", "x" } },
+        { "<Leader>ac", vim.cmd.AvanteChat },
+        { "<Leader>al", vim.cmd.AvanteClear },
+        {
+            "<Leader>aq",
+            function()
+                require("avante").close_sidebar()
+            end,
+        },
+        { "<C-a>", "<HOME>", mode = "i", ft = { "AvanteInput" } },
+        { "<C-e>", "<END>", mode = "i", ft = { "AvanteInput" } },
+    },
+    -- keys = function()
+    --     local avante = require("avante")
+    --
+    --     return {
+    --         { "<Leader>aa", vim.cmd.AvanteAsk },
+    --         { "<Leader>ac", vim.cmd.AvanteChat },
+    --         { "<Leader>al", vim.cmd.AvanteClear },
+    --         { "<Leader>aq", avante.close_sidebar },
+    --         { "<C-a>", "<HOME>", mode = "i", ft = { "AvanteInput" } },
+    --         { "<C-e>", "<END>", mode = "i", ft = { "AvanteInput" } },
+    --     }
+    -- end,
     opts = {
         provider = "copilot",
         auto_suggestions_provider = "copilot",
         copilot = {
-            model = "claude-3.5-sonnet",
+            model = "claude-3.7-sonnet",
         },
         hints = { enabled = false },
         mappings = {

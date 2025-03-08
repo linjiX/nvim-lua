@@ -100,6 +100,24 @@ end
 vim.keymap.set("ca", "q", smart_q, { silent = false, expr = true })
 vim.keymap.set("ca", "wq", smart_wq, { silent = false, expr = true })
 
+local function star(cmd)
+    return function()
+        local count = vim.v.count
+        if count ~= 0 then
+            vim.cmd(("normal! %d%s"):format(count, cmd))
+            return
+        end
+
+        local view = vim.fn.winsaveview()
+        vim.cmd(("normal! %s"):format(cmd))
+        vim.fn.winrestview(view)
+    end
+end
+
+for _, key in ipairs({ "*", "g*", "#", "g#" }) do
+    vim.keymap.set("n", key, star(key))
+end
+
 vim.api.nvim_create_autocmd("BufWinEnter", {
     group = vim.api.nvim_create_augroup("MyAutocmd", { clear = true }),
     pattern = "*",

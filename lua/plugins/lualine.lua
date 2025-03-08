@@ -4,6 +4,7 @@ return {
     event = "VeryLazy",
     opts = function()
         vim.opt.showmode = false
+        vim.opt.ruler = false
 
         local trouble = require("trouble")
         local symbols = trouble.statusline({
@@ -14,6 +15,11 @@ return {
             format = "{kind_icon}{symbol.name:Normal}",
             hl_group = "lualine_c_normal",
         })
+
+        local function get_title()
+            local filetype = vim.bo.filetype
+            return filetype:sub(1, 1):upper() .. filetype:sub(2):lower()
+        end
 
         return {
             options = {
@@ -46,7 +52,7 @@ return {
                     "diagnostics",
                 },
                 lualine_c = {
-                    "filename",
+                    -- "filename",
                     { symbols.get, cond = symbols.has },
                 },
                 lualine_x = {
@@ -58,7 +64,15 @@ return {
             },
             extensions = {
                 "quickfix",
-                "fugitive",
+                {
+                    filetypes = { "fugitive", "floggraph" },
+                    sections = {
+                        lualine_a = { get_title },
+                        lualine_b = require("lualine.extensions.fugitive").sections.lualine_a,
+                        lualine_y = { "progress" },
+                        lualine_z = { "location" },
+                    },
+                },
                 {
                     filetypes = { "AvanteInput" },
                     sections = {
@@ -70,11 +84,7 @@ return {
                 {
                     filetypes = { "undotree" },
                     sections = {
-                        lualine_a = {
-                            function()
-                                return "Undotree"
-                            end,
-                        },
+                        lualine_a = { get_title },
                         lualine_y = { "progress" },
                         lualine_z = { "location" },
                     },
