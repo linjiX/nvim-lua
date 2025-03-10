@@ -8,7 +8,12 @@ return {
     },
     cmd = "Telescope",
     keys = {
-        { "<Leader>ff", require("telescope.builtin").find_files },
+        {
+            "<Leader>ff",
+            function()
+                require("telescope.builtin").find_files({ hidden = true })
+            end,
+        },
         { "<Leader>fm", require("telescope.builtin").oldfiles },
         { "<Leader>fg", require("telescope.builtin").live_grep },
         {
@@ -97,6 +102,9 @@ return {
                         ["<C-j>"] = "move_selection_next",
                         ["<C-k>"] = "move_selection_previous",
                     },
+                },
+                file_ignore_patterns = {
+                    ".git/",
                 },
             },
             pickers = {
