@@ -1,6 +1,43 @@
 local function get_keys()
     local keys = {
         {
+            "<Leader>bp",
+            ":<C-u>BufferLineTogglePin<CR>",
+            mode = { "n", "x" },
+            silent = true,
+            desc = "Toggle Pin Buffer",
+        },
+        {
+            "<Leader>bP",
+            ":<C-u>BufferLineGroupClose ungrouped<CR>",
+            silent = true,
+            desc = "Close Upgrouped Buffers",
+        },
+        {
+            "<Leader>bl",
+            ":<C-u>BufferLineCloseRight<CR>",
+            silent = true,
+            desc = "Close Buffers to the Right",
+        },
+        {
+            "<Leader>bh",
+            ":<C-u>BufferLineCloseLeft<CR>",
+            silent = true,
+            desc = "Close Buffers to the Left",
+        },
+        {
+            "<Leader>bo",
+            ":<C-u>BufferLineCloseOthers<CR>",
+            silent = true,
+            desc = "Close Other Buffers",
+        },
+        {
+            "<Leader>bb",
+            ":<C-u>BufferLinePick<CR>",
+            silent = true,
+            desc = "Pick Buffers",
+        },
+        {
             "<M-h>",
             ":<C-u>BufferLineCyclePrev<CR>",
             mode = { "n", "x" },
@@ -59,6 +96,12 @@ return {
         return {
             options = {
                 numbers = function(opts)
+                    local state = require("bufferline.state")
+                    for i, buf in ipairs(state.components) do
+                        if buf.id == opts.id then
+                            return opts.raise(i)
+                        end
+                    end
                     return opts.raise(opts.ordinal)
                 end,
                 show_buffer_close_icons = false,
