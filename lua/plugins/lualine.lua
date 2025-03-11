@@ -15,6 +15,11 @@ return {
             hl_group = "lualine_c_normal",
         })
 
+        local function get_title()
+            local filetype = vim.bo.filetype
+            return filetype:sub(1, 1):upper() .. filetype:sub(2):lower()
+        end
+
         return {
             options = {
                 disabled_filetypes = {
@@ -58,7 +63,24 @@ return {
             },
             extensions = {
                 "quickfix",
-                "fugitive",
+                {
+                    filetypes = { "fugitive" },
+                    sections = {
+                        lualine_a = { get_title },
+                        lualine_b = require("lualine.extensions.fugitive").sections.lualine_a,
+                        lualine_y = { "progress" },
+                        lualine_z = { "location" },
+                    },
+                },
+                {
+                    filetypes = { "floggraph" },
+                    sections = {
+                        lualine_a = { get_title },
+                        lualine_b = { "branch" },
+                        lualine_y = { "progress" },
+                        lualine_z = { "location" },
+                    },
+                },
                 {
                     filetypes = { "AvanteInput" },
                     sections = {
@@ -70,11 +92,7 @@ return {
                 {
                     filetypes = { "undotree" },
                     sections = {
-                        lualine_a = {
-                            function()
-                                return "Undotree"
-                            end,
-                        },
+                        lualine_a = { get_title },
                         lualine_y = { "progress" },
                         lualine_z = { "location" },
                     },
