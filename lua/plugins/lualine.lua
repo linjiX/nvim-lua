@@ -55,9 +55,22 @@ return {
                     { symbols.get, cond = symbols.has },
                 },
                 lualine_x = {
-                    { "copilot", show_colors = true },
-                    "encoding",
-                    "fileformat",
+                    {
+                        "copilot",
+                        show_colors = true,
+                    },
+                    {
+                        "encoding",
+                        fmt = function(encoding)
+                            return encoding ~= "utf-8" and encoding or ""
+                        end,
+                    },
+                    {
+                        "fileformat",
+                        symbols = {
+                            unix = "",
+                        },
+                    },
                     "filetype",
                 },
             },
