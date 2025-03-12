@@ -4,6 +4,7 @@ return {
     event = "VeryLazy",
     opts = function()
         vim.opt.showmode = false
+        vim.opt.ruler = false
 
         local trouble = require("trouble")
         local symbols = trouble.statusline({
@@ -51,7 +52,7 @@ return {
                     "diagnostics",
                 },
                 lualine_c = {
-                    "filename",
+                    -- "filename",
                     { symbols.get, cond = symbols.has },
                 },
                 lualine_x = {
