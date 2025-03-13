@@ -48,6 +48,9 @@ return {
                     require("lspconfig").lua_ls.setup({
                         settings = {
                             Lua = {
+                                runtime = {
+                                    version = "LuaJIT",
+                                },
                                 workspace = {
                                     checkThirdParty = true,
                                     library = { vim.env.VIMRUNTIME },
