@@ -24,9 +24,16 @@ return {
             desc = "Toggle Flash",
         },
         {
-            "<C-s>",
+            "<C-x>",
             function()
                 require("flash").toggle()
+
+                vim.api.nvim_create_autocmd("CmdlineLeave", {
+                    once = true,
+                    callback = function()
+                        require("flash").toggle(false)
+                    end,
+                })
             end,
             mode = { "c" },
             desc = "Toggle Flash",
