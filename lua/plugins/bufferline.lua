@@ -1,85 +1,75 @@
+local R = require("config.utility").lazy_require
+
 local function get_keys()
     local keys = {
         {
             "<Leader>bp",
-            ":<C-u>BufferLineTogglePin<CR>",
-            mode = { "n", "x" },
-            silent = true,
+            R("bufferline.groups").toggle_pin(),
             desc = "Toggle Pin Buffer",
         },
         {
             "<Leader>bP",
-            ":<C-u>BufferLineGroupClose ungrouped<CR>",
-            silent = true,
+            R("bufferline.groups").action("ungrouped", "close"),
             desc = "Close Upgrouped Buffers",
         },
         {
             "<Leader>bl",
-            ":<C-u>BufferLineCloseRight<CR>",
-            silent = true,
+            R("bufferline").close_in_direction("right"),
             desc = "Close Buffers to the Right",
         },
         {
             "<Leader>bh",
-            ":<C-u>BufferLineCloseLeft<CR>",
-            silent = true,
+            R("bufferline").close_in_direction("left"),
             desc = "Close Buffers to the Left",
         },
         {
             "<Leader>bo",
-            ":<C-u>BufferLineCloseOthers<CR>",
-            silent = true,
+            R("bufferline").close_others(),
             desc = "Close Other Buffers",
         },
         {
             "<Leader>bb",
-            ":<C-u>BufferLinePick<CR>",
-            silent = true,
+            R("bufferline").pick(),
             desc = "Pick Buffers",
         },
         {
+            "<Leader>bB",
+            R("bufferline").close_with_pick(),
+            desc = "Close Buffers with Pick",
+        },
+        {
             "<M-h>",
-            ":<C-u>BufferLineCyclePrev<CR>",
+            R("bufferline").cycle(-1),
             mode = { "n", "x" },
-            silent = true,
             desc = "Prev Buffer",
         },
         {
             "<M-l>",
-            ":<C-u>BufferLineCycleNext<CR>",
+            R("bufferline").cycle(1),
             mode = { "n", "x" },
-            silent = true,
             desc = "Next Buffer",
         },
         {
             "<M-H>",
-            ":<C-u>BufferLineMovePrev<CR>",
+            R("bufferline").move(-1),
             mode = { "n", "x" },
-            silent = true,
             desc = "Move buffer prev",
         },
         {
             "<M-L>",
-            ":<C-u>BufferLineMoveNext<CR>",
+            R("bufferline").move(1),
             mode = { "n", "x" },
-            silent = true,
             desc = "Move buffer next",
         },
     }
 
-    for i = 1, 9 do
+    for i = 1, 10 do
         table.insert(keys, {
-            ("<Leader>%d"):format(i),
-            (":BufferLineGoToBuffer %d<CR>"):format(i),
-            silent = true,
+            ("<Leader>%d"):format(i == 10 and 0 or i),
+            R("bufferline").go_to(i, true),
             desc = ("Go To Buffer %d"):format(i),
         })
     end
-
-    table.insert(
-        keys,
-        { "<Leader>0", ":BufferLineGoToBuffer 10<CR>", silent = true, desc = "Go To Buffer 10" }
-    )
 
     return keys
 end
