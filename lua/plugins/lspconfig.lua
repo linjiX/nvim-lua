@@ -15,67 +15,59 @@ local function get_vue_plugin_path()
 end
 
 return {
-    {
-        "williamboman/mason-lspconfig.nvim",
-        dependencies = {
-            "williamboman/mason.nvim",
-            "neovim/nvim-lspconfig",
-        },
-        lazy = false,
-        keys = {
-            { "[oj", vim.cmd.LspStart },
-            { "]oj", vim.cmd.LspStop },
-            { "yoJ", vim.cmd.LspRestart },
-        },
-        opts = {
-            ensure_installed = { "lua_ls", "pyright" },
-        },
-        config = function()
-            require("mason-lspconfig").setup_handlers({
-                function(name)
-                    require("lspconfig")[name].setup({})
-                end,
-
-                ["pyright"] = function()
-                    require("lspconfig").pyright.setup({
-                        before_init = function(_, config)
-                            config.settings.python.pythonPath = get_python_path()
-                        end,
-                    })
-                end,
-
-                ["lua_ls"] = function()
-                    require("lspconfig").lua_ls.setup({
-                        settings = {
-                            Lua = {
-                                runtime = {
-                                    version = "LuaJIT",
-                                },
-                                workspace = {
-                                    checkThirdParty = true,
-                                    library = { vim.env.VIMRUNTIME },
-                                    -- library = vim.api.nvim_get_runtime_file("", true),
-                                },
-                            },
-                        },
-                    })
-                end,
-
-                ["ts_ls"] = function()
-                    require("lspconfig").ts_ls.setup({
-                        init_options = {
-                            plugins = {
-                                {
-                                    name = "@vue/typescript-plugin",
-                                    location = get_vue_plugin_path(),
-                                    languages = { "vue" },
-                                },
-                            },
-                        },
-                        filetypes = { "typescript", "javascript", "vue" },
-                    })
-                end,
-            })
-        end,
+    "neovim/nvim-lspconfig",
+    lazy = false,
+    keys = {
+        { "[oj", vim.cmd.LspStart },
+        { "]oj", vim.cmd.LspStop },
+        { "yoJ", vim.cmd.LspRestart },
     },
+    config = function()
+        local opts = {
+            lua_ls = {
+                settings = {
+                    Lua = {
+                        runtime = {
+                            version = "LuaJIT",
+                        },
+                        workspace = {
+                            checkThirdParty = true,
+                            library = { vim.env.VIMRUNTIME },
+                            -- library = vim.api.nvim_get_runtime_file("", true),
+                        },
+                    },
+                },
+            },
+            vimls = {},
+            jsonls = {},
+            taplo = {},
+
+            pyright = {
+                before_init = function(_, config)
+                    config.settings.python.pythonPath = get_python_path()
+                end,
+            },
+            ruff = {},
+
+            ts_ls = {
+                init_options = {
+                    plugins = {
+                        {
+                            name = "@vue/typescript-plugin",
+                            location = get_vue_plugin_path(),
+                            languages = { "vue" },
+                        },
+                    },
+                },
+                filetypes = { "typescript", "javascript", "vue" },
+            },
+            volar = {},
+            html = {},
+        }
+
+        local lspconfig = require("lspconfig")
+        for name, opt in pairs(opts) do
+            lspconfig[name].setup(opt)
+        end
+    end,
 }
