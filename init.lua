@@ -30,6 +30,11 @@ vim.keymap.set("n", "<C-j>", "<C-w>j")
 vim.keymap.set("n", "<C-k>", "<C-w>k")
 vim.keymap.set("n", "<C-l>", "<C-w>l")
 
+local utility = require("config.utility")
+
+vim.keymap.set("n", "<C-w>m", utility.tabopen)
+vim.keymap.set("n", "<C-w><C-m>", utility.tabopen)
+
 vim.keymap.set({ "n", "x" }, "<C-p>", '"0p')
 
 vim.keymap.set("n", "<M-l>", ":bnext<CR>")
