@@ -1,6 +1,6 @@
 local function tabopen()
     local view = vim.fn.winsaveview()
-    vim.cmd("tabedit %")
+    vim.cmd.tabedit("%")
     vim.fn.winrestview(view)
 end
 
@@ -66,36 +66,51 @@ return {
             -- },
         },
         config = function()
-            vim.api.nvim_create_user_command("Gst", ":vertical botright Git", {})
+            vim.api.nvim_create_user_command("Git", function(opts)
+                local mods = (opts.mods ~= "" or vim.startswith(opts.args, "blame")) and opts.mods
+                    or "botright vertical"
+
+                local command = vim.fn["fugitive#Command"](
+                    opts.line1,
+                    opts.count,
+                    opts.range,
+                    opts.bang,
+                    mods,
+                    opts.args
+                )
+                vim.cmd(command)
+            end, {
+                nargs = "?",
+                range = true,
+                bang = true,
+                complete = vim.fn["fugitive#Complete"],
+            })
+
+            vim.api.nvim_create_user_command("Gst", "Git", {})
+
             vim.api.nvim_create_user_command("Gc", function(opts)
-                local args = opts.args or ""
-                vim.cmd("vertical botright Git commit -v " .. args)
+                vim.cmd("Git commit -v " .. opts.args)
             end, {
                 nargs = "?",
-                complete = function(ArgLead, CmdLine, CursorPos)
-                    return vim.fn["fugitive#CommitComplete"](ArgLead, CmdLine, CursorPos)
-                end,
+                complete = vim.fn["fugitive#CommitComplete"],
             })
+
             vim.api.nvim_create_user_command("Gca", function(opts)
-                local args = opts.args or ""
-                vim.cmd("vertical botright Git commit -av " .. args)
+                vim.cmd("Git commit -av " .. opts.args)
             end, {
                 nargs = "?",
-                complete = function(ArgLead, CmdLine, CursorPos)
-                    return vim.fn["fugitive#CommitComplete"](ArgLead, CmdLine, CursorPos)
-                end,
+                complete = vim.fn["fugitive#CommitComplete"],
             })
+
             vim.api.nvim_create_user_command("Gblame", function(opts)
                 tabopen()
                 vim.cmd("Git blame --date=short" .. opts.args)
 
-                vim.keymap.set("n", "<leader>q", ":tabclose<CR>", { buffer = true, silent = true })
-                vim.keymap.set("n", "q", ":tabclose<CR>", { buffer = true, silent = true })
+                vim.keymap.set("n", "<Leader>q", vim.cmd.tabclose, { buffer = true })
+                vim.keymap.set("n", "q", vim.cmd.tabclose, { buffer = true })
             end, {
                 nargs = "?",
-                complete = function(ArgLead, CmdLine, CursorPos)
-                    return vim.fn["fugitive#BlameComplete"](ArgLead, CmdLine, CursorPos)
-                end,
+                complete = vim.fn["fugitive#BlameComplete"],
             })
 
             local augroup = vim.api.nvim_create_augroup("FugitiveAutocmd", { clear = true })
