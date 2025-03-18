@@ -1,9 +1,3 @@
-local function tabopen()
-    local view = vim.fn.winsaveview()
-    vim.cmd.tabedit("%")
-    vim.fn.winrestview(view)
-end
-
 -- local script_functions = {}
 
 -- local function get_script_snr(bufname)
@@ -102,8 +96,9 @@ return {
                 complete = vim.fn["fugitive#CommitComplete"],
             })
 
+            local utility = require("config.utility")
             vim.api.nvim_create_user_command("Gblame", function(opts)
-                tabopen()
+                utility.tabopen()
                 vim.cmd("Git blame --date=short" .. opts.args)
 
                 vim.keymap.set("n", "<Leader>q", vim.cmd.tabclose, { buffer = true })

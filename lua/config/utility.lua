@@ -27,4 +27,10 @@ return {
         setmetatable(result, METATABLE)
         return result
     end,
+
+    tabopen = function()
+        local view = vim.fn.winsaveview()
+        vim.cmd.tabedit("%")
+        vim.fn.winrestview(view)
+    end,
 }
