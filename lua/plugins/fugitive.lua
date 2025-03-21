@@ -57,6 +57,23 @@ return {
         --     ft = "fugitiveblame",
         -- },
     },
+    init = function()
+        local abbreviations = {
+            git = "Git",
+            gst = "Gst",
+            gc = "Gc",
+            gca = "Gca",
+        }
+
+        for lhs, rhs in pairs(abbreviations) do
+            vim.keymap.set("ca", lhs, function()
+                if vim.fn.getcmdtype() == ":" then
+                    return rhs
+                end
+                return lhs
+            end, { expr = true })
+        end
+    end,
     config = function()
         local window = require("config.window")
         local function redirect_to_floatwin()
@@ -166,21 +183,5 @@ return {
                 vim.keymap.set("n", "q", ":q<CR>", { buffer = true, silent = true })
             end,
         })
-
-        local abbreviations = {
-            git = "Git",
-            gst = "Gst",
-            gc = "Gc",
-            gca = "Gca",
-        }
-
-        for lhs, rhs in pairs(abbreviations) do
-            vim.keymap.set("ca", lhs, function()
-                if vim.fn.getcmdtype() == ":" then
-                    return rhs
-                end
-                return lhs
-            end, { expr = true })
-        end
     end,
 }
