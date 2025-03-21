@@ -123,5 +123,21 @@ return {
                 vim.opt_local.listchars:remove({ "precedes", "extends" })
             end,
         })
+
+        local abbreviations = {
+            git = "Git",
+            gst = "Gst",
+            gc = "Gc",
+            gca = "Gca",
+        }
+
+        for lhs, rhs in pairs(abbreviations) do
+            vim.keymap.set("ca", lhs, function()
+                if vim.fn.getcmdtype() == ":" then
+                    return rhs
+                end
+                return lhs
+            end, { expr = true })
+        end
     end,
 }
