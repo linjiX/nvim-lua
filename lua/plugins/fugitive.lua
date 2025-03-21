@@ -32,103 +32,96 @@
 -- end
 
 return {
-    {
-        "tpope/vim-fugitive",
-        event = "VeryLazy",
-        cmd = { "Gst", "Git" },
-        keys = {
-            { "gb", ":GBrowse<CR>" },
-            { "gb", ":GBrowse<CR>", mode = "x" },
-            {
-                "q",
-                "gq",
-                ft = { "fugitive", "fugitiveblame" },
-                remap = true,
-                desc = "Quit Fugitive",
-            },
-            {
-                "<Leader>q",
-                "gq",
-                ft = { "fugitive", "fugitiveblame" },
-                remap = true,
-                desc = "Quit Fugitive",
-            },
-            -- {
-            --     "<CR>",
-            --     function() end,
-            --     ft = "fugitiveblame",
-            -- },
+    "tpope/vim-fugitive",
+    dependencies = { "tpope/vim-rhubarb" },
+    cmd = { "Git", "Gst", "Gc", "Gca", "Gblame" },
+    keys = {
+        { "gb", vim.cmd.GBrowse, mode = { "n", "x" } },
+        {
+            "q",
+            "gq",
+            ft = { "fugitive", "fugitiveblame" },
+            remap = true,
+            desc = "Quit Fugitive",
         },
-        config = function()
-            vim.api.nvim_create_user_command("Git", function(opts)
-                local mods = (opts.mods ~= "" or vim.startswith(opts.args, "blame")) and opts.mods
-                    or "botright vertical"
-
-                local command = vim.fn["fugitive#Command"](
-                    opts.line1,
-                    opts.count,
-                    opts.range,
-                    opts.bang,
-                    mods,
-                    opts.args
-                )
-                vim.cmd(command)
-            end, {
-                nargs = "?",
-                range = true,
-                bang = true,
-                complete = vim.fn["fugitive#Complete"],
-            })
-
-            vim.api.nvim_create_user_command("Gst", "Git", {})
-
-            vim.api.nvim_create_user_command("Gc", function(opts)
-                vim.cmd("Git commit -v " .. opts.args)
-            end, {
-                nargs = "?",
-                complete = vim.fn["fugitive#CommitComplete"],
-            })
-
-            vim.api.nvim_create_user_command("Gca", function(opts)
-                vim.cmd("Git commit -av " .. opts.args)
-            end, {
-                nargs = "?",
-                complete = vim.fn["fugitive#CommitComplete"],
-            })
-
-            local utility = require("config.utility")
-            vim.api.nvim_create_user_command("Gblame", function(opts)
-                utility.tabopen()
-                vim.cmd("Git blame --date=short" .. opts.args)
-
-                vim.keymap.set("n", "<Leader>q", vim.cmd.tabclose, { buffer = true })
-                vim.keymap.set("n", "q", vim.cmd.tabclose, { buffer = true })
-            end, {
-                nargs = "?",
-                complete = vim.fn["fugitive#BlameComplete"],
-            })
-
-            local augroup = vim.api.nvim_create_augroup("FugitiveAutocmd", { clear = true })
-
-            vim.api.nvim_create_autocmd("FileType", {
-                group = augroup,
-                pattern = "fugitive",
-                callback = function()
-                    vim.opt_local.buflisted = false
-                end,
-            })
-
-            vim.api.nvim_create_autocmd("FileType", {
-                group = augroup,
-                pattern = "fugitiveblame",
-                callback = function()
-                    vim.opt_local.listchars:remove({ "precedes", "extends" })
-                end,
-            })
-        end,
+        {
+            "<Leader>q",
+            "gq",
+            ft = { "fugitive", "fugitiveblame" },
+            remap = true,
+            desc = "Quit Fugitive",
+        },
+        -- {
+        --     "<CR>",
+        --     function() end,
+        --     ft = "fugitiveblame",
+        -- },
     },
-    {
-        "tpope/vim-rhubarb",
-        dependencies = { "tpope/vim-fugitive" },
-    },
+    config = function()
+        vim.api.nvim_create_user_command("Git", function(opts)
+            local mods = (opts.mods ~= "" or vim.startswith(opts.args, "blame")) and opts.mods
+                or "botright vertical"
+
+            local command = vim.fn["fugitive#Command"](
+                opts.line1,
+                opts.count,
+                opts.range,
+                opts.bang,
+                mods,
+                opts.args
+            )
+            vim.cmd(command)
+        end, {
+            nargs = "?",
+            range = true,
+            bang = true,
+            complete = vim.fn["fugitive#Complete"],
+        })
+
+        vim.api.nvim_create_user_command("Gst", "Git", {})
+
+        vim.api.nvim_create_user_command("Gc", function(opts)
+            vim.cmd("Git commit -v " .. opts.args)
+        end, {
+            nargs = "?",
+            complete = vim.fn["fugitive#CommitComplete"],
+        })
+
+        vim.api.nvim_create_user_command("Gca", function(opts)
+            vim.cmd("Git commit -av " .. opts.args)
+        end, {
+            nargs = "?",
+            complete = vim.fn["fugitive#CommitComplete"],
+        })
+
+        local utility = require("config.utility")
+        vim.api.nvim_create_user_command("Gblame", function(opts)
+            utility.tabopen()
+            vim.cmd("Git blame --date=short" .. opts.args)
+
+            vim.keymap.set("n", "<Leader>q", vim.cmd.tabclose, { buffer = true })
+            vim.keymap.set("n", "q", vim.cmd.tabclose, { buffer = true })
+        end, {
+            nargs = "?",
+            complete = vim.fn["fugitive#BlameComplete"],
+        })
+
+        local augroup = vim.api.nvim_create_augroup("FugitiveAutocmd", { clear = true })
+
+        vim.api.nvim_create_autocmd("FileType", {
+            group = augroup,
+            pattern = "fugitive",
+            callback = function()
+                vim.opt_local.buflisted = false
+            end,
+        })
+
+        vim.api.nvim_create_autocmd("FileType", {
+            group = augroup,
+            pattern = "fugitiveblame",
+            callback = function()
+                vim.opt_local.listchars:remove({ "precedes", "extends" })
+            end,
+        })
+    end,
 }
