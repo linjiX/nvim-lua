@@ -1,36 +1,3 @@
--- local script_functions = {}
-
--- local function get_script_snr(bufname)
---     local scriptnames = vim.api.nvim_exec2("scriptnames", { output = true })
---
---     for line in scriptnames:gmatch("[^\n]+") do
---         local snr, name = line:match("(%d+):%s*(.*)")
---         if name and name:match(bufname) then
---             return tonumber(snr)
---         end
---     end
---     return -1
--- end
---
--- local function get_script_function(name, filename)
---     if script_functions[name] then
---         return script_functions[name]
---     end
---
---     local snr = get_script_snr(filename)
---     if snr == -1 then
---         return nil
---     end
---
---     local function_name = ("<SNR>%d_%s"):format(snr, name)
---     if vim.fn.exists("*" .. function_name) == 1 then
---         script_functions[name] = vim.fn[function_name]
---         return script_functions[name]
---     end
---
---     return nil
--- end
-
 return {
     "tpope/vim-fugitive",
     dependencies = { "tpope/vim-rhubarb" },
@@ -75,7 +42,11 @@ return {
         end
     end,
     config = function()
+        local utility = require("config.utility")
         local window = require("config.window")
+
+        local scriptname = "vim-fugitive/autoload/fugitive.vim"
+
         local function redirect_to_floatwin()
             local width = 120
             local height = math.floor(vim.go.lines * 0.9)
@@ -96,6 +67,14 @@ return {
             local win = window.redirect_win(opts)
             vim.wo[win].winfixbuf = true
             return win
+        end
+
+        local function is_commit_id(target)
+            if not target then
+                return false
+            end
+
+            return target:match("^[0-9a-f]+$") and #target >= 7 and #target <= 40
         end
 
         vim.api.nvim_create_user_command("Git", function(opts)
@@ -143,7 +122,6 @@ return {
             complete = vim.fn["fugitive#CommitComplete"],
         })
 
-        local utility = require("config.utility")
         vim.api.nvim_create_user_command("Gblame", function(opts)
             utility.tabopen()
             vim.cmd("Git blame --date=short" .. opts.args)
@@ -162,6 +140,21 @@ return {
             pattern = "fugitive",
             callback = function()
                 vim.opt_local.buflisted = false
+
+                local GF = utility.get_script_function("GF", scriptname)
+                local CfilePorcelain = utility.get_script_function("CfilePorcelain", scriptname)
+
+                if GF and CfilePorcelain then
+                    vim.keymap.set("n", "<CR>", function()
+                        local target = CfilePorcelain()[1]
+                        if is_commit_id(target) then
+                            vim.cmd(GF("split"))
+                            redirect_to_floatwin()
+                        else
+                            vim.cmd(GF("edit"))
+                        end
+                    end, { buffer = true })
+                end
             end,
         })
 
