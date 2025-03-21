@@ -124,10 +124,28 @@ return {
 
         vim.api.nvim_create_user_command("Gblame", function(opts)
             utility.tabopen()
+            vim.wo.winfixbuf = true
             vim.cmd("Git blame --date=short" .. opts.args)
 
             vim.keymap.set("n", "<Leader>q", vim.cmd.tabclose, { buffer = true })
             vim.keymap.set("n", "q", vim.cmd.tabclose, { buffer = true })
+
+            local BlameCommit = utility.get_script_function("BlameCommit", scriptname)
+            assert(BlameCommit)
+
+            vim.keymap.set("n", "<CR>", function()
+                local splitbelow = vim.o.splitbelow
+                vim.opt.splitbelow = true
+
+                local ok, result = pcall(function()
+                    vim.cmd(BlameCommit("vsplit"))
+                end)
+                vim.opt.splitbelow = splitbelow
+
+                if not ok then
+                    error(result)
+                end
+            end, { buffer = true })
         end, {
             nargs = "?",
             complete = vim.fn["fugitive#BlameComplete"],
@@ -143,18 +161,17 @@ return {
 
                 local GF = utility.get_script_function("GF", scriptname)
                 local CfilePorcelain = utility.get_script_function("CfilePorcelain", scriptname)
+                assert(GF and CfilePorcelain)
 
-                if GF and CfilePorcelain then
-                    vim.keymap.set("n", "<CR>", function()
-                        local target = CfilePorcelain()[1]
-                        if is_commit_id(target) then
-                            vim.cmd(GF("split"))
-                            redirect_to_floatwin()
-                        else
-                            vim.cmd(GF("edit"))
-                        end
-                    end, { buffer = true })
-                end
+                vim.keymap.set("n", "<CR>", function()
+                    local target = CfilePorcelain()[1]
+                    if is_commit_id(target) then
+                        vim.cmd(GF("split"))
+                        redirect_to_floatwin()
+                    else
+                        vim.cmd(GF("edit"))
+                    end
+                end, { buffer = true })
             end,
         })
 
