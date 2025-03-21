@@ -81,14 +81,14 @@ return {
         vim.api.nvim_create_user_command("Gst", "Git", {})
 
         vim.api.nvim_create_user_command("Gc", function(opts)
-            vim.cmd("Git commit -v " .. opts.args)
+            vim.cmd("Git commit --verbose " .. opts.args)
         end, {
             nargs = "?",
             complete = vim.fn["fugitive#CommitComplete"],
         })
 
         vim.api.nvim_create_user_command("Gca", function(opts)
-            vim.cmd("Git commit -av " .. opts.args)
+            vim.cmd("Git commit --verbose --all " .. opts.args)
         end, {
             nargs = "?",
             complete = vim.fn["fugitive#CommitComplete"],
