@@ -58,8 +58,32 @@ return {
         -- },
     },
     config = function()
+        local window = require("config.window")
+        local function redirect_to_floatwin()
+            local width = 120
+            local height = math.floor(vim.go.lines * 0.9)
+            local row = math.floor((vim.go.lines - height) / 2)
+            local col = math.floor((vim.go.columns - width) / 2)
+
+            local opts = {
+                enter = true,
+                win_config = {
+                    relative = "editor",
+                    width = width,
+                    height = height,
+                    row = row,
+                    col = col,
+                    border = "rounded",
+                },
+            }
+            local win = window.redirect_win(opts)
+            vim.wo[win].winfixbuf = true
+            return win
+        end
+
         vim.api.nvim_create_user_command("Git", function(opts)
-            local mods = (opts.mods ~= "" or vim.startswith(opts.args, "blame")) and opts.mods
+            local subcommand = opts.args:match("%w+")
+            local mods = (opts.mods ~= "" or subcommand == "blame") and opts.mods
                 or "botright vertical"
 
             local command = vim.fn["fugitive#Command"](
@@ -70,7 +94,15 @@ return {
                 mods,
                 opts.args
             )
+
+            local source_buf = vim.api.nvim_get_current_buf()
             vim.cmd(command)
+            if
+                source_buf ~= vim.api.nvim_get_current_buf()
+                and vim.list_contains({ "commit", "rebase" }, subcommand)
+            then
+                redirect_to_floatwin()
+            end
         end, {
             nargs = "?",
             range = true,
