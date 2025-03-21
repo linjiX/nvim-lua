@@ -27,6 +27,7 @@ return {
                     statusline = {
                         "snacks_dashboard",
                         "NvimTree",
+                        "fugitiveblame",
                         "trouble",
                         "Avante",
                         "AvanteSelectedFiles",

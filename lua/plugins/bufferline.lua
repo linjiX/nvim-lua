@@ -103,6 +103,11 @@ return {
                         text = "File Explorer",
                         highlight = "Title",
                     },
+                    {
+                        filetype = "fugitiveblame",
+                        text = "Git Blame",
+                        highlight = "Title",
+                    },
                 },
             },
         }
