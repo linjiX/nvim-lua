@@ -67,25 +67,16 @@ vim.keymap.set("n", "<Leader>jS", vim.lsp.buf.workspace_symbol)
 vim.keymap.set("n", "K", vim.lsp.buf.hover)
 vim.keymap.set("n", "<Leader>lr", vim.lsp.buf.rename)
 
-local function get_buflisted_wins()
-    local wins = {}
-    local current_win = vim.api.nvim_get_current_win()
-
-    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-        if win ~= current_win then
-            local buf = vim.api.nvim_win_get_buf(win)
-            if vim.bo[buf].buflisted then
-                table.insert(wins, win)
-            end
-        end
-    end
-    return wins
-end
+local window = require("config.window")
 
 local function smart_quit(write)
     local cmd = write and "wq" or "q"
 
-    if vim.fn.getcmdtype() ~= ":" or vim.fn.getcmdline() ~= cmd or #get_buflisted_wins() ~= 0 then
+    if
+        vim.fn.getcmdtype() ~= ":"
+        or vim.fn.getcmdline() ~= cmd
+        or #window.tabpage_list_buflisted_wins() ~= 0
+    then
         return cmd
     end
 
