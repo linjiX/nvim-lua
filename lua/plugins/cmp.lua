@@ -14,6 +14,8 @@ return {
         vim.opt.shortmess:append("c")
 
         local cmp = require("cmp")
+        local copilot = require("copilot.suggestion")
+
         cmp.setup({
             -- window = {
             --     completion = cmp.config.window.bordered(),
@@ -23,9 +25,23 @@ return {
                 ["<C-b>"] = cmp.mapping.scroll_docs(-4),
                 ["<C-f>"] = cmp.mapping.scroll_docs(4),
                 ["<C-e>"] = cmp.mapping.abort(),
-                ["<Tab>"] = cmp.mapping.confirm({ select = true }),
                 ["<C-j>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
                 ["<C-k>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+
+                ["<Tab>"] = function(fallback)
+                    local selection = cmp.get_selected_entry()
+                    if copilot.is_visible() and not selection then
+                        copilot.accept()
+                        return
+                    end
+
+                    if cmp.visible() then
+                        cmp.confirm({ select = true })
+                        return
+                    end
+
+                    fallback()
+                end,
             }),
             sources = cmp.config.sources({
                 { name = "nvim_lsp" },
