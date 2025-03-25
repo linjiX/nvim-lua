@@ -11,8 +11,26 @@ return {
         vim.opt.termguicolors = true
 
         return {
+            renderer = {
+                indent_markers = {
+                    enable = true,
+                },
+            },
             diagnostics = {
                 enable = true,
+            },
+            system_open = {
+                cmd = "open",
+            },
+            filters = {
+                custom = { "^\\.git" },
+            },
+            actions = {
+                file_popup = {
+                    open_win_config = {
+                        border = "rounded",
+                    },
+                },
             },
         }
     end,
