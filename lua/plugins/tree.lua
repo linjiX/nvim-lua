@@ -1,3 +1,4 @@
+local R = require("config.utility").lazy_require
 
 return {
     "nvim-tree/nvim-tree.lua",
@@ -6,8 +7,16 @@ return {
         vim.g.loaded_netrwPlugin = 1
     end,
     keys = {
-        { "<Leader>w", ":NvimTreeToggle<CR>", desc = "Toggle Nvim Tree" },
-        { "<Leader>W", ":NvimTreeFindFile<CR>", desc = "Nvim Tree Find File" },
+        {
+            "<Leader>w",
+            R("nvim-tree.api").tree.toggle({ focus = false }),
+            desc = "Toggle Nvim Tree",
+        },
+        {
+            "<Leader>W",
+            R("nvim-tree.api").tree.open({ find_file = true }),
+            desc = "Nvim Tree Find File",
+        },
     },
     opts = function()
         vim.opt.termguicolors = true
