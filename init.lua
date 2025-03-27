@@ -96,6 +96,20 @@ end
 vim.keymap.set("ca", "q", smart_q, { silent = false, expr = true })
 vim.keymap.set("ca", "wq", smart_wq, { silent = false, expr = true })
 
+local star = require("config.star")
+
+for _, key in ipairs({ "*", "g*", "#", "g#" }) do
+    vim.keymap.set("n", key, function()
+        star.star(key)
+    end)
+end
+
+for _, key in ipairs({ "*", "#" }) do
+    vim.keymap.set("x", key, function()
+        star.visual_star(key)
+    end)
+end
+
 vim.api.nvim_create_autocmd("BufWinEnter", {
     group = vim.api.nvim_create_augroup("MyAutocmd", { clear = true }),
     pattern = "*",
