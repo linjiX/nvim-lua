@@ -8,13 +8,18 @@ local opts = {
 }
 
 local ESC = vim.api.nvim_replace_termcodes("<ESC>", true, false, true)
-local CR = vim.api.nvim_replace_termcodes("<CR>", true, false, true)
 
-local function set_search(pattern, searchforward)
+local function do_search(pattern, searchforward)
     vim.fn.setreg("/", pattern)
     vim.fn.histadd("search", pattern)
-    vim.v.hlsearch = true
     vim.v.searchforward = searchforward
+    vim.v.hlsearch = true
+end
+
+local function do_count(count)
+    if count ~= 0 then
+        vim.cmd.normal({ count .. "n", bang = true })
+    end
 end
 
 M.visual_star = function(key)
@@ -35,32 +40,23 @@ M.visual_star = function(key)
     local pattern = [[\V]] .. table.concat(lines, [[\n]])
 
     local opt = opts[key]
-    set_search(pattern, opt.searchforward)
+    do_search(pattern, opt.searchforward)
 
     vim.fn.setpos(".", start)
-    if count ~= 0 then
-        vim.cmd.normal({
-            ("%d%s%s"):format(count, opt.searchforward and "/" or "?", CR),
-            bang = true,
-        })
-    end
+    do_count(count)
 end
 
 M.star = function(key)
-    if vim.v.count ~= 0 then
-        vim.cmd.normal({ ("%d%s"):format(vim.v.count, key), bang = true })
-        return
-    end
-
     local opt = opts[key]
 
     local word = vim.fn.expand("<cword>")
     local pattern = opt.is_g and word or ([[\<%s\>]]):format(word)
 
-    set_search(pattern, opt.searchforward)
+    do_search(pattern, opt.searchforward)
 
     local lnum, col = unpack(vim.fn.searchpos(pattern, "cen"))
     vim.api.nvim_win_set_cursor(0, { lnum, col - word:len() })
+    do_count(vim.v.count)
 end
 
 return M
