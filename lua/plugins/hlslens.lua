@@ -20,7 +20,7 @@ return {
         {
             "*",
             function()
-                vim.cmd(("normal! %d*"):format(vim.v.count1))
+                require("config.star").star("*")
                 require("hlslens").start()
             end,
             desc = "Search word under cursor forward",
@@ -28,7 +28,7 @@ return {
         {
             "#",
             function()
-                vim.cmd(("normal! %d#"):format(vim.v.count1))
+                require("config.star").star("#")
                 require("hlslens").start()
             end,
             desc = "Search word under cursor backward",
@@ -36,7 +36,7 @@ return {
         {
             "g*",
             function()
-                vim.cmd(("normal! %dg*"):format(vim.v.count1))
+                require("config.star").star("g*")
                 require("hlslens").start()
             end,
             desc = "Search word under cursor forward (partial)",
@@ -44,10 +44,28 @@ return {
         {
             "g#",
             function()
-                vim.cmd(("normal! %dg#"):format(vim.v.count1))
+                require("config.star").star("g#")
                 require("hlslens").start()
             end,
             desc = "Search word under cursor backward (partial)",
+        },
+        {
+            "*",
+            function()
+                require("config.star").visual_star("*")
+                require("hlslens").start()
+            end,
+            mode = "x",
+            desc = "Search visual selection forward",
+        },
+        {
+            "#",
+            function()
+                require("config.star").visual_star("#")
+                require("hlslens").start()
+            end,
+            mode = "x",
+            desc = "Search visual selection backward",
         },
     },
     opts = function()
