@@ -1,22 +1,8 @@
-local function hijack_find_textobject()
-    local miniai = require("mini.ai")
-    local find_textobject = miniai.find_textobject
-    miniai.find_textobject = function(ai_type, id, opts)
-        local result = find_textobject(ai_type, id, opts)
-        if result ~= nil then
-            result.from, result.to = result.to, result.from
-        end
-        return result
-    end
-end
-
 return {
     "echasnovski/mini.ai",
     dependencies = "echasnovski/mini.extra",
     event = "VeryLazy",
     opts = function()
-        hijack_find_textobject()
-
         local gen_ai_spec = require("mini.extra").gen_ai_spec
 
         return {
