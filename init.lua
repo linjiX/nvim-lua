@@ -154,7 +154,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 })
 
 -- Diagnostic
-vim.keymap.set("n", "<leader>K", vim.diagnostic.open_float, { noremap = true, silent = true })
+vim.keymap.set("n", "<Leader>K", vim.diagnostic.open_float, { noremap = true, silent = true })
 
 vim.diagnostic.config({
     float = {

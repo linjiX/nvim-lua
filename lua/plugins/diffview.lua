@@ -7,29 +7,29 @@ return {
     opts = {
         keymaps = {
             view = {
-                ["<leader>b"] = false,
-                ["<leader>co"] = false,
-                ["<leader>ct"] = false,
-                ["<leader>cb"] = false,
-                ["<leader>ca"] = false,
-                ["<leader>cO"] = false,
-                ["<leader>cT"] = false,
-                ["<leader>cA"] = false,
+                ["<Leader>b"] = false,
+                ["<Leader>co"] = false,
+                ["<Leader>ct"] = false,
+                ["<Leader>cb"] = false,
+                ["<Leader>ca"] = false,
+                ["<Leader>cO"] = false,
+                ["<Leader>cT"] = false,
+                ["<Leader>cA"] = false,
 
-                ["<leader>w"] = function()
+                ["<Leader>w"] = function()
                     require("diffview.actions").toggle_files()
                 end,
 
-                ["<leader>cJ"] = function()
+                ["<Leader>cJ"] = function()
                     require("diffview.actions").conflict_choose_all("theirs")()
                 end,
-                ["<leader>cK"] = function()
+                ["<Leader>cK"] = function()
                     require("diffview.actions").conflict_choose_all("ours")()
                 end,
-                ["<leader>cN"] = function()
+                ["<Leader>cN"] = function()
                     require("diffview.actions").conflict_choose_all("none")()
                 end,
-                ["<leader>cB"] = function()
+                ["<Leader>cB"] = function()
                     require("diffview.actions").conflict_choose_all("all")()
                 end,
             },
