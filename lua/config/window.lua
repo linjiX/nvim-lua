@@ -3,13 +3,13 @@ local api = vim.api
 local fn = vim.fn
 
 local WINDOW_KEYS = { "<C-h>", "<C-j>", "<C-k>", "<C-l>" }
-M.block_window_keymaps = function(buf)
+function M.block_window_keymaps(buf)
     for _, key in pairs(WINDOW_KEYS) do
         vim.keymap.set("n", key, "<Nop>", { buffer = buf })
     end
 end
 
-M.tabpage_list_buflisted_wins = function()
+function M.tabpage_list_buflisted_wins()
     local wins = {}
     local current_win = api.nvim_get_current_win()
 
@@ -24,7 +24,7 @@ M.tabpage_list_buflisted_wins = function()
     return wins
 end
 
-M.redirect_win = function(opts)
+function M.redirect_win(opts)
     local buf = api.nvim_get_current_buf()
     local source_win = api.nvim_get_current_win()
 

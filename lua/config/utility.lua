@@ -1,3 +1,5 @@
+local M = {}
+
 local METATABLE = {
     __index = function(self, key)
         table.insert(self.keys, key)
@@ -34,35 +36,35 @@ local function get_script_snr(scriptname)
     return nil
 end
 
-return {
-    lazy_require = function(name)
-        local result = { name = name, keys = {} }
-        setmetatable(result, METATABLE)
-        return result
-    end,
+function M.lazy_require(name)
+    local result = { name = name, keys = {} }
+    setmetatable(result, METATABLE)
+    return result
+end
 
-    tabopen = function()
-        local view = vim.fn.winsaveview()
-        vim.cmd.tabedit("%")
-        vim.fn.winrestview(view)
-    end,
+function M.get_script_function(name, scriptname)
+    if script_functions[name] then
+        return script_functions[name]
+    end
 
-    get_script_function = function(name, scriptname)
-        if script_functions[name] then
-            return script_functions[name]
-        end
-
-        local snr = get_script_snr(scriptname)
-        if not snr then
-            return nil
-        end
-
-        local function_name = ("<SNR>%s_%s"):format(snr, name)
-        if vim.fn.exists("*" .. function_name) == 1 then
-            script_functions[name] = vim.fn[function_name]
-            return script_functions[name]
-        end
-
+    local snr = get_script_snr(scriptname)
+    if not snr then
         return nil
-    end,
-}
+    end
+
+    local function_name = ("<SNR>%s_%s"):format(snr, name)
+    if vim.fn.exists("*" .. function_name) == 1 then
+        script_functions[name] = vim.fn[function_name]
+        return script_functions[name]
+    end
+
+    return nil
+end
+
+function M.tabopen()
+    local view = vim.fn.winsaveview()
+    vim.cmd.tabedit("%")
+    vim.fn.winrestview(view)
+end
+
+return M

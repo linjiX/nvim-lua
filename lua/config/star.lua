@@ -22,7 +22,7 @@ local function do_count(count)
     end
 end
 
-M.visual_star = function(key)
+function M.visual_star(key)
     local mode = vim.fn.mode()
     local count = vim.v.count
 
@@ -46,7 +46,7 @@ M.visual_star = function(key)
     do_count(count)
 end
 
-M.star = function(key)
+function M.star(key)
     local opt = opts[key]
 
     local word = vim.fn.expand("<cword>")
