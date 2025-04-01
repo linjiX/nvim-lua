@@ -1,3 +1,5 @@
+local R = require("config.utility").lazy_require
+
 return {
     "nvim-telescope/telescope.nvim",
     branch = "0.1.x",
@@ -8,73 +10,57 @@ return {
     },
     cmd = "Telescope",
     keys = {
-        {
-            "<Leader>ff",
-            function()
-                require("telescope.builtin").find_files({ hidden = true })
-            end,
-        },
-        { "<Leader>fm", require("telescope.builtin").oldfiles },
-        { "<Leader>fg", require("telescope.builtin").live_grep },
+        { "<Leader>ff", R("telescope.builtin").find_files({ hidden = true }) },
+        { "<Leader>fm", R("telescope.builtin").oldfiles() },
+        { "<Leader>fg", R("telescope.builtin").live_grep() },
         {
             "<Leader>fG",
-            function()
-                require("telescope.builtin").grep_string({
-                    search = "",
-                    word_match = "-w",
-                    only_sort_text = true,
-                })
-            end,
+            R("telescope.builtin").grep_string({
+                search = "",
+                word_match = "-w",
+                only_sort_text = true,
+            }),
         },
-        { "<Leader>fb", require("telescope.builtin").buffers },
-        { "<Leader>fh", require("telescope.builtin").help_tags },
-        { "<Leader>fe", require("telescope.builtin").filetypes },
-        { "<Leader>fc", require("telescope.builtin").colorscheme },
-        { "<Leader>fw", require("telescope.builtin").grep_string },
-        { "<Leader>fs", require("telescope.builtin").builtin },
-        { "<Leader>fd", require("telescope.builtin").diagnostics },
-        { "<Leader>fl", require("telescope.builtin").current_buffer_fuzzy_find },
-        { "<Leader>fr", require("telescope.builtin").resume },
+        { "<Leader>fb", R("telescope.builtin").buffers() },
+        { "<Leader>fh", R("telescope.builtin").help_tags() },
+        { "<Leader>fe", R("telescope.builtin").filetypes() },
+        { "<Leader>fc", R("telescope.builtin").colorscheme() },
+        { "<Leader>fw", R("telescope.builtin").grep_string() },
+        { "<Leader>fs", R("telescope.builtin").builtin() },
+        { "<Leader>fd", R("telescope.builtin").diagnostics() },
+        { "<Leader>fl", R("telescope.builtin").current_buffer_fuzzy_find() },
+        { "<Leader>fr", R("telescope.builtin").resume() },
 
-        { "<Leader>gb", require("telescope.builtin").git_branches },
-        { "<Leader>gl", require("telescope.builtin").git_bcommits },
-        { "<Leader>gL", require("telescope.builtin").git_commits },
-        { "<Leader>gf", require("telescope.builtin").git_status },
-        { "<Leader>gF", require("telescope.builtin").git_files },
-        { "<Leader>gs", require("telescope.builtin").git_stash },
+        { "<Leader>gb", R("telescope.builtin").git_branches() },
+        { "<Leader>gl", R("telescope.builtin").git_bcommits() },
+        { "<Leader>gL", R("telescope.builtin").git_commits() },
+        { "<Leader>gf", R("telescope.builtin").git_status() },
+        { "<Leader>gF", R("telescope.builtin").git_files() },
+        { "<Leader>gs", R("telescope.builtin").git_stash() },
 
-        { "gd", require("telescope.builtin").lsp_definitions },
-        { "<Leader>jj", require("telescope.builtin").lsp_definitions },
-        {
-            "<Leader>jr",
-            function()
-                require("telescope.builtin").lsp_references({ include_declaration = false })
-            end,
-        },
+        { "gd", R("telescope.builtin").lsp_definitions() },
+        { "<Leader>jj", R("telescope.builtin").lsp_definitions() },
+        { "<Leader>jr", R("telescope.builtin").lsp_references({ include_declaration = false }) },
         {
             "<Leader>js",
-            function()
-                require("telescope.builtin").lsp_document_symbols({
-                    symbols = {
-                        "function",
-                        "class",
-                    },
-                })
-            end,
+            R("telescope.builtin").lsp_document_symbols({
+                symbols = {
+                    "function",
+                    "class",
+                },
+            }),
         },
         {
             "<Leader>jS",
-            function()
-                require("telescope.builtin").lsp_dynamic_workspace_symbols({
-                    symbols = {
-                        "function",
-                        "class",
-                    },
-                })
-            end,
+            R("telescope.builtin").lsp_dynamic_workspace_symbols({
+                symbols = {
+                    "function",
+                    "class",
+                },
+            }),
         },
-        { "<Leader>ji", require("telescope.builtin").lsp_implementations },
-        { "<Leader>jt", require("telescope.builtin").lsp_type_definitions },
+        { "<Leader>ji", R("telescope.builtin").lsp_implementations() },
+        { "<Leader>jt", R("telescope.builtin").lsp_type_definitions() },
     },
     opts = function()
         require("telescope").load_extension("fzf")
