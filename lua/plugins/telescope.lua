@@ -11,7 +11,8 @@ return {
     cmd = "Telescope",
     keys = {
         { "<Leader>ff", R("telescope.builtin").find_files({ hidden = true }) },
-        { "<Leader>fm", R("telescope.builtin").oldfiles() },
+        { "<Leader>fo", R("telescope.builtin").oldfiles({ only_cwd = true }) },
+        { "<Leader>fO", R("telescope.builtin").oldfiles() },
         { "<Leader>fg", R("telescope.builtin").live_grep() },
         {
             "<Leader>fG",
