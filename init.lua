@@ -9,7 +9,6 @@ vim.opt.sidescrolloff = 8
 
 vim.opt.cursorline = true
 vim.opt.cursorcolumn = true
-vim.opt.colorcolumn = "100"
 
 vim.opt.splitright = true
 vim.opt.splitkeep = "screen"
@@ -132,6 +131,8 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
             vim.keymap.set("n", "q", ":helpclose<CR>", { buffer = args.buf, silent = true })
             vim.keymap.set("n", "<Leader>q", ":helpclose<CR>", { buffer = args.buf, silent = true })
             vim.keymap.set("n", "K", "K", { buffer = args.buf })
+        elseif vim.bo.buftype == "" then
+            vim.opt_local.colorcolumn = "100"
         end
     end,
 })
