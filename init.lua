@@ -36,12 +36,12 @@ vim.keymap.set("n", "<C-w><C-m>", utility.tabopen)
 
 vim.keymap.set({ "n", "x" }, "<C-p>", '"0p')
 
-vim.keymap.set("n", "<M-l>", ":bnext<CR>")
-vim.keymap.set("n", "<M-h>", ":bprevious<CR>")
-vim.keymap.set("n", "<Leader>q", ":bwipeout<CR>")
+vim.keymap.set("n", "<M-l>", vim.cmd.bnext)
+vim.keymap.set("n", "<M-h>", vim.cmd.bprevious)
+vim.keymap.set("n", "<Leader>q", vim.cmd.bwipeout)
 vim.keymap.set("n", "<Leader>`", "<C-^>")
 
-vim.keymap.set("n", "<BS>", ":nohlsearch<CR>", { silent = true })
+vim.keymap.set("n", "<BS>", vim.cmd.nohlsearch)
 
 vim.keymap.set("c", "<C-k>", function()
     return vim.fn.pumvisible() == 1 and "<C-p>" or "<Up>"
@@ -92,8 +92,8 @@ local function smart_wq()
     return smart_quit(true)
 end
 
-vim.keymap.set("ca", "q", smart_q, { silent = false, expr = true })
-vim.keymap.set("ca", "wq", smart_wq, { silent = false, expr = true })
+vim.keymap.set("ca", "q", smart_q, { expr = true })
+vim.keymap.set("ca", "wq", smart_wq, { expr = true })
 
 local star = require("config.star")
 
@@ -128,8 +128,8 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
             vim.keymap.set("n", "<Leader>q", ":q<CR>", { buffer = args.buf, silent = true })
         elseif vim.bo.buftype == "help" then
             vim.cmd("wincmd L")
-            vim.keymap.set("n", "q", ":helpclose<CR>", { buffer = args.buf, silent = true })
-            vim.keymap.set("n", "<Leader>q", ":helpclose<CR>", { buffer = args.buf, silent = true })
+            vim.keymap.set("n", "q", vim.cmd.helpclose, { buffer = args.buf })
+            vim.keymap.set("n", "<Leader>q", vim.cmd.helpclose, { buffer = args.buf })
             vim.keymap.set("n", "K", "K", { buffer = args.buf })
         elseif vim.bo.buftype == "" then
             vim.opt_local.colorcolumn = "100"
@@ -165,7 +165,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 })
 
 -- Diagnostic
-vim.keymap.set("n", "<Leader>K", vim.diagnostic.open_float, { noremap = true, silent = true })
+vim.keymap.set("n", "<Leader>K", vim.diagnostic.open_float)
 
 vim.diagnostic.config({
     float = {
