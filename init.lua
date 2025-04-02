@@ -110,6 +110,16 @@ for _, key in ipairs({ "*", "#" }) do
     end)
 end
 
+local buffer = require("config.buffer")
+
+vim.keymap.set("n", "<Leader>u", buffer.reopen_buffer)
+
+vim.api.nvim_create_autocmd("BufUnload", {
+    group = vim.api.nvim_create_augroup("MyBufUnload", { clear = true }),
+    pattern = "*",
+    callback = buffer.add_unloaded_buffer,
+})
+
 vim.api.nvim_create_autocmd("BufWinEnter", {
     group = vim.api.nvim_create_augroup("MyAutocmd", { clear = true }),
     pattern = "*",
