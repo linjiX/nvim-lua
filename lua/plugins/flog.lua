@@ -1,6 +1,7 @@
 return {
     "rbong/vim-flog",
-    lazy = true,
+    dependencies = { "tpope/vim-fugitive" },
+    cmd = { "Flog", "Flogsplit", "Floggit" },
     keys = {
         {
             "gb",
@@ -15,8 +16,6 @@ return {
         { "q", "<Plug>(FlogQuit)", ft = "floggraph", desc = "Quit Flog" },
         { "<Leader>q", "<Plug>(FlogQuit)", ft = "floggraph", desc = "Quit Flog" },
     },
-    cmd = { "Flog", "Flogsplit", "Floggit" },
-    dependencies = { "tpope/vim-fugitive" },
     config = function()
         vim.g.flog_permanent_default_opts = { date = "short" }
 
