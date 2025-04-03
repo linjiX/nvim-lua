@@ -2,10 +2,12 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 vim.opt.number = true
+vim.opt.numberwidth = 5
 vim.opt.wrap = false
 vim.opt.confirm = true
 vim.opt.scrolloff = 1
 vim.opt.sidescrolloff = 8
+vim.opt.wildmode = { "longest:full", "full" }
 
 vim.opt.cursorline = true
 vim.opt.cursorcolumn = true
