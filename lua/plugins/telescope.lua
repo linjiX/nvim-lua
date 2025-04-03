@@ -1,4 +1,5 @@
 local R = require("config.utility").lazy_require
+local symbols = { "function", "class" }
 
 return {
     "nvim-telescope/telescope.nvim",
@@ -40,28 +41,11 @@ return {
         { "<Leader>gs", R("telescope.builtin").git_stash() },
 
         { "gd", R("telescope.builtin").lsp_definitions() },
-        { "<Leader>jj", R("telescope.builtin").lsp_definitions() },
-        { "<Leader>jr", R("telescope.builtin").lsp_references({ include_declaration = false }) },
-        {
-            "<Leader>js",
-            R("telescope.builtin").lsp_document_symbols({
-                symbols = {
-                    "function",
-                    "class",
-                },
-            }),
-        },
-        {
-            "<Leader>jS",
-            R("telescope.builtin").lsp_dynamic_workspace_symbols({
-                symbols = {
-                    "function",
-                    "class",
-                },
-            }),
-        },
-        { "<Leader>ji", R("telescope.builtin").lsp_implementations() },
-        { "<Leader>jt", R("telescope.builtin").lsp_type_definitions() },
+        { "grr", R("telescope.builtin").lsp_references({ include_declaration = false }) },
+        { "gro", R("telescope.builtin").lsp_document_symbols({ symbols = symbols }) },
+        { "grO", R("telescope.builtin").lsp_dynamic_workspace_symbols({ symbols = symbols }) },
+        { "gri", R("telescope.builtin").lsp_implementations() },
+        { "grt", R("telescope.builtin").lsp_type_definitions() },
     },
     opts = function()
         require("telescope").load_extension("fzf")
