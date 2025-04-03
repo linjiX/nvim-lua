@@ -18,26 +18,12 @@ return {
             remap = true,
             desc = "Quit Fugitive",
         },
-        -- {
-        --     "<CR>",
-        --     function() end,
-        --     ft = "fugitiveblame",
-        -- },
     },
     init = function()
-        local abbreviations = {
-            git = "Git",
-            gst = "Gst",
-            gc = "Gc",
-            gca = "Gca",
-        }
-
-        for lhs, rhs in pairs(abbreviations) do
+        for _, rhs in ipairs({"Git", "Gst", "Gc", "Gca"}) do
+            local lhs = rhs:lower()
             vim.keymap.set("ca", lhs, function()
-                if vim.fn.getcmdtype() == ":" then
-                    return rhs
-                end
-                return lhs
+                return vim.fn.getcmdtype() == ":" and vim.fn.getcmdline() == lhs and rhs or lhs
             end, { expr = true })
         end
     end,
@@ -70,11 +56,7 @@ return {
         end
 
         local function is_commit_id(target)
-            if not target then
-                return false
-            end
-
-            return target:match("^[0-9a-f]+$") and #target >= 7 and #target <= 40
+            return target and #target >= 7 and #target <= 40 and target:match("^[0-9a-f]+$")
         end
 
         vim.api.nvim_create_user_command("Git", function(opts)
