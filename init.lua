@@ -66,32 +66,11 @@ vim.keymap.set("n", "grO", vim.lsp.buf.workspace_symbol)
 
 local window = require("config.window")
 
-local function smart_quit(write)
-    local cmd = write and "wq" or "q"
-
-    if
-        vim.fn.getcmdtype() ~= ":"
-        or vim.fn.getcmdline() ~= cmd
-        or #window.tabpage_list_buflisted_wins() ~= 0
-    then
-        return cmd
-    end
-
-    cmd = #vim.api.nvim_list_tabpages() > 1 and "tabclose" or "qa"
-
-    return write and "w | " .. cmd or cmd
+for _, cmd in ipairs({ "q", "wq" }) do
+    vim.keymap.set("ca", cmd, function()
+        return window.smart_quit(cmd)
+    end, { expr = true })
 end
-
-local function smart_q()
-    return smart_quit(false)
-end
-
-local function smart_wq()
-    return smart_quit(true)
-end
-
-vim.keymap.set("ca", "q", smart_q, { expr = true })
-vim.keymap.set("ca", "wq", smart_wq, { expr = true })
 
 local star = require("config.star")
 

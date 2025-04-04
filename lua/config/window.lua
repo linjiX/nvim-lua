@@ -2,14 +2,12 @@ local M = {}
 local api = vim.api
 local fn = vim.fn
 
-local WINDOW_KEYS = { "<C-h>", "<C-j>", "<C-k>", "<C-l>" }
-function M.block_window_keymaps(buf)
-    for _, key in pairs(WINDOW_KEYS) do
-        vim.keymap.set("n", key, "<Nop>", { buffer = buf })
-    end
-end
+local SMART_QUIT_CONFIGS = {
+    ["q"] = { is_write = false },
+    ["wq"] = { is_write = true },
+}
 
-function M.tabpage_list_buflisted_wins()
+local function tabpage_list_buflisted_wins()
     local wins = {}
     local current_win = api.nvim_get_current_win()
 
@@ -22,6 +20,25 @@ function M.tabpage_list_buflisted_wins()
         end
     end
     return wins
+end
+
+function M.smart_quit(cmd)
+    local is_write = SMART_QUIT_CONFIGS[cmd].is_write
+
+    if fn.getcmdtype() ~= ":" or fn.getcmdline() ~= cmd or #tabpage_list_buflisted_wins() ~= 0 then
+        return cmd
+    end
+
+    cmd = #api.nvim_list_tabpages() > 1 and "tabclose" or "qa"
+
+    return is_write and "w | " .. cmd or cmd
+end
+
+local WINDOW_KEYS = { "<C-h>", "<C-j>", "<C-k>", "<C-l>" }
+function M.block_window_keymaps(buf)
+    for _, key in pairs(WINDOW_KEYS) do
+        vim.keymap.set("n", key, "<Nop>", { buffer = buf })
+    end
 end
 
 function M.redirect_win(opts)
