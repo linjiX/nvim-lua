@@ -33,29 +33,6 @@ return {
 
         local scriptname = "vim-fugitive/autoload/fugitive.vim"
 
-        local function redirect_to_floatwin()
-            local width = 120
-            local height = math.floor(vim.go.lines * 0.9)
-            local row = math.floor((vim.go.lines - height) / 2)
-            local col = math.floor((vim.go.columns - width) / 2)
-
-            local opts = {
-                enter = true,
-                win_config = {
-                    relative = "editor",
-                    width = width,
-                    height = height,
-                    row = row,
-                    col = col,
-                    border = "rounded",
-                    zindex = 45,
-                },
-            }
-            local win = window.redirect_win(opts)
-            vim.wo[win].winfixbuf = true
-            return win
-        end
-
         local function is_commit_id(target)
             return target and #target >= 7 and #target <= 40 and target:match("^[0-9a-f]+$")
         end
@@ -80,7 +57,7 @@ return {
                 source_buf ~= vim.api.nvim_get_current_buf()
                 and vim.list_contains({ "commit", "rebase" }, subcommand)
             then
-                redirect_to_floatwin()
+                window.redirect_git_floatwin()
             end
         end, {
             nargs = "?",
@@ -151,7 +128,7 @@ return {
                     local target = CfilePorcelain()[1]
                     if is_commit_id(target) then
                         vim.cmd(GF("split"))
-                        redirect_to_floatwin()
+                        window.redirect_git_floatwin()
                     else
                         vim.cmd(GF("edit"))
                     end

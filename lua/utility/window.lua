@@ -58,4 +58,27 @@ function M.redirect_win(opts)
     return win
 end
 
+function M.redirect_git_floatwin()
+    local width = 120
+    local height = math.floor(vim.go.lines * 0.9)
+    local row = math.floor((vim.go.lines - height) / 2)
+    local col = math.floor((vim.go.columns - width) / 2)
+
+    local opts = {
+        enter = true,
+        win_config = {
+            relative = "editor",
+            width = width,
+            height = height,
+            row = row,
+            col = col,
+            border = "rounded",
+            zindex = 45,
+        },
+    }
+    local win = M.redirect_win(opts)
+    vim.wo[win].winfixbuf = true
+    return win
+end
+
 return M
