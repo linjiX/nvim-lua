@@ -49,7 +49,7 @@ function M.get_script_function(name, scriptname)
 
     local snr = get_script_snr(scriptname)
     if not snr then
-        return nil
+        error(("Script not found '%s'"):format(scriptname))
     end
 
     local function_name = ("<SNR>%s_%s"):format(snr, name)
@@ -58,7 +58,7 @@ function M.get_script_function(name, scriptname)
         return script_functions[name]
     end
 
-    return nil
+    error(("Function '%s' not found in script '%s'"):format(name, scriptname))
 end
 
 function M.tabopen()

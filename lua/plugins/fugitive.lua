@@ -91,7 +91,6 @@ return {
             vim.keymap.set("n", "q", vim.cmd.tabclose, { buffer = true })
 
             local BlameCommit = utility.get_script_function("BlameCommit", scriptname)
-            assert(BlameCommit)
 
             vim.keymap.set("n", "<CR>", function()
                 local splitbelow = vim.o.splitbelow
@@ -122,7 +121,6 @@ return {
 
                 local GF = utility.get_script_function("GF", scriptname)
                 local CfilePorcelain = utility.get_script_function("CfilePorcelain", scriptname)
-                assert(GF and CfilePorcelain)
 
                 vim.keymap.set("n", "<CR>", function()
                     local target = CfilePorcelain()[1]
