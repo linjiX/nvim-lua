@@ -48,6 +48,7 @@ return {
                     row = row,
                     col = col,
                     border = "rounded",
+                    zindex = 45,
                 },
             }
             local win = window.redirect_win(opts)
