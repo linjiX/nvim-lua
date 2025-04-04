@@ -20,7 +20,7 @@ return {
         {
             "*",
             function()
-                require("config.star").star("*")
+                require("utility.star").star("*")
                 require("hlslens").start()
             end,
             desc = "Search word under cursor forward",
@@ -28,7 +28,7 @@ return {
         {
             "#",
             function()
-                require("config.star").star("#")
+                require("utility.star").star("#")
                 require("hlslens").start()
             end,
             desc = "Search word under cursor backward",
@@ -36,7 +36,7 @@ return {
         {
             "g*",
             function()
-                require("config.star").star("g*")
+                require("utility.star").star("g*")
                 require("hlslens").start()
             end,
             desc = "Search word under cursor forward (partial)",
@@ -44,7 +44,7 @@ return {
         {
             "g#",
             function()
-                require("config.star").star("g#")
+                require("utility.star").star("g#")
                 require("hlslens").start()
             end,
             desc = "Search word under cursor backward (partial)",
@@ -52,7 +52,7 @@ return {
         {
             "*",
             function()
-                require("config.star").visual_star("*")
+                require("utility.star").visual_star("*")
                 require("hlslens").start()
             end,
             mode = "x",
@@ -61,7 +61,7 @@ return {
         {
             "#",
             function()
-                require("config.star").visual_star("#")
+                require("utility.star").visual_star("#")
                 require("hlslens").start()
             end,
             mode = "x",

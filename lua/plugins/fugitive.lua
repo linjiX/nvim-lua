@@ -28,8 +28,8 @@ return {
         end
     end,
     config = function()
-        local utility = require("config.utility")
-        local window = require("config.window")
+        local utility = require("utility")
+        local window = require("utility.window")
 
         local scriptname = "vim-fugitive/autoload/fugitive.vim"
 

@@ -31,7 +31,7 @@ vim.keymap.set("n", "<C-j>", "<C-w>j")
 vim.keymap.set("n", "<C-k>", "<C-w>k")
 vim.keymap.set("n", "<C-l>", "<C-w>l")
 
-local utility = require("config.utility")
+local utility = require("utility")
 
 vim.keymap.set("n", "<C-w>m", utility.tabopen)
 vim.keymap.set("n", "<C-w><C-m>", utility.tabopen)
@@ -64,7 +64,7 @@ vim.keymap.set("n", "grk", vim.lsp.buf.signature_help)
 vim.keymap.set("n", "gro", vim.lsp.buf.document_symbol)
 vim.keymap.set("n", "grO", vim.lsp.buf.workspace_symbol)
 
-local window = require("config.window")
+local window = require("utility.window")
 
 for _, cmd in ipairs({ "q", "wq" }) do
     vim.keymap.set("ca", cmd, function()
@@ -72,7 +72,7 @@ for _, cmd in ipairs({ "q", "wq" }) do
     end, { expr = true })
 end
 
-local star = require("config.star")
+local star = require("utility.star")
 
 for _, key in ipairs({ "*", "g*", "#", "g#" }) do
     vim.keymap.set("n", key, function()
@@ -86,7 +86,7 @@ for _, key in ipairs({ "*", "#" }) do
     end)
 end
 
-local buffer = require("config.buffer")
+local buffer = require("utility.buffer")
 
 vim.keymap.set("n", "<Leader>u", buffer.reopen_buffer)
 

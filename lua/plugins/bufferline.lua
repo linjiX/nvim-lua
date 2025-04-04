@@ -1,4 +1,4 @@
-local R = require("config.utility").lazy_require
+local R = require("utility").lazy_require
 
 local function get_keys()
     local keys = {
