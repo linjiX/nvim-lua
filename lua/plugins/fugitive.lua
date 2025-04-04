@@ -1,7 +1,7 @@
 return {
     "tpope/vim-fugitive",
     dependencies = { "tpope/vim-rhubarb" },
-    cmd = { "Git", "Gst", "Gc", "Gca", "Gblame" },
+    cmd = { "Git", "Gw", "Gst", "Gc", "Gca", "Gblame" },
     keys = {
         { "gb", vim.cmd.GBrowse, mode = { "n", "x" } },
         {
@@ -139,6 +139,7 @@ return {
             group = augroup,
             pattern = "fugitive",
             callback = function()
+                vim.opt_local.number = false
                 vim.opt_local.buflisted = false
 
                 local GF = utility.get_script_function("GF", scriptname)
