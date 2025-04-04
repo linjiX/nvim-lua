@@ -1,6 +1,6 @@
 local M = {}
 
-local opts = {
+local STAR_CONFIGS = {
     ["*"] = { is_g = false, searchforward = true },
     ["g*"] = { is_g = true, searchforward = true },
     ["#"] = { is_g = false, searchforward = false },
@@ -39,20 +39,20 @@ function M.visual_star(key)
 
     local pattern = [[\V]] .. table.concat(lines, [[\n]])
 
-    local opt = opts[key]
-    do_search(pattern, opt.searchforward)
+    local config = STAR_CONFIGS[key]
+    do_search(pattern, config.searchforward)
 
     vim.fn.setpos(".", start)
     do_count(count)
 end
 
 function M.star(key)
-    local opt = opts[key]
+    local config = STAR_CONFIGS[key]
 
     local word = vim.fn.expand("<cword>")
-    local pattern = opt.is_g and word or ([[\<%s\>]]):format(word)
+    local pattern = config.is_g and word or ([[\<%s\>]]):format(word)
 
-    do_search(pattern, opt.searchforward)
+    do_search(pattern, config.searchforward)
 
     local lnum, col = unpack(vim.fn.searchpos(pattern, "cen"))
     vim.api.nvim_win_set_cursor(0, { lnum, col - word:len() })
