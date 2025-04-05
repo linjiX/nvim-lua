@@ -41,6 +41,19 @@ function M.block_window_keymaps(buf)
     end
 end
 
+function M.set_quit_keymaps(rhs, opts)
+    rhs = rhs or function()
+        vim.cmd(M.smart_quit("q"))
+    end
+
+    opts = opts or {}
+    opts.buffer = true
+    opts.desc = "Quit"
+
+    vim.keymap.set("n", "q", rhs, opts)
+    vim.keymap.set("n", "<Leader>q", rhs, opts)
+end
+
 function M.redirect_win(opts)
     local buf = api.nvim_get_current_buf()
     local source_win = api.nvim_get_current_win()

@@ -13,8 +13,6 @@ return {
             ft = "floggraph",
             desc = "Git Browse",
         },
-        { "q", "<Plug>(FlogQuit)", ft = "floggraph", desc = "Quit Flog" },
-        { "<Leader>q", "<Plug>(FlogQuit)", ft = "floggraph", desc = "Quit Flog" },
     },
     config = function()
         vim.g.flog_permanent_default_opts = { date = "short" }

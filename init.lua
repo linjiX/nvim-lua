@@ -101,12 +101,10 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     pattern = "*",
     callback = function(args)
         if vim.bo.buftype == "nofile" then
-            vim.keymap.set("n", "q", ":q<CR>", { buffer = args.buf, silent = true })
-            vim.keymap.set("n", "<Leader>q", ":q<CR>", { buffer = args.buf, silent = true })
+            window.set_quit_keymaps()
         elseif vim.bo.buftype == "help" then
-            vim.cmd("wincmd L")
-            vim.keymap.set("n", "q", vim.cmd.helpclose, { buffer = args.buf })
-            vim.keymap.set("n", "<Leader>q", vim.cmd.helpclose, { buffer = args.buf })
+            vim.cmd.wincmd("L")
+            window.set_quit_keymaps(vim.cmd.helpclose)
             vim.keymap.set("n", "K", "K", { buffer = args.buf })
         elseif
             vim.bo.buftype == ""

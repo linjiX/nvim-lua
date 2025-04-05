@@ -5,6 +5,8 @@ local scriptname = require("plugins.fugitive").scriptname
 vim.opt_local.number = false
 vim.opt_local.buflisted = false
 
+window.set_quit_keymaps("gq", { remap = true })
+
 vim.keymap.set("n", "<CR>", function()
     local GF = utility.get_script_function("GF", scriptname)
     local CfilePorcelain = utility.get_script_function("CfilePorcelain", scriptname)

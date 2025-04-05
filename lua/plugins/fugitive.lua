@@ -7,20 +7,6 @@ return {
     cmd = { "Git", "Gw", "Gst", "Gc", "Gca", "Gblame" },
     keys = {
         { "gb", vim.cmd.GBrowse, mode = { "n", "x" } },
-        {
-            "q",
-            "gq",
-            ft = { "fugitive", "fugitiveblame" },
-            remap = true,
-            desc = "Quit Fugitive",
-        },
-        {
-            "<Leader>q",
-            "gq",
-            ft = { "fugitive", "fugitiveblame" },
-            remap = true,
-            desc = "Quit Fugitive",
-        },
     },
     init = function()
         for _, rhs in ipairs({ "Git", "Gst", "Gc", "Gca" }) do
@@ -32,6 +18,7 @@ return {
     end,
     config = function()
         local utility = require("utility")
+        local window = require("utility.window")
 
         vim.api.nvim_create_user_command("Git", function(opts)
             local subcommand = opts.args:match("%w+")
@@ -76,8 +63,7 @@ return {
             vim.opt_local.winfixbuf = true
             vim.cmd("Git blame --date=short" .. opts.args)
 
-            vim.keymap.set("n", "<Leader>q", vim.cmd.tabclose, { buffer = true })
-            vim.keymap.set("n", "q", vim.cmd.tabclose, { buffer = true })
+            window.set_quit_keymaps(vim.cmd.tabclose)
 
             vim.keymap.set("n", "<CR>", function()
                 local splitbelow = vim.o.splitbelow
