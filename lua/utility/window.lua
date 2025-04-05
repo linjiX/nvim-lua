@@ -45,7 +45,12 @@ function M.redirect_win(opts)
     local buf = api.nvim_get_current_buf()
     local source_win = api.nvim_get_current_win()
 
-    local previous_win = fn.win_getid(fn.winnr("#"))
+    local previous_winnr = fn.winnr("#")
+    if previous_winnr == 0 then
+        return nil
+    end
+
+    local previous_win = fn.win_getid(previous_winnr)
     api.nvim_set_current_win(previous_win)
 
     local win = api.nvim_open_win(buf, opts.enter, opts.win_config)
@@ -77,6 +82,9 @@ function M.redirect_git_floatwin()
         },
     }
     local win = M.redirect_win(opts)
+    if not win then
+        return nil
+    end
     vim.wo[win].winfixbuf = true
     return win
 end

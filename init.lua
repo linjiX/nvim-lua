@@ -108,7 +108,10 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
             vim.keymap.set("n", "q", vim.cmd.helpclose, { buffer = args.buf })
             vim.keymap.set("n", "<Leader>q", vim.cmd.helpclose, { buffer = args.buf })
             vim.keymap.set("n", "K", "K", { buffer = args.buf })
-        elseif vim.bo.buftype == "" then
+        elseif
+            vim.bo.buftype == ""
+            and not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
+        then
             vim.opt_local.colorcolumn = "100"
         end
     end,

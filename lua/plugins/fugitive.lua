@@ -32,30 +32,22 @@ return {
     end,
     config = function()
         local utility = require("utility")
-        local window = require("utility.window")
 
         vim.api.nvim_create_user_command("Git", function(opts)
             local subcommand = opts.args:match("%w+")
             local mods = (opts.mods ~= "" or subcommand == "blame") and opts.mods
                 or "botright vertical"
 
-            local command = vim.fn["fugitive#Command"](
-                opts.line1,
-                opts.count,
-                opts.range,
-                opts.bang,
-                mods,
-                opts.args
+            vim.cmd(
+                vim.fn["fugitive#Command"](
+                    opts.line1,
+                    opts.count,
+                    opts.range,
+                    opts.bang,
+                    mods,
+                    opts.args
+                )
             )
-
-            local source_buf = vim.api.nvim_get_current_buf()
-            vim.cmd(command)
-            if
-                source_buf ~= vim.api.nvim_get_current_buf()
-                and vim.list_contains({ "commit", "rebase" }, subcommand)
-            then
-                window.redirect_git_floatwin()
-            end
         end, {
             nargs = "?",
             range = true,
