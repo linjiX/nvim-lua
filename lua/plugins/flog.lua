@@ -18,13 +18,5 @@ return {
     },
     config = function()
         vim.g.flog_permanent_default_opts = { date = "short" }
-
-        vim.api.nvim_create_autocmd("FileType", {
-            group = vim.api.nvim_create_augroup("FlogAutocmd", { clear = true }),
-            pattern = "floggraph",
-            callback = function()
-                vim.wo.colorcolumn = "0"
-            end,
-        })
     end,
 }

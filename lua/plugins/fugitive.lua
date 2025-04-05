@@ -1,5 +1,8 @@
+local scriptname = "vim-fugitive/autoload/fugitive.vim"
+
 return {
     "tpope/vim-fugitive",
+    scriptname = scriptname,
     dependencies = { "tpope/vim-rhubarb" },
     cmd = { "Git", "Gw", "Gst", "Gc", "Gca", "Gblame" },
     keys = {
@@ -20,7 +23,7 @@ return {
         },
     },
     init = function()
-        for _, rhs in ipairs({"Git", "Gst", "Gc", "Gca"}) do
+        for _, rhs in ipairs({ "Git", "Gst", "Gc", "Gca" }) do
             local lhs = rhs:lower()
             vim.keymap.set("ca", lhs, function()
                 return vim.fn.getcmdtype() == ":" and vim.fn.getcmdline() == lhs and rhs or lhs
@@ -30,12 +33,6 @@ return {
     config = function()
         local utility = require("utility")
         local window = require("utility.window")
-
-        local scriptname = "vim-fugitive/autoload/fugitive.vim"
-
-        local function is_commit_id(target)
-            return target and #target >= 7 and #target <= 40 and target:match("^[0-9a-f]+$")
-        end
 
         vim.api.nvim_create_user_command("Git", function(opts)
             local subcommand = opts.args:match("%w+")
@@ -84,18 +81,17 @@ return {
 
         vim.api.nvim_create_user_command("Gblame", function(opts)
             utility.tabopen()
-            vim.wo.winfixbuf = true
+            vim.opt_local.winfixbuf = true
             vim.cmd("Git blame --date=short" .. opts.args)
 
             vim.keymap.set("n", "<Leader>q", vim.cmd.tabclose, { buffer = true })
             vim.keymap.set("n", "q", vim.cmd.tabclose, { buffer = true })
 
-            local BlameCommit = utility.get_script_function("BlameCommit", scriptname)
-
             vim.keymap.set("n", "<CR>", function()
                 local splitbelow = vim.o.splitbelow
                 vim.opt.splitbelow = true
 
+                local BlameCommit = utility.get_script_function("BlameCommit", scriptname)
                 local ok, result = pcall(function()
                     vim.cmd(BlameCommit("vsplit"))
                 end)
@@ -108,49 +104,6 @@ return {
         end, {
             nargs = "?",
             complete = vim.fn["fugitive#BlameComplete"],
-        })
-
-        local augroup = vim.api.nvim_create_augroup("FugitiveAutocmd", { clear = true })
-
-        vim.api.nvim_create_autocmd("FileType", {
-            group = augroup,
-            pattern = "fugitive",
-            callback = function()
-                vim.opt_local.number = false
-                vim.opt_local.buflisted = false
-
-                local GF = utility.get_script_function("GF", scriptname)
-                local CfilePorcelain = utility.get_script_function("CfilePorcelain", scriptname)
-
-                vim.keymap.set("n", "<CR>", function()
-                    local target = CfilePorcelain()[1]
-                    if is_commit_id(target) then
-                        vim.cmd(GF("split"))
-                        window.redirect_git_floatwin()
-                    else
-                        vim.cmd(GF("edit"))
-                    end
-                end, { buffer = true })
-            end,
-        })
-
-        vim.api.nvim_create_autocmd("FileType", {
-            group = augroup,
-            pattern = "fugitiveblame",
-            callback = function()
-                vim.opt_local.listchars:remove({ "precedes", "extends" })
-            end,
-        })
-
-        vim.api.nvim_create_autocmd("FileType", {
-            group = augroup,
-            pattern = "git",
-            callback = function()
-                vim.opt_local.buflisted = false
-
-                vim.keymap.set("n", "<Leader>q", ":q<CR>", { buffer = true, silent = true })
-                vim.keymap.set("n", "q", ":q<CR>", { buffer = true, silent = true })
-            end,
         })
     end,
 }

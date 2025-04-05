@@ -67,4 +67,8 @@ function M.tabopen()
     vim.fn.winrestview(view)
 end
 
+function M.is_commit_id(target)
+    return target and #target >= 7 and #target <= 40 and target:match("^[0-9a-f]+$")
+end
+
 return M
