@@ -3,9 +3,7 @@ return {
     event = "VeryLazy",
     opts = {
         preset = "modern",
-        delay = function(ctx)
-            return ctx.plugin and 0 or 800
-        end,
+        delay = 800,
     },
     keys = {
         {
