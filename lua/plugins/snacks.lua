@@ -10,6 +10,12 @@ return {
                 snacks.bufdelete.delete,
             },
             {
+                "<Leader>Q",
+                function()
+                    snacks.bufdelete.delete({ wipe = true })
+                end,
+            },
+            {
                 "[rw",
                 snacks.words.enable,
             },

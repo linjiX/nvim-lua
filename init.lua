@@ -40,7 +40,8 @@ vim.keymap.set({ "n", "x" }, "<C-p>", '"0p')
 
 vim.keymap.set("n", "<M-l>", vim.cmd.bnext)
 vim.keymap.set("n", "<M-h>", vim.cmd.bprevious)
-vim.keymap.set("n", "<Leader>q", vim.cmd.bwipeout)
+vim.keymap.set("n", "<Leader>q", vim.cmd.bdelete)
+vim.keymap.set("n", "<Leader>Q", vim.cmd.bwipeout)
 vim.keymap.set("n", "<Leader>`", "<C-^>")
 
 vim.keymap.set("n", "<BS>", vim.cmd.nohlsearch)
