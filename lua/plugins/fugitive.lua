@@ -18,7 +18,6 @@ return {
     end,
     config = function()
         local utility = require("utility")
-        local window = require("utility.window")
 
         vim.api.nvim_create_user_command("Git", function(opts)
             local subcommand = opts.args:match("%w+")
@@ -60,25 +59,7 @@ return {
 
         vim.api.nvim_create_user_command("Gblame", function(opts)
             utility.tabopen()
-            vim.opt_local.winfixbuf = true
             vim.cmd("Git blame --date=short" .. opts.args)
-
-            window.set_quit_keymaps(vim.cmd.tabclose)
-
-            vim.keymap.set("n", "<CR>", function()
-                local splitbelow = vim.o.splitbelow
-                vim.opt.splitbelow = true
-
-                local BlameCommit = utility.get_script_function("BlameCommit", scriptname)
-                local ok, result = pcall(function()
-                    vim.cmd(BlameCommit("vsplit"))
-                end)
-                vim.opt.splitbelow = splitbelow
-
-                if not ok then
-                    error(result)
-                end
-            end, { buffer = true })
         end, {
             nargs = "?",
             complete = vim.fn["fugitive#BlameComplete"],
