@@ -16,7 +16,7 @@ local METATABLE = {
                     target = target[key]
                 end
             end
-            target(unpack(args))
+            return target(unpack(args))
         end
 
         return fn
@@ -38,6 +38,14 @@ local function get_script_snr(scriptname)
     return nil
 end
 
+---@class LazyModule
+---@field private name string
+---@field private keys string[]
+---@field [string] LazyModule
+---@operator call(...): fun(): any
+
+---@param name string
+---@return LazyModule
 function M.lazy_require(name)
     local result = { name = name, keys = {} }
     setmetatable(result, METATABLE)
