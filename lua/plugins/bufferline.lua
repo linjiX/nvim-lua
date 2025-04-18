@@ -83,6 +83,38 @@ return {
     opts = function()
         vim.opt.termguicolors = true
 
+        vim.api.nvim_create_autocmd("BufAdd", {
+            group = vim.api.nvim_create_augroup("MyBufferLine", { clear = true }),
+            pattern = "*",
+            callback = function(opts)
+                local state = require("bufferline.state")
+                local utils = require("bufferline.utils")
+
+                if not state.custom_sort then
+                    local maxbuf = 0
+                    for _, component in ipairs(state.components) do
+                        if component.id > maxbuf then
+                            maxbuf = component.id
+                        end
+                    end
+
+                    if opts.buf > maxbuf then
+                        return
+                    end
+                    state.custom_sort = utils.get_ids(state.components)
+                end
+
+                for i, value in ipairs(state.custom_sort) do
+                    if value == opts.buf then
+                        table.remove(state.custom_sort, i)
+                        break
+                    end
+                end
+
+                table.insert(state.custom_sort, opts.buf)
+            end,
+        })
+
         return {
             options = {
                 numbers = function(opts)
