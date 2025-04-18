@@ -4,6 +4,8 @@ local ignored_filetypes = { "gitcommit", "gitrebase" }
 
 M.unloaded_buffers = {}
 
+---@param opts {buf: integer, match: string}
+---@return nil
 function M.add_unloaded_buffer(opts)
     local buf = opts.buf
     if
@@ -22,6 +24,7 @@ function M.add_unloaded_buffer(opts)
     table.insert(M.unloaded_buffers, filename)
 end
 
+---@return nil
 function M.reopen_buffer()
     while #M.unloaded_buffers > 0 do
         local filename = M.unloaded_buffers[#M.unloaded_buffers]

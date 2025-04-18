@@ -7,6 +7,7 @@ local SMART_QUIT_CONFIGS = {
     ["wq"] = { is_write = true },
 }
 
+---@return integer[]
 local function tabpage_list_buflisted_wins()
     local wins = {}
     local current_win = api.nvim_get_current_win()
@@ -22,6 +23,8 @@ local function tabpage_list_buflisted_wins()
     return wins
 end
 
+---@param cmd 'q'|'wq'
+---@return string
 function M.smart_quit(cmd)
     local is_write = SMART_QUIT_CONFIGS[cmd].is_write
 
@@ -29,18 +32,24 @@ function M.smart_quit(cmd)
         return cmd
     end
 
-    cmd = #api.nvim_list_tabpages() > 1 and "tabclose" or "qa"
+    local quit_cmd = #api.nvim_list_tabpages() > 1 and "tabclose" or "qa"
 
-    return is_write and "w | " .. cmd or cmd
+    return is_write and "w | " .. quit_cmd or quit_cmd
 end
 
 local WINDOW_KEYS = { "<C-h>", "<C-j>", "<C-k>", "<C-l>" }
+
+---@param buf integer
+---@return nil
 function M.block_window_keymaps(buf)
     for _, key in pairs(WINDOW_KEYS) do
         vim.keymap.set("n", key, "<Nop>", { buffer = buf })
     end
 end
 
+---@param rhs? function|string
+---@param opts? vim.keymap.set.Opts
+---@return nil
 function M.set_quit_keymaps(rhs, opts)
     rhs = rhs or function()
         vim.cmd(M.smart_quit("q"))
@@ -54,6 +63,8 @@ function M.set_quit_keymaps(rhs, opts)
     vim.keymap.set("n", "<Leader>q", rhs, opts)
 end
 
+---@param opts { enter: boolean, win_config: vim.api.keyset.win_config }
+---@return integer|nil
 function M.redirect_win(opts)
     local buf = api.nvim_get_current_buf()
     local source_win = api.nvim_get_current_win()
@@ -76,6 +87,7 @@ function M.redirect_win(opts)
     return win
 end
 
+---@return integer|nil
 function M.redirect_git_floatwin()
     local width = 120
     local height = math.floor(vim.go.lines * 0.9)

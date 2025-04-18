@@ -9,6 +9,9 @@ local STAR_CONFIGS = {
 
 local ESC = vim.api.nvim_replace_termcodes("<ESC>", true, false, true)
 
+---@param pattern string
+---@param searchforward boolean
+---@return nil
 local function do_search(pattern, searchforward)
     vim.fn.setreg("/", pattern)
     vim.fn.histadd("search", pattern)
@@ -16,12 +19,16 @@ local function do_search(pattern, searchforward)
     vim.v.hlsearch = true
 end
 
+---@param count integer
+---@return nil
 local function do_count(count)
     if count ~= 0 then
         vim.cmd.normal({ count .. "n", bang = true })
     end
 end
 
+---@param key "*"|"#"
+---@return nil
 function M.visual_star(key)
     local mode = vim.fn.mode()
     local count = vim.v.count
@@ -46,6 +53,8 @@ function M.visual_star(key)
     do_count(count)
 end
 
+---@param key "*"|"g*"|"#"|"g#"
+---@return nil
 function M.star(key)
     local config = STAR_CONFIGS[key]
 

@@ -25,6 +25,8 @@ local METATABLE = {
 
 local script_functions = {}
 
+---@param scriptname string
+---@return string|nil
 local function get_script_snr(scriptname)
     local scriptnames = vim.api.nvim_exec2("scriptnames", { output = true }).output
 
@@ -42,6 +44,9 @@ function M.lazy_require(name)
     return result
 end
 
+---@param name string
+---@param scriptname string
+---@return function
 function M.get_script_function(name, scriptname)
     if script_functions[name] then
         return script_functions[name]
@@ -61,12 +66,15 @@ function M.get_script_function(name, scriptname)
     error(("Function '%s' not found in script '%s'"):format(name, scriptname))
 end
 
+---@return nil
 function M.tabopen()
     local view = vim.fn.winsaveview()
     vim.cmd.tabedit("%")
     vim.fn.winrestview(view)
 end
 
+---@param target string|nil
+---@return boolean
 function M.is_commit_id(target)
     return target and #target >= 7 and #target <= 40 and target:match("^[0-9a-f]+$")
 end
