@@ -33,7 +33,11 @@ return {
         { "<Leader>fl", R("telescope.builtin").current_buffer_fuzzy_find() },
         { "<Leader>fr", R("telescope.builtin").resume() },
 
-        { "<Leader>gb", R("telescope.builtin").git_branches() },
+        {
+            "<Leader>gb",
+            R("telescope.builtin").git_branches({ show_remote_tracking_branches = false }),
+        },
+        { "<Leader>gB", R("telescope.builtin").git_branches() },
         { "<Leader>gl", R("telescope.builtin").git_bcommits() },
         { "<Leader>gl", R("telescope.builtin").git_bcommits_range(), mode = { "x" } },
         { "<Leader>gL", R("telescope.builtin").git_commits() },
