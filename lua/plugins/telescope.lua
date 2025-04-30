@@ -27,7 +27,7 @@ return {
         { "<Leader>fh", R("telescope.builtin").help_tags() },
         { "<Leader>fe", R("telescope.builtin").filetypes() },
         { "<Leader>fc", R("telescope.builtin").colorscheme() },
-        { "<Leader>fw", R("telescope.builtin").grep_string() },
+        { "<Leader>fw", R("telescope.builtin").grep_string(), mode = { "n", "x" } },
         { "<Leader>fs", R("telescope.builtin").builtin() },
         { "<Leader>fd", R("telescope.builtin").diagnostics() },
         { "<Leader>fl", R("telescope.builtin").current_buffer_fuzzy_find() },
@@ -35,6 +35,7 @@ return {
 
         { "<Leader>gb", R("telescope.builtin").git_branches() },
         { "<Leader>gl", R("telescope.builtin").git_bcommits() },
+        { "<Leader>gl", R("telescope.builtin").git_bcommits_range(), mode = { "x" } },
         { "<Leader>gL", R("telescope.builtin").git_commits() },
         { "<Leader>gf", R("telescope.builtin").git_status() },
         { "<Leader>gF", R("telescope.builtin").git_files() },
