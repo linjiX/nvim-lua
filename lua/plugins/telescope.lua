@@ -23,7 +23,7 @@ return {
                 only_sort_text = true,
             }),
         },
-        { "<Leader>fb", R("telescope.builtin").buffers() },
+        { "<Leader>fb", R("telescope.builtin").buffers({ ignore_current_buffer = true }) },
         { "<Leader>fh", R("telescope.builtin").help_tags() },
         { "<Leader>fe", R("telescope.builtin").filetypes() },
         { "<Leader>fc", R("telescope.builtin").colorscheme() },
