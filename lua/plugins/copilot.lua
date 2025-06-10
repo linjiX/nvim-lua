@@ -87,6 +87,7 @@ return {
             filetypes = {
                 gitcommit = true,
             },
+            copilot_model = "claude-sonnet-4",
         },
     },
     {
