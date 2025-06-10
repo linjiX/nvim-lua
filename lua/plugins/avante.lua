@@ -1,7 +1,7 @@
+local R = require("utility").lazy_require
+
 return {
     "yetone/avante.nvim",
-    event = "VeryLazy",
-    lazy = false,
     version = false,
     build = "make",
     dependencies = {
@@ -37,18 +37,14 @@ return {
             ft = { "markdown", "Avante" },
         },
     },
-    keys = function()
-        local avante = require("avante")
-
-        return {
-            { "<Leader>aa", vim.cmd.AvanteAsk },
-            { "<Leader>ac", vim.cmd.AvanteChat },
-            { "<Leader>al", vim.cmd.AvanteClear },
-            { "<Leader>aq", avante.close_sidebar },
-            { "<C-a>", "<HOME>", mode = "i", ft = { "AvanteInput" } },
-            { "<C-e>", "<END>", mode = "i", ft = { "AvanteInput" } },
-        }
-    end,
+    keys = {
+        { "<Leader>aa", vim.cmd.AvanteAsk, mode = { "n", "x" } },
+        { "<Leader>ac", vim.cmd.AvanteChat },
+        { "<Leader>al", vim.cmd.AvanteClear },
+        { "<Leader>aq", R("avante").close_sidebar() },
+        { "<C-a>", "<HOME>", mode = "i", ft = { "AvanteInput" } },
+        { "<C-e>", "<END>", mode = "i", ft = { "AvanteInput" } },
+    },
     opts = {
         provider = "copilot",
         auto_suggestions_provider = "copilot",
