@@ -8,14 +8,12 @@ local function get_python_path()
 end
 
 local function get_vue_plugin_path()
-    local mason = require("mason-registry")
-    local package_path = mason.get_package("vue-language-server"):get_install_path()
-
-    return package_path .. "/node_modules/@vue/language-server"
+    return vim.fn.expand("$MASON/packages/vue-language-server/node_modules/@vue/language-server")
 end
 
 return {
     "neovim/nvim-lspconfig",
+    dependencies = { "mason-org/mason.nvim" },
     lazy = false,
     keys = {
         { "[oj", vim.cmd.LspStart },
