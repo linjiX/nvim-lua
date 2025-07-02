@@ -47,10 +47,12 @@ return {
     },
     opts = {
         provider = "copilot",
-        auto_suggestions_provider = "copilot",
-        copilot = {
-            model = "claude-sonnet-4",
+        providers = {
+            copilot = {
+                model = "claude-sonnet-4",
+            },
         },
+        auto_suggestions_provider = "copilot",
         hints = { enabled = false },
         mappings = {
             diff = {
