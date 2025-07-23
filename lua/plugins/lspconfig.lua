@@ -47,19 +47,37 @@ return {
             },
             ruff = {},
 
-            ts_ls = {
-                init_options = {
-                    plugins = {
-                        {
-                            name = "@vue/typescript-plugin",
-                            location = get_vue_plugin_path(),
-                            languages = { "vue" },
+            -- ts_ls = {
+            --     init_options = {
+            --         hostInfo = "neovim",
+            --         plugins = {
+            --             {
+            --                 name = "@vue/typescript-plugin",
+            --                 location = get_vue_plugin_path(),
+            --                 languages = { "vue" },
+            --             },
+            --         },
+            --     },
+            --     filetypes = { "typescript", "javascript", "vue" },
+            -- },
+            vtsls = {
+                settings = {
+                    vtsls = {
+                        tsserver = {
+                            globalPlugins = {
+                                {
+                                    name = "@vue/typescript-plugin",
+                                    location = get_vue_plugin_path(),
+                                    languages = { "vue" },
+                                    configNamespace = "typescript",
+                                },
+                            },
                         },
                     },
                 },
                 filetypes = { "typescript", "javascript", "vue" },
             },
-            volar = {},
+            vue_ls = {},
             html = {},
         }
 
