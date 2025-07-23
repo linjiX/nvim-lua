@@ -63,9 +63,9 @@ return {
             html = {},
         }
 
-        local lspconfig = require("lspconfig")
         for name, opt in pairs(opts) do
-            lspconfig[name].setup(opt)
+            vim.lsp.config(name, opt)
         end
+        vim.lsp.enable(vim.tbl_keys(opts))
     end,
 }
