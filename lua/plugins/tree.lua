@@ -19,6 +19,9 @@ return {
         },
     },
     opts = function()
+        vim.api.nvim_set_hl(0, "NvimTreeModifiedIcon", { fg = "#b3f6c0" })
+        vim.api.nvim_set_hl(0, "NvimTreeHiddenDisplay", { italic = true, fg = "#424455" })
+
         vim.opt.termguicolors = true
 
         local function my_on_attach(bufnr)
@@ -100,19 +103,42 @@ return {
 
         return {
             on_attach = my_on_attach,
+            view = {
+                width = 32,
+            },
             renderer = {
+                hidden_display = "simple",
+                highlight_git = "all",
                 indent_markers = {
                     enable = true,
                 },
-            },
-            diagnostics = {
-                enable = true,
+                icons = {
+                    git_placement = "right_align",
+                    glyphs = {
+                        modified = " ●",
+                        git = {
+                            untracked = "?",
+                        },
+                    },
+                },
             },
             system_open = {
                 cmd = "open",
             },
+            git = {
+                enable = true,
+                show_on_open_dirs = false,
+            },
+            diagnostics = {
+                enable = true,
+                show_on_open_dirs = false,
+            },
+            modified = {
+                enable = true,
+                show_on_open_dirs = false,
+            },
             filters = {
-                custom = { "^\\.git" },
+                custom = { "^\\.git$" },
             },
             actions = {
                 file_popup = {
