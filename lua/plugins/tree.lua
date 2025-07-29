@@ -5,7 +5,18 @@ return {
     init = function()
         vim.g.loaded_netrw = 1
         vim.g.loaded_netrwPlugin = 1
+
+        vim.api.nvim_create_autocmd("VimEnter", {
+            group = vim.api.nvim_create_augroup("DirectoryDetector", { clear = true }),
+            pattern = "*",
+            callback = function(opts)
+                if vim.fn.isdirectory(opts.file) == 1 then
+                    require("nvim-tree.api").tree.open()
+                end
+            end,
+        })
     end,
+    cmd = { "NvimTreeOpen", "NvimTreeFindFile" },
     keys = {
         {
             "<Leader>w",
