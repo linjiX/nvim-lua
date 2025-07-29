@@ -27,7 +27,6 @@ return {
                     statusline = {
                         "snacks_dashboard",
                         "NvimTree",
-                        "neo-tree",
                         "fugitiveblame",
                         "trouble",
                         "Avante",

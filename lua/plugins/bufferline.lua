@@ -131,11 +131,6 @@ return {
                 diagnostics = "nvim_lsp",
                 offsets = {
                     {
-                        filetype = "neo-tree",
-                        text = "Neo Tree",
-                        highlight = "Title",
-                    },
-                    {
                         filetype = "NvimTree",
                         text = "File Explorer",
                         highlight = "Title",
