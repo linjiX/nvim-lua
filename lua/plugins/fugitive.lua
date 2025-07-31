@@ -1,4 +1,5 @@
 local scriptname = "vim-fugitive/autoload/fugitive.vim"
+local ESC = vim.api.nvim_replace_termcodes("<ESC>", true, false, true)
 
 return {
     "tpope/vim-fugitive",
@@ -6,7 +7,20 @@ return {
     dependencies = { "tpope/vim-rhubarb" },
     cmd = { "Git", "Gw", "Gst", "Gc", "Gca", "Gblame", "Gco" },
     keys = {
-        { "gb", vim.cmd.GBrowse, mode = { "n", "x" } },
+        {
+            "gb",
+            vim.cmd.GBrowse,
+            desc = "Open current file in GitHub",
+        },
+        {
+            "gb",
+            function()
+                vim.cmd.normal(ESC)
+                vim.cmd.GBrowse({ range = { vim.fn.line("'<"), vim.fn.line("'>") } })
+            end,
+            mode = "x",
+            desc = "Open selected lines in GitHub",
+        },
     },
     init = function()
         for _, rhs in ipairs({ "Git", "Gst", "Gc", "Gca", "Gco" }) do
