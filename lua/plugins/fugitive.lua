@@ -4,12 +4,12 @@ return {
     "tpope/vim-fugitive",
     scriptname = scriptname,
     dependencies = { "tpope/vim-rhubarb" },
-    cmd = { "Git", "Gw", "Gst", "Gc", "Gca", "Gblame" },
+    cmd = { "Git", "Gw", "Gst", "Gc", "Gca", "Gblame", "Gco" },
     keys = {
         { "gb", vim.cmd.GBrowse, mode = { "n", "x" } },
     },
     init = function()
-        for _, rhs in ipairs({ "Git", "Gst", "Gc", "Gca" }) do
+        for _, rhs in ipairs({ "Git", "Gst", "Gc", "Gca", "Gco" }) do
             local lhs = rhs:lower()
             vim.keymap.set("ca", lhs, function()
                 return vim.fn.getcmdtype() == ":" and vim.fn.getcmdline() == lhs and rhs or lhs
@@ -55,6 +55,13 @@ return {
         end, {
             nargs = "?",
             complete = vim.fn["fugitive#CommitComplete"],
+        })
+
+        vim.api.nvim_create_user_command("Gco", function(opts)
+            vim.cmd("Git checkout " .. opts.args)
+        end, {
+            nargs = "?",
+            complete = vim.fn["fugitive#ReadComplete"],
         })
 
         vim.api.nvim_create_user_command("Gblame", function(opts)
