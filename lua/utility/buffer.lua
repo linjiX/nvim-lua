@@ -4,6 +4,18 @@ local ignored_filetypes = { "gitcommit", "gitrebase" }
 
 M.unloaded_buffers = {}
 
+---@param t table
+---@param value any
+---@return integer|nil
+local function tbl_find_index(t, value)
+    for i, v in ipairs(t) do
+        if v == value then
+            return i
+        end
+    end
+    return nil
+end
+
 ---@param opts {buf: integer, match: string}
 ---@return nil
 function M.add_unloaded_buffer(opts)
@@ -17,8 +29,13 @@ function M.add_unloaded_buffer(opts)
     end
 
     local filename = opts.match
-    if not vim.fn.filereadable(filename) or vim.tbl_contains(M.unloaded_buffers, filename) then
+    if vim.fn.filereadable(filename) == 0 then
         return
+    end
+
+    local index = tbl_find_index(M.unloaded_buffers, filename)
+    if index then
+        table.remove(M.unloaded_buffers, index)
     end
 
     table.insert(M.unloaded_buffers, filename)
