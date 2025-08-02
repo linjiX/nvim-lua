@@ -1,5 +1,6 @@
 local R = require("utility").lazy_require
 local symbols = { "function", "class" }
+local ts_ignore = { ".d.ts$" }
 
 return {
     "nvim-telescope/telescope.nvim",
@@ -45,8 +46,17 @@ return {
         { "<Leader>gF", R("telescope.builtin").git_files() },
         { "<Leader>gs", R("telescope.builtin").git_stash() },
 
-        { "gd", R("telescope.builtin").lsp_definitions() },
-        { "grr", R("telescope.builtin").lsp_references({ include_declaration = false }) },
+        {
+            "gd",
+            R("telescope.builtin").lsp_definitions({ file_ignore_patterns = ts_ignore }),
+        },
+        {
+            "grr",
+            R("telescope.builtin").lsp_references({
+                include_declaration = false,
+                file_ignore_patterns = ts_ignore,
+            }),
+        },
         { "gro", R("telescope.builtin").lsp_document_symbols({ symbols = symbols }) },
         { "grO", R("telescope.builtin").lsp_dynamic_workspace_symbols({ symbols = symbols }) },
         { "gri", R("telescope.builtin").lsp_implementations() },
