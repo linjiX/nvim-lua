@@ -26,6 +26,7 @@ return {
         },
         { "<Leader>fb", R("telescope.builtin").buffers({ ignore_current_buffer = true }) },
         { "<Leader>fh", R("telescope.builtin").help_tags() },
+        { "<Leader>fH", R("telescope.builtin").highlights() },
         { "<Leader>fe", R("telescope.builtin").filetypes() },
         { "<Leader>fc", R("telescope.builtin").colorscheme() },
         { "<Leader>fw", R("telescope.builtin").grep_string(), mode = { "n", "x" } },
