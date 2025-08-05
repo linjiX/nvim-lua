@@ -2,8 +2,9 @@ local M = {}
 
 local METATABLE = {
     __index = function(self, key)
-        table.insert(self.keys, key)
-        return self
+        local other = vim.deepcopy(self)
+        table.insert(other.keys, key)
+        return other
     end,
     __call = function(self, ...)
         local target = nil
@@ -23,6 +24,20 @@ local METATABLE = {
     end,
 }
 
+---@class LazyModule
+---@field private name string
+---@field private keys string[]
+---@field [string] LazyModule
+---@operator call(...): fun(): any
+
+---@param name string
+---@return LazyModule
+function M.lazy_require(name)
+    local result = { name = name, keys = {} }
+    setmetatable(result, METATABLE)
+    return result
+end
+
 local script_functions = {}
 
 ---@param scriptname string
@@ -36,20 +51,6 @@ local function get_script_snr(scriptname)
         end
     end
     return nil
-end
-
----@class LazyModule
----@field private name string
----@field private keys string[]
----@field [string] LazyModule
----@operator call(...): fun(): any
-
----@param name string
----@return LazyModule
-function M.lazy_require(name)
-    local result = { name = name, keys = {} }
-    setmetatable(result, METATABLE)
-    return result
 end
 
 ---@param name string
