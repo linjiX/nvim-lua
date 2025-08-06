@@ -73,9 +73,14 @@ return {
                     cursor = "cc",
                 },
                 sidebar = {
+                    switch_windows = "<C-j>",
+                    reverse_switch_windows = "<C-k>",
                     add_file = "a",
                     remove_file = "dd",
                     close = {},
+                    close_from_input = {
+                        insert = "<C-d>",
+                    },
                 },
                 files = {
                     add_current = "<Leader>A",
