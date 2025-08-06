@@ -1,3 +1,4 @@
+local window = require("utility.window")
 local R = require("utility").lazy_require
 
 return {
@@ -45,39 +46,49 @@ return {
         { "<C-a>", "<HOME>", mode = "i", ft = { "AvanteInput" } },
         { "<C-e>", "<END>", mode = "i", ft = { "AvanteInput" } },
     },
-    opts = {
-        provider = "copilot",
-        providers = {
-            copilot = {
-                model = "claude-sonnet-4",
+    opts = function()
+        vim.api.nvim_create_autocmd("FileType", {
+            group = vim.api.nvim_create_augroup("AvanteMapping", { clear = true }),
+            pattern = "Avante*",
+            callback = function()
+                window.set_quit_keymaps(require("avante").close_sidebar)
+            end,
+        })
+
+        return {
+            provider = "copilot",
+            providers = {
+                copilot = {
+                    model = "claude-sonnet-4",
+                },
             },
-        },
-        auto_suggestions_provider = "copilot",
-        hints = { enabled = false },
-        mappings = {
-            diff = {
-                ours = "ck",
-                theirs = "cj",
-                all_theirs = "ca",
-                both = "cb",
-                cursor = "cc",
+            auto_suggestions_provider = "copilot",
+            hints = { enabled = false },
+            mappings = {
+                diff = {
+                    ours = "ck",
+                    theirs = "cj",
+                    all_theirs = "ca",
+                    both = "cb",
+                    cursor = "cc",
+                },
+                sidebar = {
+                    add_file = "a",
+                    remove_file = "dd",
+                    close = {},
+                },
+                files = {
+                    add_current = "<Leader>A",
+                },
             },
-            sidebar = {
-                add_file = "a",
-                remove_file = "dd",
-                close = "q",
+            windows = {
+                ask = {
+                    start_insert = false,
+                },
             },
-            files = {
-                add_current = "<Leader>A",
+            file_selector = {
+                provider = "telescope",
             },
-        },
-        windows = {
-            ask = {
-                start_insert = false,
-            },
-        },
-        file_selector = {
-            provider = "telescope",
-        },
-    },
+        }
+    end,
 }
