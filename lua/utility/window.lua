@@ -38,6 +38,7 @@ function M.smart_quit(cmd)
 end
 
 local WINDOW_KEYS = { "<C-h>", "<C-j>", "<C-k>", "<C-l>" }
+local QUIT_KEYS = { "q", "<Leader>q" }
 
 ---@param buf integer
 ---@return nil
@@ -49,18 +50,34 @@ end
 
 ---@param rhs? function|string
 ---@param opts? vim.keymap.set.Opts
+---@param check? boolean
 ---@return nil
-function M.set_quit_keymaps(rhs, opts)
+function M.set_quit_keymaps(rhs, opts, check)
     rhs = rhs or function()
         vim.cmd(M.smart_quit("q"))
     end
 
-    opts = opts or {}
+    opts = opts and vim.deepcopy(opts) or {}
     opts.buffer = true
-    opts.desc = "Quit"
+    if not opts.desc then
+        opts.desc = "Quit"
+    end
 
-    vim.keymap.set("n", "q", rhs, opts)
-    vim.keymap.set("n", "<Leader>q", rhs, opts)
+    local keys = QUIT_KEYS
+    if check then
+        local existing_keys = {}
+        for _, keymap in ipairs(vim.api.nvim_buf_get_keymap(0, "n")) do
+            existing_keys[keymap.lhsraw] = true
+        end
+
+        keys = vim.tbl_filter(function(key)
+            return not existing_keys[vim.keycode(key)]
+        end, keys)
+    end
+
+    for _, key in ipairs(keys) do
+        vim.keymap.set("n", key, rhs, opts)
+    end
 end
 
 ---@param opts { enter: boolean, win_config: vim.api.keyset.win_config }

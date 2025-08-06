@@ -102,7 +102,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     pattern = "*",
     callback = function(args)
         if vim.bo.buftype == "nofile" then
-            window.set_quit_keymaps()
+            window.set_quit_keymaps(nil, nil, true)
         elseif vim.bo.buftype == "help" then
             vim.cmd.wincmd("L")
             window.set_quit_keymaps(vim.cmd.helpclose)
