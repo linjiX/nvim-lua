@@ -1,5 +1,6 @@
 local window = require("utility.window")
 local R = require("utility").lazy_require
+local api = R("avante.api")
 
 return {
     "yetone/avante.nvim",
@@ -39,10 +40,40 @@ return {
         },
     },
     keys = {
-        { "<Leader>aa", vim.cmd.AvanteAsk, mode = { "n", "x" } },
-        { "<Leader>ac", vim.cmd.AvanteChat },
-        { "<Leader>al", vim.cmd.AvanteClear },
-        { "<Leader>aq", R("avante").close_sidebar() },
+        {
+            "<Leader>aa",
+            api.ask(),
+            mode = { "n", "x" },
+            desc = "avante: ask",
+        },
+        {
+            "<Leader>ac",
+            api.ask({ ask = false }),
+            mode = { "n", "x" },
+            desc = "avante: chat",
+        },
+        {
+            "<Leader>an",
+            api.ask({ new_chat = true }),
+            mode = { "n", "x" },
+            desc = "avante: new ask",
+        },
+        {
+            "<Leader>ae",
+            api.edit(),
+            mode = "x",
+            desc = "avante: edit",
+        },
+        {
+            "<Leader>al",
+            vim.cmd.AvanteClear,
+            desc = "avante: clear",
+        },
+        {
+            "<Leader>aq",
+            R("avante").close_sidebar(),
+            desc = "avante: quit",
+        },
         { "<C-a>", "<HOME>", mode = "i", ft = { "AvanteInput" } },
         { "<C-e>", "<END>", mode = "i", ft = { "AvanteInput" } },
     },
@@ -84,6 +115,7 @@ return {
                 },
                 files = {
                     add_current = "<Leader>A",
+                    add_all_buffers = "<Leader>ab",
                 },
             },
             windows = {
