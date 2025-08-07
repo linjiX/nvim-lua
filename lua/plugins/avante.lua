@@ -74,15 +74,31 @@ return {
             R("avante").close_sidebar(),
             desc = "avante: quit",
         },
-        { "<C-a>", "<HOME>", mode = "i", ft = { "AvanteInput" } },
-        { "<C-e>", "<END>", mode = "i", ft = { "AvanteInput" } },
     },
     opts = function()
+        local function insert_avante()
+            for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+                local buf = vim.api.nvim_win_get_buf(win)
+                if vim.bo[buf].filetype == "AvanteInput" then
+                    vim.api.nvim_set_current_win(win)
+                    vim.cmd.startinsert()
+                    return
+                end
+            end
+        end
+
         vim.api.nvim_create_autocmd("FileType", {
             group = vim.api.nvim_create_augroup("AvanteMapping", { clear = true }),
             pattern = "Avante*",
             callback = function()
                 window.set_quit_keymaps(require("avante").close_sidebar)
+
+                if vim.bo.filetype == "AvanteInput" then
+                    vim.keymap.set("i", "<C-a>", "<HOME>", { buffer = true })
+                    vim.keymap.set("i", "<C-e>", "<END>", { buffer = true })
+                else
+                    vim.keymap.set("n", "i", insert_avante, { buffer = true })
+                end
             end,
         })
 
