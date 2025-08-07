@@ -135,11 +135,17 @@ return {
                 },
             },
             windows = {
+                input = {
+                    height = 12,
+                },
                 ask = {
                     start_insert = false,
                 },
             },
             file_selector = {
+                provider = "telescope",
+            },
+            selector = {
                 provider = "telescope",
             },
         }
