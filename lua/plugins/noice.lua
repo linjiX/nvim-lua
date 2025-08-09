@@ -25,6 +25,18 @@ return {
             messages = {
                 view_search = false,
             },
+            routes = {
+                {
+                    filter = { event = "msg_show", kind = "shell_out" },
+                    view = "notify",
+                    opts = { level = "info", title = "stdout" },
+                },
+                {
+                    filter = { event = "msg_show", kind = "shell_err" },
+                    view = "notify",
+                    opts = { level = "error", title = "stderr" },
+                },
+            },
         }
     end,
 }
