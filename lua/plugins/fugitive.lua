@@ -1,5 +1,4 @@
 local scriptname = "vim-fugitive/autoload/fugitive.vim"
-local ESC = vim.api.nvim_replace_termcodes("<ESC>", true, false, true)
 
 return {
     "tpope/vim-fugitive",
@@ -15,7 +14,7 @@ return {
         {
             "gb",
             function()
-                vim.cmd.normal(ESC)
+                vim.cmd.normal(vim.keycode("<ESC>"))
                 vim.cmd.GBrowse({ range = { vim.fn.line("'<"), vim.fn.line("'>") } })
             end,
             mode = "x",

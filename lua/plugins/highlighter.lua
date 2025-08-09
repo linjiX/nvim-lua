@@ -1,4 +1,4 @@
-local ESC = vim.api.nvim_replace_termcodes("<ESC>", true, false, true)
+local ESC = vim.keycode("<ESC>")
 
 return {
     "azabiong/vim-highlighter",

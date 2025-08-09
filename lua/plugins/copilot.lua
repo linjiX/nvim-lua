@@ -8,11 +8,7 @@ return {
                 "<Tab>",
                 function()
                     if not require("copilot.suggestion").is_visible() then
-                        vim.api.nvim_feedkeys(
-                            vim.api.nvim_replace_termcodes("<Tab>", true, false, true),
-                            "n",
-                            false
-                        )
+                        vim.api.nvim_feedkeys(vim.keycode("<Tab>"), "n", false)
                         return
                     end
 
@@ -25,11 +21,7 @@ return {
                 "<C-e>",
                 function()
                     if not require("copilot.suggestion").is_visible() then
-                        vim.api.nvim_feedkeys(
-                            vim.api.nvim_replace_termcodes("<C-e>", true, false, true),
-                            "n",
-                            false
-                        )
+                        vim.api.nvim_feedkeys(vim.keycode("<C-e>"), "n", false)
                         return
                     end
 

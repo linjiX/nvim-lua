@@ -7,8 +7,6 @@ local STAR_CONFIGS = {
     ["g#"] = { is_g = true, searchforward = false },
 }
 
-local ESC = vim.api.nvim_replace_termcodes("<ESC>", true, false, true)
-
 ---@param pattern string
 ---@param searchforward boolean
 ---@return nil
@@ -33,7 +31,7 @@ function M.visual_star(key)
     local mode = vim.fn.mode()
     local count = vim.v.count
 
-    vim.cmd.normal(ESC)
+    vim.cmd.normal(vim.keycode("<ESC>"))
 
     local start = vim.fn.getpos("'<")
     local stop = vim.fn.getpos("'>")
