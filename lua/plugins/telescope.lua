@@ -33,7 +33,8 @@ return {
         { "<Leader>fc", builtin.colorscheme() },
         { "<Leader>fw", builtin.grep_string(), mode = { "n", "x" } },
         { "<Leader>fs", builtin.builtin() },
-        { "<Leader>fd", builtin.diagnostics() },
+        { "<Leader>fd", builtin.diagnostics({ bufnr = 0 }) },
+        { "<Leader>fD", builtin.diagnostics() },
         { "<Leader>fl", builtin.current_buffer_fuzzy_find() },
         { "<Leader>fr", builtin.resume() },
 
