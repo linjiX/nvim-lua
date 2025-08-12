@@ -77,6 +77,7 @@ return {
                     },
                     "filetype",
                 },
+                lualine_y = { "selectioncount", "progress" },
             },
             extensions = {
                 "quickfix",
@@ -85,7 +86,7 @@ return {
                     sections = {
                         lualine_a = { get_title },
                         lualine_b = require("lualine.extensions.fugitive").sections.lualine_a,
-                        lualine_y = { "progress" },
+                        lualine_y = { "selectioncount", "progress" },
                         lualine_z = { "location" },
                     },
                 },
@@ -94,7 +95,7 @@ return {
                     sections = {
                         lualine_a = { get_title },
                         lualine_b = { "branch" },
-                        lualine_y = { "progress" },
+                        lualine_y = { "selectioncount", "progress" },
                         lualine_z = { "location" },
                     },
                 },
@@ -102,7 +103,7 @@ return {
                     filetypes = { "AvanteInput" },
                     sections = {
                         lualine_a = { "mode" },
-                        lualine_y = { "progress" },
+                        lualine_y = { "selectioncount", "progress" },
                         lualine_z = { "location" },
                     },
                 },
@@ -110,7 +111,7 @@ return {
                     filetypes = { "undotree" },
                     sections = {
                         lualine_a = { get_title },
-                        lualine_y = { "progress" },
+                        lualine_y = { "selectioncount", "progress" },
                         lualine_z = { "location" },
                     },
                 },
@@ -119,7 +120,7 @@ return {
                     sections = {
                         lualine_a = { "mode" },
                         lualine_x = { "filetype" },
-                        lualine_y = { "progress" },
+                        lualine_y = { "selectioncount", "progress" },
                         lualine_z = { "location" },
                     },
                 },
@@ -129,7 +130,7 @@ return {
                         lualine_a = { "mode" },
                         lualine_c = { "filename" },
                         lualine_x = { "filetype" },
-                        lualine_y = { "progress" },
+                        lualine_y = { "selectioncount", "progress" },
                         lualine_z = { "location" },
                     },
                 },
