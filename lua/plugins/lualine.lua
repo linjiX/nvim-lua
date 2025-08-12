@@ -30,6 +30,8 @@ return {
                         "fugitiveblame",
                         "trouble",
                         "Avante",
+                        "AvanteTodos",
+                        "AvanteSelectedCode",
                         "AvanteSelectedFiles",
                     },
                 },
