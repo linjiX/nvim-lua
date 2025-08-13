@@ -93,7 +93,7 @@ return {
             callback = function()
                 window.set_quit_keymaps(require("avante").close_sidebar)
 
-                if vim.bo.filetype == "AvanteInput" then
+                if vim.tbl_contains({ "AvanteInput", "AvantePromptInput" }, vim.bo.filetype) then
                     vim.keymap.set("i", "<C-a>", "<HOME>", { buffer = true })
                     vim.keymap.set("i", "<C-e>", "<END>", { buffer = true })
                 else
