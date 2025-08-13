@@ -59,11 +59,8 @@ vim.keymap.set("c", "<C-e>", "<END>")
 
 vim.keymap.set("n", "K", vim.lsp.buf.hover)
 vim.keymap.set("n", "gd", vim.lsp.buf.definition)
-vim.keymap.set("n", "grt", vim.lsp.buf.type_definition)
 vim.keymap.set("n", "grh", vim.lsp.buf.typehierarchy)
 vim.keymap.set("n", "grk", vim.lsp.buf.signature_help)
-vim.keymap.set("n", "gro", vim.lsp.buf.document_symbol)
-vim.keymap.set("n", "grO", vim.lsp.buf.workspace_symbol)
 
 local window = require("utility.window")
 
