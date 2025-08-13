@@ -136,6 +136,11 @@ return {
                         highlight = "Title",
                     },
                     {
+                        filetype = "aerial",
+                        text = "Symbols",
+                        highlight = "Title",
+                    },
+                    {
                         filetype = "fugitiveblame",
                         text = "Git Blame",
                         highlight = "Title",

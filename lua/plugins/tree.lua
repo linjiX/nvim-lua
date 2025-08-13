@@ -1,4 +1,5 @@
 local R = require("utility").lazy_require
+local sidebar = R("utility.sidebar")
 
 return {
     "nvim-tree/nvim-tree.lua",
@@ -20,12 +21,12 @@ return {
     keys = {
         {
             "<Leader>w",
-            R("nvim-tree.api").tree.toggle({ focus = false }),
-            desc = "Toggle Nvim Tree",
+            sidebar.toggle(),
+            desc = "Toggle Sidebar",
         },
         {
             "<Leader>W",
-            R("nvim-tree.api").tree.open({ find_file = true }),
+            sidebar.find_file(),
             desc = "Nvim Tree Find File",
         },
     },

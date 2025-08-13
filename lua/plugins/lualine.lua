@@ -28,6 +28,7 @@ return {
                         "snacks_dashboard",
                         "NvimTree",
                         "fugitiveblame",
+                        "aerial",
                         "trouble",
                         "Avante",
                         "AvanteTodos",
