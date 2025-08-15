@@ -6,16 +6,6 @@ return {
         vim.opt.showmode = false
         vim.opt.ruler = false
 
-        local trouble = require("trouble")
-        local symbols = trouble.statusline({
-            mode = "lsp_document_symbols",
-            groups = {},
-            title = false,
-            filter = { range = true },
-            format = "{kind_icon}{symbol.name:Normal}",
-            hl_group = "lualine_c_normal",
-        })
-
         local function get_title()
             local filetype = vim.bo.filetype
             return filetype:sub(1, 1):upper() .. filetype:sub(2):lower()
@@ -55,10 +45,7 @@ return {
                     },
                     "diagnostics",
                 },
-                lualine_c = {
-                    -- "filename",
-                    { symbols.get, cond = symbols.has },
-                },
+                lualine_c = { "aerial" },
                 lualine_x = {
                     {
                         "copilot",

@@ -1,7 +1,8 @@
 local R = require("utility").lazy_require
 local builtin = R("telescope.builtin")
 
-local symbols = { "function", "class" }
+-- local symbols =
+--     { "class", "constructor", "enum", "function", "interface", "module", "method", "struct" }
 local ts_ignore = { ".d.ts$" }
 
 return {
@@ -61,7 +62,8 @@ return {
                 file_ignore_patterns = ts_ignore,
             }),
         },
-        { "gO", builtin.lsp_document_symbols({ bufnr = 0, symbols = symbols }) },
+        -- { "gO", builtin.lsp_document_symbols({ bufnr = 0, symbols = symbols }) },
+        { "gO", R("telescope").extensions.aerial.aerial() },
         { "gri", builtin.lsp_implementations() },
         { "grt", builtin.lsp_type_definitions() },
     },

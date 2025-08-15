@@ -7,6 +7,10 @@ return {
         return {
             layout = {
                 width = 32,
+                win_opts = {
+                    cursorline = true,
+                    cursorcolumn = false,
+                },
             },
             attach_mode = "global",
             keymaps = {
@@ -14,6 +18,7 @@ return {
                 ["<C-x>"] = "actions.jump_split",
                 ["<C-j>"] = false,
                 ["<C-k>"] = false,
+                ["l"] = "actions.jump",
             },
             show_guides = true,
             guides = {
