@@ -88,4 +88,13 @@ function M.is_commit_id(target)
     return target and #target >= 7 and #target <= 40 and target:match("^[0-9a-f]+$")
 end
 
+---@return string
+function M.get_python_path()
+    if vim.env.VIRTUAL_ENV then
+        return vim.fs.joinpath(vim.env.VIRTUAL_ENV, "bin", "python")
+    end
+
+    return vim.fn.exepath("python3") or vim.fn.exepath("python") or "python"
+end
+
 return M

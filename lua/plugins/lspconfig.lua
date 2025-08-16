@@ -1,12 +1,3 @@
-local function get_python_path()
-    if vim.env.VIRTUAL_ENV then
-        local path = require("lspconfig/util").path
-        return path.join(vim.env.VIRTUAL_ENV, "bin", "python")
-    end
-
-    return vim.fn.exepath("python3") or vim.fn.exepath("python") or "python"
-end
-
 local function get_vue_plugin_path()
     return vim.fn.expand("$MASON/packages/vue-language-server/node_modules/@vue/language-server")
 end
@@ -42,7 +33,7 @@ return {
 
             pyright = {
                 before_init = function(_, config)
-                    config.settings.python.pythonPath = get_python_path()
+                    config.settings.python.pythonPath = require("utility").get_python_path()
                 end,
             },
             ruff = {},

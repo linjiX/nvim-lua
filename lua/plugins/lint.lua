@@ -1,8 +1,18 @@
+local python_path = nil
+local function python_path_getter()
+    if not python_path then
+        python_path = require("utility").get_python_path()
+    end
+    return python_path
+end
+
 return {
     "mfussenegger/nvim-lint",
     event = { "BufReadPre", "BufNewFile" },
     config = function()
         local lint = require("lint")
+
+        vim.list_extend(lint.linters.mypy.args, { "--python-executable", python_path_getter })
 
         lint.linters_by_ft = {
             lua = { "luacheck" },
