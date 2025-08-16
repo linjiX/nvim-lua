@@ -57,7 +57,13 @@ function M.star(key)
     local config = STAR_CONFIGS[key]
 
     local word = vim.fn.expand("<cword>")
-    local pattern = config.is_g and word or ([[\<%s\>]]):format(word)
+    if #word == 0 then
+        vim.notify("No string under cursor", vim.log.levels.ERROR)
+        return
+    end
+
+    local is_g = (config.is_g or (vim.fn.match(word, [[\k]]) == -1))
+    local pattern = is_g and word or ([[\<%s\>]]):format(word)
 
     do_search(pattern, config.searchforward)
 
