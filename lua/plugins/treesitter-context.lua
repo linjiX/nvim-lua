@@ -1,3 +1,5 @@
+local context = require("utility").lazy_require("treesitter-context")
+
 return {
     "nvim-treesitter/nvim-treesitter-context",
     dependencies = { "nvim-treesitter/nvim-treesitter" },
@@ -5,38 +7,28 @@ return {
     keys = {
         {
             "[rc",
-            function()
-                require("treesitter-context").enable()
-            end,
+            context.enable(),
             desc = "Enable Treesiter Context",
         },
         {
             "]rc",
-            function()
-                require("treesitter-context").disable()
-            end,
+            context.disable(),
             desc = "Disable Treesiter Context",
         },
         {
             "yrc",
-            function()
-                require("treesitter-context").toggle()
-            end,
+            context.toggle(),
             desc = "Toggle Treesiter Context",
         },
         {
             "[c",
-            function()
-                require("treesitter-context").go_to_context(vim.v.count1)
-            end,
+            context.go_to_context(vim.v.count1),
             mode = { "n", "x" },
             desc = "Previous Treesiter Context",
         },
         {
             "[C",
-            function()
-                require("treesitter-context").go_to_context(-1)
-            end,
+            context.go_to_context(-1),
             mode = { "n", "x" },
             desc = "Top Treesiter Context",
         },
