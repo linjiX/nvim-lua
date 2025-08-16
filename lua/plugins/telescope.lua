@@ -1,4 +1,5 @@
 local R = require("utility").lazy_require
+local telescope = R("telescope")
 local builtin = R("telescope.builtin")
 
 -- local symbols =
@@ -38,6 +39,7 @@ return {
         { "<Leader>fD", builtin.diagnostics() },
         { "<Leader>fl", builtin.current_buffer_fuzzy_find() },
         { "<Leader>fr", builtin.resume() },
+        { "<Leader>fn", telescope.extensions.noice.noice() },
 
         {
             "<Leader>gb",
@@ -63,7 +65,7 @@ return {
             }),
         },
         -- { "gO", builtin.lsp_document_symbols({ bufnr = 0, symbols = symbols }) },
-        { "gO", R("telescope").extensions.aerial.aerial() },
+        { "gO", telescope.extensions.aerial.aerial() },
         { "gri", builtin.lsp_implementations() },
         { "grt", builtin.lsp_type_definitions() },
     },
