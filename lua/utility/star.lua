@@ -22,6 +22,8 @@ end
 local function do_count(count)
     if count ~= 0 then
         vim.cmd.normal({ count .. "n", bang = true })
+    else
+        vim.cmd.normal({ "m'", bang = true }) -- Add corsor position into jumplist
     end
 end
 
