@@ -119,6 +119,7 @@ return {
                 width = 32,
             },
             renderer = {
+                special_files = {},
                 hidden_display = "simple",
                 highlight_git = "all",
                 indent_markers = {
