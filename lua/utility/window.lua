@@ -37,14 +37,23 @@ function M.smart_quit(cmd)
     return is_write and "w | " .. quit_cmd or quit_cmd
 end
 
-local WINDOW_KEYS = { "<C-h>", "<C-j>", "<C-k>", "<C-l>" }
+local NAVIGATION_KEYS = { "h", "j", "k", "l" }
 local QUIT_KEYS = { "q", "<Leader>q" }
+
+---@return nil
+function M.set_navigation_keymaps()
+    for _, key in ipairs(NAVIGATION_KEYS) do
+        vim.keymap.set({ "n", "t" }, ("<C-%s>"):format(key), function()
+            vim.cmd.wincmd(key)
+        end)
+    end
+end
 
 ---@param buf integer
 ---@return nil
-function M.block_window_keymaps(buf)
-    for _, key in pairs(WINDOW_KEYS) do
-        vim.keymap.set("n", key, "<Nop>", { buffer = buf })
+function M.block_navigation_keymaps(buf)
+    for _, key in pairs(NAVIGATION_KEYS) do
+        vim.keymap.set("n", ("<C-%s>"):format(key), "<Nop>", { buffer = buf })
     end
 end
 
@@ -98,7 +107,7 @@ function M.redirect_win(opts)
     api.nvim_win_close(source_win, false)
 
     if opts.win_config.relative then
-        M.block_window_keymaps(buf)
+        M.block_navigation_keymaps(buf)
     end
 
     return win

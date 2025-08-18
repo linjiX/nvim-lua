@@ -26,11 +26,6 @@ vim.opt.listchars = { tab = "-->", nbsp = "+", precedes = "<", extends = ">" }
 
 vim.opt.clipboard = "unnamedplus"
 
-vim.keymap.set("n", "<C-h>", "<C-w>h")
-vim.keymap.set("n", "<C-j>", "<C-w>j")
-vim.keymap.set("n", "<C-k>", "<C-w>k")
-vim.keymap.set("n", "<C-l>", "<C-w>l")
-
 local utility = require("utility")
 
 vim.keymap.set("n", "<C-w>m", utility.tabopen)
@@ -63,6 +58,8 @@ vim.keymap.set("n", "grh", vim.lsp.buf.typehierarchy)
 vim.keymap.set("n", "grk", vim.lsp.buf.signature_help)
 
 local window = require("utility.window")
+
+window.set_navigation_keymaps()
 
 for _, cmd in ipairs({ "q", "wq" }) do
     vim.keymap.set("ca", cmd, function()
