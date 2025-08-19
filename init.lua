@@ -137,6 +137,15 @@ vim.api.nvim_create_autocmd("BufReadPost", {
     end,
 })
 
+-- Highlight yanked text
+vim.api.nvim_create_autocmd("TextYankPost", {
+    group = vim.api.nvim_create_augroup("MyYankHighlight", { clear = true }),
+    pattern = "*",
+    callback = function()
+        vim.hl.on_yank({ higroup = "DiffText", timeout = 300 })
+    end,
+})
+
 -- Diagnostic
 vim.keymap.set("n", "<Leader>K", vim.diagnostic.open_float)
 
