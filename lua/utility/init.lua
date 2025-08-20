@@ -17,7 +17,7 @@ local METATABLE = {
                     target = target[key]
                 end
             end
-            return target(unpack(args))
+            return target(unpack(vim.deepcopy(args)))
         end
 
         return fn
