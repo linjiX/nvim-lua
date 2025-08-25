@@ -5,6 +5,7 @@ return {
         vim.api.nvim_set_hl(0, "AerialLine", { link = "CursorLineNr" })
 
         return {
+            backends = { "lsp", "treesitter", "markdown", "asciidoc", "man" },
             layout = {
                 width = 32,
                 win_opts = {
