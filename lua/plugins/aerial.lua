@@ -12,6 +12,9 @@ return {
                     cursorcolumn = false,
                 },
             },
+            filter_kind = {
+                json = { "Array", "Module" },
+            },
             attach_mode = "global",
             keymaps = {
                 ["<C-s>"] = false,
@@ -49,6 +52,9 @@ return {
                     TypeParameter = "𝙏",
                     Variable = "󰀫",
                     Collapsed = "",
+                },
+                json = {
+                    Module = "󰅩",
                 },
             },
             show_guides = true,
