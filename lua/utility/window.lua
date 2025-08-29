@@ -2,6 +2,8 @@ local M = {}
 local api = vim.api
 local fn = vim.fn
 
+local utility = require("utility")
+
 local SMART_QUIT_CONFIGS = {
     ["q"] = { is_write = false },
     ["wq"] = { is_write = true },
@@ -38,14 +40,47 @@ function M.smart_quit(cmd)
 end
 
 local NAVIGATION_KEYS = { "h", "j", "k", "l" }
+local NAVIGATION_VERTICAL_KEYS = { "j", "k" }
 local QUIT_KEYS = { "q", "<Leader>q" }
+
+--- @param wincmd fun(key: string): nil
+--- @return { [1]: string, [2]: (fun(): nil), mode: string|string[] }[]
+function M.get_navigation_lazy_keys(wincmd)
+    local keys = {}
+    for _, key in ipairs(NAVIGATION_KEYS) do
+        table.insert(keys, {
+            ("<C-%s>"):format(key),
+            function()
+                wincmd(key)
+            end,
+            mode = vim.tbl_contains(NAVIGATION_VERTICAL_KEYS, key) and "n" or { "n", "t" },
+        })
+    end
+
+    for _, key in ipairs(NAVIGATION_VERTICAL_KEYS) do
+        local lhs = ("<C-%s>"):format(key)
+
+        table.insert(keys, {
+            lhs,
+            function()
+                if utility.get_terminal_command() == "fzf" then
+                    vim.api.nvim_chan_send(vim.b.terminal_job_id, vim.keycode(lhs))
+                    return
+                end
+                wincmd(key)
+            end,
+            mode = "t",
+        })
+    end
+
+    return keys
+end
 
 ---@return nil
 function M.set_navigation_keymaps()
-    for _, key in ipairs(NAVIGATION_KEYS) do
-        vim.keymap.set({ "n", "t" }, ("<C-%s>"):format(key), function()
-            vim.cmd.wincmd(key)
-        end)
+    local keys = M.get_navigation_lazy_keys(vim.cmd.wincmd)
+    for _, keymap in ipairs(keys) do
+        vim.keymap.set(keymap.mode, keymap[1], keymap[2])
     end
 end
 

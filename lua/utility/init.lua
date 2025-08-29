@@ -97,4 +97,56 @@ function M.get_python_path()
     return vim.fn.exepath("python3") or vim.fn.exepath("python") or "python"
 end
 
+---@param bufnr number|nil
+---@return string|nil
+function M.get_terminal_command(bufnr)
+    if not bufnr or bufnr == 0 then
+        bufnr = vim.api.nvim_get_current_buf()
+    end
+
+    local pid = vim.b[bufnr].terminal_job_pid
+    if not pid then
+        error("Failed to get terminal job pid")
+    end
+
+    local tty = vim.fn.system("ps -o tty= " .. pid)
+    if vim.v.shell_error ~= 0 then
+        error("Failed to get terminal tty")
+    end
+
+    local ps_result = vim.fn.system("ps -o stat= -o command= -t " .. vim.trim(tty))
+    if vim.v.shell_error ~= 0 then
+        error("Failed to get process list")
+    end
+
+    local ps_lines = vim.split(ps_result, "\n", { trimempty = true })
+    local fg_command_parts = nil
+
+    for i = #ps_lines, 1, -1 do
+        local line = ps_lines[i]
+
+        local parts = vim.split(line, "%s+", { trimempty = true })
+
+        if #parts > 0 and parts[1]:find("+") then
+            fg_command_parts = { unpack(parts, 2) }
+
+            if fg_command_parts[1] == "fzf" then
+                break
+            end
+        end
+    end
+
+    if not fg_command_parts then
+        error("Fail to get terminal foreground process")
+    end
+
+    local fg_command = vim.fn.fnamemodify(fg_command_parts[1], ":t")
+
+    if fg_command:match("^[Pp]ython") and fg_command_parts[2] then
+        fg_command = vim.fn.fnamemodify(fg_command_parts[2], ":t")
+    end
+
+    return fg_command
+end
+
 return M
