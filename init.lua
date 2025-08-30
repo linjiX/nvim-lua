@@ -81,6 +81,18 @@ for _, key in ipairs({ "*", "#" }) do
     end)
 end
 
+local jq_keymaps = {
+    { key = [[<Leader>jq]], cmd = "!jq -M -r --indent 4", desc = "Format JSON with jq" },
+    { key = [[<Leader>jc]], cmd = "!jq -M -c", desc = "Compact JSON with jq" },
+    { key = [[<Leader>j\]], cmd = "!jq -M @json", desc = "Escape JSON with jq" },
+}
+
+for _, map in ipairs(jq_keymaps) do
+    local opts = { silent = true, desc = map.desc }
+    vim.keymap.set("n", map.key, ":%" .. map.cmd .. "<CR>", opts)
+    vim.keymap.set("x", map.key, ":" .. map.cmd .. "<CR>", opts)
+end
+
 local buffer = require("utility.buffer")
 
 vim.keymap.set("n", "<Leader>u", buffer.reopen_buffer)
