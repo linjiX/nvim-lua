@@ -12,11 +12,24 @@ return {
     config = function()
         local lint = require("lint")
 
-        vim.list_extend(lint.linters.mypy.args, { "--python-executable", python_path_getter })
+        lint.linters.dmypy.args = {
+            "run",
+            "--timeout",
+            "3600",
+            "--",
+            "--show-column-numbers",
+            "--show-error-end",
+            "--hide-error-context",
+            "--no-color-output",
+            "--no-error-summary",
+            "--no-pretty",
+            "--python-executable",
+            python_path_getter,
+        }
 
         lint.linters_by_ft = {
             lua = { "luacheck" },
-            python = { "mypy" },
+            python = { "dmypy" },
             html = { "htmlhint" },
             gitcommit = { "gitlint" },
         }
