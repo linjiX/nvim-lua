@@ -69,6 +69,7 @@ return {
                 filetypes = { "typescript", "javascript", "vue" },
             },
             vue_ls = {},
+            eslint = {},
             html = {},
             bashls = {
                 filetypes = { "bash", "zsh", "sh" },

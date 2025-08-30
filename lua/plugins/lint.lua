@@ -18,9 +18,6 @@ return {
             lua = { "luacheck" },
             python = { "mypy" },
             html = { "htmlhint" },
-            javascript = { "eslint_d" },
-            typescript = { "eslint_d" },
-            vue = { "eslint_d" },
             gitcommit = { "gitlint" },
         }
 
