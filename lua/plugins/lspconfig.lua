@@ -70,6 +70,9 @@ return {
             },
             vue_ls = {},
             html = {},
+            bashls = {
+                filetypes = { "bash", "zsh", "sh" },
+            },
         }
 
         for name, opt in pairs(opts) do
