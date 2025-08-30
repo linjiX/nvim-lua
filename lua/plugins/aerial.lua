@@ -2,7 +2,15 @@ return {
     "stevearc/aerial.nvim",
     cmd = { "AerialOpen", "AerialToggle" },
     opts = function()
-        vim.api.nvim_set_hl(0, "AerialLine", { link = "CursorLineNr" })
+        vim.api.nvim_set_hl(
+            0,
+            "AerialLine",
+            vim.tbl_extend(
+                "force",
+                vim.api.nvim_get_hl(0, { name = "DiffAdd" }),
+                { bold = true, italic = true }
+            )
+        )
 
         return {
             backends = { "lsp", "treesitter", "markdown", "asciidoc", "man" },
