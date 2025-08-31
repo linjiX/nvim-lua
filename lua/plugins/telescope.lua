@@ -27,6 +27,7 @@ return {
         },
         { "<Leader>fb", builtin.buffers({ ignore_current_buffer = true }), desc = "Buffers" },
         { "<Leader>fh", builtin.help_tags(), desc = "Help Tags" },
+        { "<Leader>fm", builtin.man_pages(), desc = "Man pages" },
         { "<Leader>fH", builtin.highlights(), desc = "Highlights" },
         { "<Leader>fe", builtin.filetypes(), desc = "Filetypes" },
         { "<Leader>fc", builtin.colorscheme(), desc = "Colorschemes" },
