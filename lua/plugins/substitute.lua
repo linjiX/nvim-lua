@@ -1,77 +1,24 @@
+local R = require("utility").lazy_require
+local substitute = R("substitute")
+local range = R("substitute.range")
+local exchange = R("substitute.exchange")
+
 return {
     "gbprod/substitute.nvim",
     keys = {
-        {
-            "s",
-            function()
-                require("substitute").operator()
-            end,
-        },
-        {
-            "ss",
-            function()
-                require("substitute").line()
-            end,
-        },
-        {
-            "S",
-            function()
-                require("substitute").eol()
-            end,
-        },
-        {
-            "s",
-            function()
-                require("substitute").visual()
-            end,
-            mode = "x",
-        },
+        { "s", substitute.operator(), desc = "Substitute" },
+        { "ss", substitute.line(), desc = "Substitute line" },
+        { "S", substitute.eol(), desc = "Substitute to end of line" },
+        { "s", substitute.visual(), mode = "x", desc = "Substitute visual selection" },
 
-        {
-            "gss",
-            function()
-                require("substitute.range").word()
-            end,
-        },
-        {
-            "gs",
-            function()
-                require("substitute.range").operator()
-            end,
-        },
-        {
-            "gs",
-            function()
-                require("substitute.range").visual()
-            end,
-            mode = "x",
-        },
+        { "gss", range.word(), desc = "Range substitute for word" },
+        { "gs", range.operator(), desc = "Range substitute" },
+        { "gs", range.visual(), mode = "x", desc = "Range substitute" },
 
-        {
-            "sx",
-            function()
-                require("substitute.exchange").operator()
-            end,
-        },
-        {
-            "sxx",
-            function()
-                require("substitute.exchange").line()
-            end,
-        },
-        {
-            "sxc",
-            function()
-                require("substitute.exchange").cancel()
-            end,
-        },
-        {
-            "X",
-            function()
-                require("substitute.exchange").visual()
-            end,
-            mode = "x",
-        },
+        { "sx", exchange.operator(), desc = "Exchange" },
+        { "sxx", exchange.line(), desc = "Exchange line" },
+        { "sxc", exchange.cancel(), desc = "Exchange cancel" },
+        { "X", exchange.visual(), mode = "x", desc = "Exchange" },
     },
     opts = {},
 }
