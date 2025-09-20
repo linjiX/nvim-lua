@@ -39,6 +39,13 @@ return {
             ruff = {},
 
             -- ts_ls = {
+            --     settings = {
+            --         typescript = {
+            --             tsserver = {
+            --                 maxTsServerMemory = 8192,
+            --             },
+            --         },
+            --     },
             --     init_options = {
             --         hostInfo = "neovim",
             --         plugins = {
@@ -53,6 +60,11 @@ return {
             -- },
             vtsls = {
                 settings = {
+                    typescript = {
+                        tsserver = {
+                            maxTsServerMemory = 8192,
+                        },
+                    },
                     vtsls = {
                         tsserver = {
                             globalPlugins = {
