@@ -154,7 +154,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
     group = vim.api.nvim_create_augroup("MyYankHighlight", { clear = true }),
     pattern = "*",
     callback = function()
-        vim.hl.on_yank({ higroup = "DiffText", timeout = 300 })
+        vim.hl.on_yank({ higroup = "TabLineSel", timeout = 300 })
     end,
 })
 
