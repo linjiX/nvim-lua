@@ -1,6 +1,6 @@
 local R = require("utility").lazy_require
 
-local ft = { "vue", "javascript", "typescript", "html", "css" }
+local ft = { "vue", "javascript", "typescript", "html", "css", "lua" }
 
 return {
     "norcalli/nvim-colorizer.lua",
