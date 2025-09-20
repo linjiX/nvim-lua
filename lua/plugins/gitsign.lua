@@ -4,31 +4,31 @@ return {
         on_attach = function(buffer)
             local gs = package.loaded.gitsigns
 
-            local function map(mode, l, r, desc)
-                vim.keymap.set(mode, l, r, { buffer = buffer, desc = desc })
+            local function map(mode, lhs, rhs, desc)
+                vim.keymap.set(mode, lhs, rhs, { buffer = buffer, desc = desc })
             end
 
-            map("n", "]h", function()
+            map("n", "]c", function()
                 if vim.wo.diff then
                     vim.cmd.normal({ "]c", bang = true })
                 else
                     gs.nav_hunk("next")
                 end
-            end, "Next Hunk")
-            map("n", "[h", function()
+            end, "Next Change")
+            map("n", "[c", function()
                 if vim.wo.diff then
                     vim.cmd.normal({ "[c", bang = true })
                 else
                     gs.nav_hunk("prev")
                 end
-            end, "Prev Hunk")
+            end, "Prev Change")
 
-            map("n", "]H", function()
+            map("n", "]C", function()
                 gs.nav_hunk("last")
-            end, "Last Hunk")
-            map("n", "[H", function()
+            end, "Last Change")
+            map("n", "[C", function()
                 gs.nav_hunk("first")
-            end, "First Hunk")
+            end, "First Change")
 
             map("n", "<Leader>ga", gs.stage_hunk, "Stage Hunk")
             map("v", "<Leader>ga", function()
@@ -58,8 +58,8 @@ return {
                 gs.diffthis("~")
             end, "Diff This ~")
 
-            map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
-            map({ "o", "x" }, "ah", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
+            map({ "o", "x" }, "ic", gs.select_hunk, "Select Change")
+            map({ "o", "x" }, "ac", gs.select_hunk, "Select Change")
         end,
     },
 }

@@ -8,27 +8,27 @@ return {
                     enable = true,
                     lookahead = true,
                     keymaps = {
-                        ["af"] = {
+                        ["am"] = {
                             query = "@function.outer",
                             desc = "outer function",
                         },
-                        ["if"] = {
+                        ["im"] = {
                             query = "@function.inner",
                             desc = "inner function",
                         },
-                        ["ac"] = {
+                        ["an"] = {
                             query = "@class.outer",
                             desc = "outer class",
                         },
-                        ["ic"] = {
+                        ["in"] = {
                             query = "@class.inner",
                             desc = "inner class",
                         },
-                        ["aa"] = {
+                        ["aA"] = {
                             query = "@parameter.outer",
                             desc = "outer argument",
                         },
-                        ["ia"] = {
+                        ["iA"] = {
                             query = "@parameter.inner",
                             desc = "inner argument",
                         },

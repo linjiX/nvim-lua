@@ -7,10 +7,13 @@ return {
 
         return {
             mappings = {
-                around_next = "an",
-                inside_next = "in",
-                around_last = "aN",
-                inside_last = "iN",
+                around_next = "",
+                inside_next = "",
+                around_last = "",
+                inside_last = "",
+
+                goto_left = "",
+                goto_right = "",
             },
 
             custom_textobjects = {
