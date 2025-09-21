@@ -159,8 +159,6 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 })
 
 -- Diagnostic
-vim.keymap.set("n", "<Leader>K", vim.diagnostic.open_float)
-
 vim.diagnostic.config({
     float = {
         border = "rounded",
