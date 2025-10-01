@@ -1,4 +1,4 @@
-local context = require("utility").lazy_require("treesitter-context")
+local context = require("config.utility").lazy_require("treesitter-context")
 
 return {
     "nvim-treesitter/nvim-treesitter-context",

@@ -26,7 +26,7 @@ vim.opt.listchars = { tab = "-->", nbsp = "+", precedes = "<", extends = ">" }
 
 vim.opt.clipboard = "unnamedplus"
 
-local utility = require("utility")
+local utility = require("config.utility")
 
 vim.keymap.set("n", "<C-w>m", utility.tabopen)
 vim.keymap.set("n", "<C-w><C-m>", utility.tabopen)

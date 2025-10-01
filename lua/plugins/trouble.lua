@@ -1,4 +1,4 @@
-local trouble = require("utility").lazy_require("trouble")
+local trouble = require("config.utility").lazy_require("trouble")
 
 return {
     "folke/trouble.nvim",

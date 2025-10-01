@@ -2,7 +2,7 @@ local M = {}
 local api = vim.api
 local fn = vim.fn
 
-local utility = require("utility")
+local utility = require("config.utility")
 
 local SMART_QUIT_CONFIGS = {
     ["q"] = { is_write = false },

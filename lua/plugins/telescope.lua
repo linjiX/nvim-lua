@@ -1,4 +1,4 @@
-local R = require("utility").lazy_require
+local R = require("config.utility").lazy_require
 local telescope = R("telescope")
 local builtin = R("telescope.builtin")
 

@@ -1,4 +1,4 @@
-local map = require("utility").lazy_require("dial.map")
+local map = require("config.utility").lazy_require("dial.map")
 
 return {
     "monaqa/dial.nvim",

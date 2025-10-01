@@ -1,4 +1,4 @@
-local command = require("utility").lazy_require("copilot.command")
+local command = require("config.utility").lazy_require("copilot.command")
 
 return {
     "zbirenbaum/copilot.lua",

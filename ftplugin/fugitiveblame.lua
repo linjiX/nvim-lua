@@ -1,4 +1,4 @@
-local utility = require("utility")
+local utility = require("config.utility")
 local window = require("config.window")
 local scriptname = require("plugins.fugitive").scriptname
 

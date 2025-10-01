@@ -1,5 +1,5 @@
 local function get_keys()
-    local utility = require("utility")
+    local utility = require("config.utility")
     local window = require("config.window")
     local navigation = utility.lazy_require("nvim-tmux-navigation")
 

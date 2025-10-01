@@ -1,4 +1,4 @@
-local R = require("utility").lazy_require
+local R = require("config.utility").lazy_require
 local substitute = R("substitute")
 local range = R("substitute.range")
 local exchange = R("substitute.exchange")

@@ -30,7 +30,7 @@ return {
         end
     end,
     config = function()
-        local utility = require("utility")
+        local utility = require("config.utility")
 
         vim.api.nvim_create_user_command("Git", function(opts)
             local subcommand = opts.args:match("%w+")

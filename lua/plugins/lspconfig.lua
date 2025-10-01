@@ -33,7 +33,7 @@ return {
 
             pyright = {
                 before_init = function(_, config)
-                    config.settings.python.pythonPath = require("utility").get_python_path()
+                    config.settings.python.pythonPath = require("config.utility").get_python_path()
                 end,
             },
             ruff = {},

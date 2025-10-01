@@ -1,7 +1,7 @@
 local python_path = nil
 local function python_path_getter()
     if not python_path then
-        python_path = require("utility").get_python_path()
+        python_path = require("config.utility").get_python_path()
     end
     return python_path
 end
