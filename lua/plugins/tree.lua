@@ -1,5 +1,5 @@
 local R = require("config.utility").lazy_require
-local sidebar = R("utility.sidebar")
+local sidebar = R("config.sidebar")
 
 return {
     "nvim-tree/nvim-tree.lua",
