@@ -13,19 +13,19 @@ local function map_diagnostic_pairs(severity)
     local name = severity:lower()
     local key = name:sub(1, 1)
 
-    vim.keymap.set("n", "]" .. key, function()
+    vim.keymap.set("n", "]g" .. key, function()
         vim.diagnostic.jump({ count = vim.v.count1, severity = severity })
     end, { desc = "Next " .. name })
 
-    vim.keymap.set("n", "[" .. key, function()
+    vim.keymap.set("n", "[g" .. key, function()
         vim.diagnostic.jump({ count = -vim.v.count1, severity = severity })
     end, { desc = "Prev " .. name })
 
-    vim.keymap.set("n", "]" .. key:upper(), function()
+    vim.keymap.set("n", "]g" .. key:upper(), function()
         vim.diagnostic.jump({ count = math.huge, wrap = false, severity = severity })
     end, { desc = "First " .. name })
 
-    vim.keymap.set("n", "[" .. key:upper(), function()
+    vim.keymap.set("n", "[g" .. key:upper(), function()
         vim.diagnostic.jump({ count = -math.huge, wrap = false, severity = severity })
     end, { desc = "Last " .. name })
 end

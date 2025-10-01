@@ -5,7 +5,7 @@ return {
     cmd = { "Hi" },
     keys = {
         {
-            "<Leader>k",
+            "<Leader>h",
             function()
                 vim.cmd.Hi("+")
             end,
@@ -13,7 +13,7 @@ return {
             desc = "Highlight word",
         },
         {
-            "<Leader>k",
+            "<Leader>h",
             function()
                 vim.cmd.normal(ESC)
                 vim.cmd.Hi("+x")
@@ -64,8 +64,8 @@ return {
             { key = "<Leader><BS>", cmd = "clear", desc = "Clear Highlight" },
             { key = "<Leader>n", cmd = "}", desc = "Next Highlight" },
             { key = "<Leader>N", cmd = "{", desc = "Previous Highlight" },
-            { key = "]k", cmd = ">", desc = "Next Highlight Pattern" },
-            { key = "[k", cmd = "<", desc = "Previous Highlight Pattern" },
+            { key = "]h", cmd = ">", desc = "Next Highlight Pattern" },
+            { key = "[h", cmd = "<", desc = "Previous Highlight Pattern" },
         }
 
         for _, map in ipairs(maps) do

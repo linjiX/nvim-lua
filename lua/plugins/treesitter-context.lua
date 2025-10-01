@@ -6,28 +6,28 @@ return {
     lazy = false,
     keys = {
         {
-            "[re",
+            "[rx",
             context.enable(),
             desc = "Enable Treesiter Context",
         },
         {
-            "]re",
+            "]rx",
             context.disable(),
             desc = "Disable Treesiter Context",
         },
         {
-            "yre",
+            "yrx",
             context.toggle(),
             desc = "Toggle Treesiter Context",
         },
         {
-            "[e",
+            "[x",
             context.go_to_context(vim.v.count1),
             mode = { "n", "x" },
             desc = "Previous Treesiter Context",
         },
         {
-            "[E",
+            "[X",
             context.go_to_context(-1),
             mode = { "n", "x" },
             desc = "Top Treesiter Context",

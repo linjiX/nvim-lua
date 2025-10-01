@@ -4,8 +4,8 @@ return {
     "rhysd/conflict-marker.vim",
     lazy = false,
     keys = {
-        { "]x", "<Plug>(conflict-marker-next-hunk)", desc = "Next Git Conflict" },
-        { "[x", "<Plug>(conflict-marker-prev-hunk)", desc = "Previous Git Conflict" },
+        { "]k", "<Plug>(conflict-marker-next-hunk)", desc = "Next Git Conflict" },
+        { "[k", "<Plug>(conflict-marker-prev-hunk)", desc = "Previous Git Conflict" },
 
         { "<Leader>cj", "<Plug>(conflict-marker-themselves)", desc = "Git Conflict Choose Theirs" },
         { "<Leader>ck", "<Plug>(conflict-marker-ourselves)", desc = "Git Conflict Choose Ours" },
