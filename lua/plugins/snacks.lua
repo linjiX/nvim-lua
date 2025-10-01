@@ -45,7 +45,12 @@ return {
             quickfile = { enabled = true },
             statuscolumn = { enabled = true },
             words = { enabled = true },
-            indent = { enabled = true },
+            indent = {
+                enabled = true,
+                scope = {
+                    hl = "SnacksIndent6",
+                },
+            },
             input = { enabled = true },
             picker = {
                 enabled = true,
