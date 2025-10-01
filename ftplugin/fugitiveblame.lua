@@ -1,5 +1,5 @@
 local utility = require("utility")
-local window = require("utility.window")
+local window = require("config.window")
 local scriptname = require("plugins.fugitive").scriptname
 
 vim.b.did_ftplugin = true

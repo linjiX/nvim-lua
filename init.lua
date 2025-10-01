@@ -61,13 +61,7 @@ local window = require("utility.window")
 
 window.set_navigation_keymaps()
 
-for _, cmd in ipairs({ "q", "wq" }) do
-    vim.keymap.set("ca", cmd, function()
-        return window.smart_quit(cmd)
-    end, { expr = true })
-end
-
-require("config.star").setup()
+local window = require("config.window")
 
 local jq_keymaps = {
     { key = [[<Leader>jq]], cmd = "!jq -M -r --indent 4", desc = "Format JSON with jq" },
@@ -80,8 +74,6 @@ for _, map in ipairs(jq_keymaps) do
     vim.keymap.set("n", map.key, ":%" .. map.cmd .. "<CR>", opts)
     vim.keymap.set("x", map.key, ":" .. map.cmd .. "<CR>", opts)
 end
-
-require("config.buffer").setup()
 
 vim.api.nvim_create_autocmd("BufWinEnter", {
     group = vim.api.nvim_create_augroup("MyAutocmd", { clear = true }),
@@ -138,7 +130,10 @@ vim.api.nvim_create_autocmd("TextYankPost", {
     end,
 })
 
+window.setup()
+require("config.buffer").setup()
 require("config.diagnostic").setup()
+require("config.star").setup()
 require("config.lazy")
 
 vim.cmd.colorscheme("tokyonight-night")

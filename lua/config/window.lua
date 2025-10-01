@@ -175,4 +175,15 @@ function M.redirect_git_floatwin()
     return win
 end
 
+---@return integer|nil
+function M.setup()
+    M.set_navigation_keymaps()
+
+    for _, cmd in ipairs(vim.tbl_keys(SMART_QUIT_CONFIGS)) do
+        vim.keymap.set("ca", cmd, function()
+            return M.smart_quit(cmd)
+        end, { expr = true })
+    end
+end
+
 return M

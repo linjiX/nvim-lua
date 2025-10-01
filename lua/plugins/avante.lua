@@ -1,4 +1,4 @@
-local window = require("utility.window")
+local window = require("config.window")
 local R = require("utility").lazy_require
 local api = R("avante.api")
 

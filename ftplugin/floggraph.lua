@@ -1,4 +1,4 @@
-local window = require("utility.window")
+local window = require("config.window")
 
 window.set_quit_keymaps("<Plug>(FlogQuit)")
 

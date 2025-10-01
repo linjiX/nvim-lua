@@ -1,1 +1,1 @@
-require("utility.window").redirect_git_floatwin()
+require("config.window").redirect_git_floatwin()
