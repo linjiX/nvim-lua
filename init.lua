@@ -62,9 +62,10 @@ local window = require("utility.window")
 window.set_navigation_keymaps()
 
 local window = require("config.window")
+local augroup = vim.api.nvim_create_augroup("MyAutocmds", { clear = true })
 
 vim.api.nvim_create_autocmd("BufWinEnter", {
-    group = vim.api.nvim_create_augroup("MyAutocmd", { clear = true }),
+    group = augroup,
     pattern = "*",
     callback = function(args)
         if vim.bo.buftype == "nofile" then
@@ -83,7 +84,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 })
 
 vim.api.nvim_create_autocmd("FileType", {
-    group = vim.api.nvim_create_augroup("MyFiletype", { clear = true }),
+    group = augroup,
     pattern = "*",
     callback = function()
         vim.opt_local.formatoptions:remove({ "c", "r", "o" })
@@ -92,7 +93,7 @@ vim.api.nvim_create_autocmd("FileType", {
 
 -- Restore cursor to the last position
 vim.api.nvim_create_autocmd("BufReadPost", {
-    group = vim.api.nvim_create_augroup("MyCursor", { clear = true }),
+    group = augroup,
     pattern = "*",
     callback = function(args)
         local exclude = { "COMMIT_EDITMSG" }
@@ -111,7 +112,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 
 -- Highlight yanked text
 vim.api.nvim_create_autocmd("TextYankPost", {
-    group = vim.api.nvim_create_augroup("MyYankHighlight", { clear = true }),
+    group = augroup,
     pattern = "*",
     callback = function()
         vim.hl.on_yank({ higroup = "TabLineSel", timeout = 300 })
