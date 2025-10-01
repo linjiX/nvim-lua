@@ -134,6 +134,6 @@ window.setup()
 require("config.buffer").setup()
 require("config.diagnostic").setup()
 require("config.star").setup()
-require("config.lazy")
+require("config.lazy").setup()
 
 vim.cmd.colorscheme("tokyonight-night")
