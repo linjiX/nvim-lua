@@ -67,19 +67,7 @@ for _, cmd in ipairs({ "q", "wq" }) do
     end, { expr = true })
 end
 
-local star = require("utility.star")
-
-for _, key in ipairs({ "*", "g*", "#", "g#" }) do
-    vim.keymap.set("n", key, function()
-        star.star(key)
-    end)
-end
-
-for _, key in ipairs({ "*", "#" }) do
-    vim.keymap.set("x", key, function()
-        star.visual_star(key)
-    end)
-end
+require("config.star").setup()
 
 local jq_keymaps = {
     { key = [[<Leader>jq]], cmd = "!jq -M -r --indent 4", desc = "Format JSON with jq" },

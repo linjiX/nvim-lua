@@ -74,4 +74,19 @@ function M.star(key)
     do_count(vim.v.count)
 end
 
+---@return nil
+function M.setup()
+    for _, key in ipairs({ "*", "g*", "#", "g#" }) do
+        vim.keymap.set("n", key, function()
+            M.star(key)
+        end)
+    end
+
+    for _, key in ipairs({ "*", "#" }) do
+        vim.keymap.set("x", key, function()
+            M.visual_star(key)
+        end)
+    end
+end
+
 return M

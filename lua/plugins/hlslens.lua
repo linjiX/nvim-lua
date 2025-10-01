@@ -1,3 +1,5 @@
+local star = require("config.star")
+
 return {
     "kevinhwang91/nvim-hlslens",
     keys = {
@@ -20,7 +22,7 @@ return {
         {
             "*",
             function()
-                require("utility.star").star("*")
+                star.star("*")
                 require("hlslens").start()
             end,
             desc = "Search word under cursor forward",
@@ -28,7 +30,7 @@ return {
         {
             "#",
             function()
-                require("utility.star").star("#")
+                star.star("#")
                 require("hlslens").start()
             end,
             desc = "Search word under cursor backward",
@@ -36,7 +38,7 @@ return {
         {
             "g*",
             function()
-                require("utility.star").star("g*")
+                star.star("g*")
                 require("hlslens").start()
             end,
             desc = "Search word under cursor forward (partial)",
@@ -44,7 +46,7 @@ return {
         {
             "g#",
             function()
-                require("utility.star").star("g#")
+                star.star("g#")
                 require("hlslens").start()
             end,
             desc = "Search word under cursor backward (partial)",
@@ -52,7 +54,7 @@ return {
         {
             "*",
             function()
-                require("utility.star").visual_star("*")
+                star.visual_star("*")
                 require("hlslens").start()
             end,
             mode = "x",
@@ -61,7 +63,7 @@ return {
         {
             "#",
             function()
-                require("utility.star").visual_star("#")
+                star.visual_star("#")
                 require("hlslens").start()
             end,
             mode = "x",
