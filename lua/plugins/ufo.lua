@@ -40,8 +40,9 @@ return {
 
         return {
             fold_virt_text_handler = handler,
-            provider_selector = function()
-                return { "treesitter", "indent" }
+            ---@diagnostic disable-next-line: unused-local
+            provider_selector = function(_bufnr, _filetype, buftype)
+                return buftype == "" and { "treesitter", "indent" } or ""
             end,
         }
     end,
