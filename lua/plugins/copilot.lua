@@ -1,3 +1,5 @@
+local command = require("utility").lazy_require("copilot.command")
+
 return {
     "zbirenbaum/copilot.lua",
     dependencies = {
@@ -34,23 +36,17 @@ return {
         },
         {
             "[rg",
-            function()
-                require("copilot.command").enable()
-            end,
+            command.enable(),
             desc = "Enable Copilot",
         },
         {
             "]rg",
-            function()
-                require("copilot.command").disable()
-            end,
+            command.disable(),
             desc = "Disable Copilot",
         },
         {
             "yrg",
-            function()
-                require("copilot.command").toggle()
-            end,
+            command.toggle(),
             desc = "Toggle Copilot",
         },
     },
