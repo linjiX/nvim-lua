@@ -57,14 +57,45 @@ local function reopen_buffer()
     vim.notify("No unloaded buffers")
 end
 
+---@param args vim.api.keyset.create_autocmd.callback_args
+---@return nil
+local function wipe_empty_buffer(args)
+    local buf = args.buf
+
+    if
+        args.file == ""
+        and vim.bo[buf].buftype == ""
+        and vim.bo[buf].filetype == ""
+        and vim.bo[buf].bufhidden == ""
+        and vim.api.nvim_buf_line_count(buf) == 1
+        and vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1] == ""
+    then
+        vim.bo[buf].bufhidden = "wipe"
+
+        vim.schedule(function()
+            if vim.api.nvim_buf_is_valid(buf) then
+                vim.bo[buf].bufhidden = ""
+            end
+        end)
+    end
+end
+
 ---@return nil
 function M.setup()
     vim.keymap.set("n", "<Leader>u", reopen_buffer)
 
+    local augroup = vim.api.nvim_create_augroup("MyBuffer", { clear = true })
+
     vim.api.nvim_create_autocmd("BufUnload", {
-        group = vim.api.nvim_create_augroup("MyBufUnload", { clear = true }),
+        group = augroup,
         pattern = "*",
         callback = add_unloaded_buffer,
+    })
+
+    vim.api.nvim_create_autocmd("BufLeave", {
+        group = augroup,
+        pattern = "*",
+        callback = wipe_empty_buffer,
     })
 end
 
