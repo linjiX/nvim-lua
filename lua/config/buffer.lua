@@ -18,7 +18,7 @@ end
 
 ---@param opts {buf: integer, match: string}
 ---@return nil
-function M.add_unloaded_buffer(opts)
+local function add_unloaded_buffer(opts)
     local buf = opts.buf
     if
         vim.fn.buflisted(buf) == 0
@@ -42,7 +42,7 @@ function M.add_unloaded_buffer(opts)
 end
 
 ---@return nil
-function M.reopen_buffer()
+local function reopen_buffer()
     while #M.unloaded_buffers > 0 do
         local filename = M.unloaded_buffers[#M.unloaded_buffers]
 
@@ -55,6 +55,17 @@ function M.reopen_buffer()
         table.remove(M.unloaded_buffers)
     end
     vim.notify("No unloaded buffers")
+end
+
+---@return nil
+function M.setup()
+    vim.keymap.set("n", "<Leader>u", reopen_buffer)
+
+    vim.api.nvim_create_autocmd("BufUnload", {
+        group = vim.api.nvim_create_augroup("MyBufUnload", { clear = true }),
+        pattern = "*",
+        callback = add_unloaded_buffer,
+    })
 end
 
 return M
