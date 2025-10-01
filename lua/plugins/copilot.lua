@@ -4,6 +4,7 @@ return {
     "zbirenbaum/copilot.lua",
     dependencies = {
         "AndreM222/copilot-lualine",
+        "copilotlsp-nvim/copilot-lsp",
     },
     cmd = "Copilot",
     event = "InsertEnter",
@@ -74,8 +75,18 @@ return {
                 dismiss = "<C-]>",
             },
         },
+        nes = {
+            enabled = true,
+            auto_trigger = true,
+            keymap = {
+                accept_and_goto = "<Tab>",
+                accept = "<S-Tab>",
+                dismiss = "<C-e>",
+            },
+        },
         filetypes = {
             gitcommit = true,
+            AvanteInput = false,
         },
         copilot_model = "claude-sonnet-4",
     },
