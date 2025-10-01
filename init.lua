@@ -138,18 +138,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
     end,
 })
 
--- Diagnostic
-vim.diagnostic.config({
-    float = {
-        border = "rounded",
-        source = true,
-    },
-    virtual_text = {
-        prefix = "●",
-        source = true,
-    },
-})
-
+require("config.diagnostic").setup()
 require("config.lazy")
 
 vim.cmd.colorscheme("tokyonight-night")
