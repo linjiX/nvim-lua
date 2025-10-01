@@ -43,7 +43,10 @@ return {
                             end
                         end,
                     },
-                    "diagnostics",
+                    {
+                        "diagnostics",
+                        symbols = require("config.diagnostic").icons,
+                    },
                 },
                 lualine_c = { "aerial" },
                 lualine_x = {

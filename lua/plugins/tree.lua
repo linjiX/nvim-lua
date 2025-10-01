@@ -113,6 +113,8 @@ return {
             end
         end
 
+        local icons = require("config.diagnostic").icons
+
         return {
             on_attach = my_on_attach,
             view = {
@@ -145,6 +147,12 @@ return {
             diagnostics = {
                 enable = true,
                 show_on_open_dirs = false,
+                icons = {
+                    error = icons.error,
+                    warning = icons.warn,
+                    info = icons.info,
+                    hint = icons.hint,
+                },
             },
             modified = {
                 enable = true,

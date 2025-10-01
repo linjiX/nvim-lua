@@ -1,5 +1,12 @@
 local M = {}
 
+M.icons = {
+    error = " ",
+    warn = " ",
+    info = " ",
+    hint = " ",
+}
+
 ---@param severity vim.diagnostic.Severity
 local function map_diagnostic_pairs(severity)
     ---@cast severity string
@@ -33,6 +40,14 @@ function M.setup()
         virtual_text = {
             prefix = "●",
             source = true,
+        },
+        signs = {
+            text = {
+                [vim.diagnostic.severity.ERROR] = M.icons.error,
+                [vim.diagnostic.severity.WARN] = M.icons.warn,
+                [vim.diagnostic.severity.HINT] = M.icons.hint,
+                [vim.diagnostic.severity.INFO] = M.icons.info,
+            },
         },
     })
 
