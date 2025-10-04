@@ -106,7 +106,7 @@ return {
             provider = "copilot",
             providers = {
                 copilot = {
-                    model = "claude-sonnet-4",
+                    model = "claude-sonnet-4.5",
                 },
             },
             auto_suggestions_provider = "copilot",
