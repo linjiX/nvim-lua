@@ -20,5 +20,12 @@ return {
         { "sxc", exchange.cancel(), desc = "Exchange cancel" },
         { "X", exchange.visual(), mode = "x", desc = "Exchange" },
     },
-    opts = {},
+    opts = function()
+        return {
+            on_substitute = require("yanky.integration").substitute(),
+            highlight_substituted_text = {
+                timer = 300,
+            },
+        }
+    end,
 }

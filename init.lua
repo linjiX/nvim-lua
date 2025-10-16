@@ -31,8 +31,6 @@ local utility = require("config.utility")
 vim.keymap.set("n", "<C-w>m", utility.tabopen)
 vim.keymap.set("n", "<C-w><C-m>", utility.tabopen)
 
-vim.keymap.set({ "n", "x" }, "<C-p>", '"0p')
-
 vim.keymap.set("n", "<M-l>", vim.cmd.bnext)
 vim.keymap.set("n", "<M-h>", vim.cmd.bprevious)
 vim.keymap.set("n", "<Leader>q", vim.cmd.bdelete)
@@ -107,15 +105,6 @@ vim.api.nvim_create_autocmd("BufReadPost", {
         if mark[1] > 0 and mark[1] <= line_count then
             pcall(vim.api.nvim_win_set_cursor, 0, mark)
         end
-    end,
-})
-
--- Highlight yanked text
-vim.api.nvim_create_autocmd("TextYankPost", {
-    group = augroup,
-    pattern = "*",
-    callback = function()
-        vim.hl.on_yank({ higroup = "TabLineSel", timeout = 300 })
     end,
 })
 

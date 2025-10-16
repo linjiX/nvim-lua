@@ -38,6 +38,7 @@ return {
         { "<Leader>fl", builtin.current_buffer_fuzzy_find(), desc = "Lines" },
         { "<Leader>fr", builtin.resume(), desc = "Resume" },
         { "<Leader>fn", telescope.extensions.noice.noice(), desc = "Noice" },
+        { "<Leader>fy", telescope.extensions.yank_history.yank_history(), desc = "Yank" },
 
         {
             "<Leader>gb",
@@ -81,6 +82,7 @@ return {
 
         return {
             defaults = {
+                dynamic_preview_title = true,
                 mappings = {
                     i = {
                         ["<ESC>"] = "close",
@@ -103,6 +105,9 @@ return {
                 },
                 file_ignore_patterns = {
                     ".git/",
+                },
+                history = {
+                    path = vim.fn.stdpath("data") .. "/databases/telescope.db",
                 },
             },
             pickers = {
