@@ -55,10 +55,6 @@ vim.keymap.set("n", "gd", vim.lsp.buf.definition)
 vim.keymap.set("n", "grh", vim.lsp.buf.typehierarchy)
 vim.keymap.set("n", "grk", vim.lsp.buf.signature_help)
 
-local window = require("utility.window")
-
-window.set_navigation_keymaps()
-
 local window = require("config.window")
 local augroup = vim.api.nvim_create_augroup("MyAutocmds", { clear = true })
 
