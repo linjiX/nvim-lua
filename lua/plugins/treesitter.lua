@@ -6,7 +6,9 @@ return {
             ensure_installed = {
                 "bash",
                 "css",
+                "diff",
                 "git_config",
+                "git_rebase",
                 "gitcommit",
                 "gitignore",
                 "html",
@@ -19,6 +21,7 @@ return {
                 "python",
                 "regex",
                 "scss",
+                "tmux",
                 "toml",
                 "typescript",
                 "vim",
