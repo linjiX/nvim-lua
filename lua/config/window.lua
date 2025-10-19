@@ -130,6 +130,10 @@ function M.redirect_win(opts)
     local buf = api.nvim_get_current_buf()
     local source_win = api.nvim_get_current_win()
 
+    if vim.api.nvim_win_get_config(source_win).relative ~= "" then
+        return nil
+    end
+
     local previous_winnr = fn.winnr("#")
     if previous_winnr == 0 then
         return nil
