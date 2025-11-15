@@ -32,6 +32,7 @@ return {
             python = { "dmypy" },
             html = { "htmlhint" },
             gitcommit = { "gitlint" },
+            dockerfile = { "hadolint" },
         }
 
         local MyLint = vim.api.nvim_create_augroup("nvim-lint", { clear = true })

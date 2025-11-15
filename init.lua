@@ -85,6 +85,19 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+    group = augroup,
+    pattern = {
+        "docker-compose.yaml",
+        "docker-compose.yml",
+        "compose.yaml",
+        "compose.yml",
+    },
+    callback = function()
+        vim.opt_local.filetype = "yaml.docker-compose"
+    end,
+})
+
 -- Restore cursor to the last position
 vim.api.nvim_create_autocmd("BufReadPost", {
     group = augroup,

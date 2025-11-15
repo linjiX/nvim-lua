@@ -7,6 +7,7 @@ return {
                 "bash",
                 "css",
                 "diff",
+                "dockerfile",
                 "git_config",
                 "git_rebase",
                 "gitcommit",

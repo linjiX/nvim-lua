@@ -86,6 +86,9 @@ return {
             bashls = {
                 filetypes = { "bash", "zsh", "sh" },
             },
+            dockerls = {},
+            docker_compose_language_service = {},
+            yamlls = {},
         }
 
         for name, opt in pairs(opts) do
