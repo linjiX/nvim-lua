@@ -16,6 +16,9 @@ return {
 
         { "<C-p>", "<Plug>(YankyPreviousEntry)" },
         { "<C-n>", "<Plug>(YankyNextEntry)" },
+
+        { "<Leader>p", '"0<Plug>(YankyPutAfter)', mode = { "n", "x" } },
+        { "<Leader>P", '"0<Plug>(YankyPutBefore)', mode = { "n", "x" } },
     },
     opts = function()
         vim.api.nvim_set_hl(0, "YankyYanked", { link = "Search" })
