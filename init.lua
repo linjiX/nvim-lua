@@ -88,10 +88,10 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
     group = augroup,
     pattern = {
-        "docker-compose.yaml",
-        "docker-compose.yml",
-        "compose.yaml",
-        "compose.yml",
+        "docker-compose*.yaml",
+        "docker-compose*.yml",
+        "compose*.yaml",
+        "compose*.yml",
     },
     callback = function()
         vim.opt_local.filetype = "yaml.docker-compose"
