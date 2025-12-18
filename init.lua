@@ -85,18 +85,31 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
-vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
-    group = augroup,
-    pattern = {
-        "docker-compose*.yaml",
-        "docker-compose*.yml",
-        "compose*.yaml",
-        "compose*.yml",
+local filetypes = {
+    {
+        pattern = {
+            "docker-compose*.yaml",
+            "docker-compose*.yml",
+            "compose*.yaml",
+            "compose*.yml",
+        },
+        filetype = "yaml.docker-compose",
     },
-    callback = function()
-        vim.opt_local.filetype = "yaml.docker-compose"
-    end,
-})
+    {
+        pattern = "requirements*.txt",
+        filetype = "requirements",
+    },
+}
+
+for _, ft in ipairs(filetypes) do
+    vim.api.nvim_create_autocmd({ "VimEnter", "BufNewFile", "BufRead" }, {
+        group = augroup,
+        pattern = ft.pattern,
+        callback = function()
+            vim.cmd.setfiletype(ft.filetype)
+        end,
+    })
+end
 
 -- Restore cursor to the last position
 vim.api.nvim_create_autocmd("BufReadPost", {
