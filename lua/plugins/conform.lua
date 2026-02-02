@@ -14,7 +14,7 @@ return {
     opts = {
         formatters_by_ft = {
             lua = { "stylua" },
-            python = { "isort", "pyupgrade", "black" },
+            python = { "ruff_fix", "black" },
             javascript = { "prettierd" },
             typescript = { "prettierd" },
             vue = { "prettierd" },
@@ -25,12 +25,6 @@ return {
             css = { "prettierd" },
             scss = { "prettierd" },
             markdown = { "prettierd" },
-        },
-        formatters = {
-            pyupgrade = {
-                command = "pyupgrade",
-                args = { "--exit-zero-even-if-changed", "-" },
-            },
         },
     },
 }

@@ -1,1 +1,0 @@
-return { pyupgrade = "registry.pyupgrade" }
