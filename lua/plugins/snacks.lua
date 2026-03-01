@@ -33,6 +33,10 @@ return {
                     end
                 end,
             },
+            {
+                "grN",
+                snacks.rename.rename_file,
+            },
         }
     end,
     opts = function()

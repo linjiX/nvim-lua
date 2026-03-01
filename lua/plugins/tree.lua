@@ -36,9 +36,16 @@ return {
 
         vim.opt.termguicolors = true
 
-        local function my_on_attach(bufnr)
-            local api = require("nvim-tree.api")
+        local api = require("nvim-tree.api")
 
+        local function lsp_rename()
+            local snacks = require("snacks")
+            local node = api.tree.get_node_under_cursor()
+
+            snacks.rename.rename_file({ from = node.absolute_path })
+        end
+
+        local function my_on_attach(bufnr)
             local keys = {
                 { "g?", api.tree.toggle_help, "Help" },
 
@@ -78,6 +85,8 @@ return {
                 { "Rb", api.fs.rename_basename, "Rename: Basename" },
                 { "Ra", api.fs.rename_full, "Rename: Absolute Path" },
                 { "Rs", api.fs.rename_sub, "Rename: Omit Filename" },
+                { "grn", lsp_rename, "LSP Rename" },
+                { "grN", lsp_rename, "LSP Rename" },
 
                 { "q", api.tree.close, "Close" },
                 { "RR", api.tree.reload, "Refresh" },
