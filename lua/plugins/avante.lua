@@ -87,8 +87,9 @@ return {
             end
         end
 
+        local augroup = vim.api.nvim_create_augroup("MyAvante", { clear = true })
         vim.api.nvim_create_autocmd("FileType", {
-            group = vim.api.nvim_create_augroup("AvanteMapping", { clear = true }),
+            group = augroup,
             pattern = "Avante*",
             callback = function()
                 window.set_quit_keymaps(require("avante").close_sidebar)
@@ -102,12 +103,40 @@ return {
             end,
         })
 
+        vim.api.nvim_create_autocmd("User", {
+            group = augroup,
+            pattern = "AvanteViewBufferUpdated",
+            callback = function()
+                local config = require("avante.config")
+                if not config.acp_providers[config.provider] then
+                    return
+                end
+                vim.cmd.checktime()
+            end,
+        })
+
         return {
-            provider = "copilot",
+            provider = "claude-code",
             providers = {
                 copilot = {
                     model = "claude-sonnet-4.5",
                 },
+            },
+            acp_providers = {
+                ["claude-code"] = {
+                    command = "npx",
+                    args = { "-y", "-g", "@zed-industries/claude-agent-acp" },
+                    env = {
+                        NODE_NO_WARNINGS = "1",
+                        ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY"),
+                        ANTHROPIC_BASE_URL = os.getenv("ANTHROPIC_BASE_URL"),
+                        ACP_PATH_TO_CLAUDE_CODE_EXECUTABLE = vim.fn.exepath("claude"),
+                        ACP_PERMISSION_MODE = "bypassPermissions",
+                    },
+                },
+            },
+            behaviour = {
+                acp_follow_agent_locations = false,
             },
             auto_suggestions_provider = "copilot",
             hints = { enabled = false },
