@@ -132,7 +132,13 @@ return {
                     glyphs = {
                         modified = " ●",
                         git = {
-                            untracked = "?",
+                            unstaged = " ✗",
+                            staged = " ✓",
+                            unmerged = " ",
+                            renamed = " ➜",
+                            untracked = " ?",
+                            deleted = " ",
+                            ignored = " ◌",
                         },
                     },
                 },
