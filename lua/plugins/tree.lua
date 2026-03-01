@@ -118,12 +118,9 @@ return {
 
             for _, key in ipairs(keys) do
                 local lhs, rhs, desc = unpack(key)
-                vim.keymap.set(
-                    "n",
-                    lhs,
-                    rhs,
-                    { desc = ("nvim-tree: %s"):format(desc), buffer = bufnr, nowait = true }
-                )
+                local opts =
+                    { buffer = bufnr, nowait = true, desc = ("nvim-tree: %s"):format(desc) }
+                vim.keymap.set("n", lhs, rhs, opts)
             end
         end
 
