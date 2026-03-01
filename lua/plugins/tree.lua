@@ -39,6 +39,10 @@ return {
 
         local api = require("nvim-tree.api")
 
+        api.events.subscribe(api.events.Event.TreeOpen, function()
+            vim.opt_local.winfixheight = false
+        end)
+
         local function lsp_rename()
             local snacks = require("snacks")
             local node = api.tree.get_node_under_cursor()
