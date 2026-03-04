@@ -12,6 +12,7 @@ return {
     config = function()
         local lint = require("lint")
 
+        lint.linters.gitlint.args = { "--msg-filename", "-" }
         lint.linters.dmypy.args = {
             "run",
             "--timeout",
