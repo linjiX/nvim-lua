@@ -125,6 +125,14 @@ return {
                         lualine_z = { "location" },
                     },
                 },
+                {
+                    filetypes = { "toggleterm" },
+                    sections = {
+                        lualine_a = { "mode" },
+                        lualine_y = { "selectioncount", "progress" },
+                        lualine_z = { "location" },
+                    },
+                },
             },
         }
     end,
