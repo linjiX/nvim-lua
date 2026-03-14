@@ -25,6 +25,7 @@ return {
             css = { "prettierd" },
             scss = { "prettierd" },
             markdown = { "prettierd" },
+            sql = { "sql_formatter" },
         },
     },
 }

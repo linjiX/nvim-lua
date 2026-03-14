@@ -34,6 +34,7 @@ return {
             html = { "htmlhint" },
             gitcommit = { "gitlint" },
             dockerfile = { "hadolint" },
+            sql = { "sqlfluff" },
         }
 
         local MyLint = vim.api.nvim_create_augroup("nvim-lint", { clear = true })
