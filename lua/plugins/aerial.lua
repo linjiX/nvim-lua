@@ -1,3 +1,20 @@
+local function hijack_open_aerial_in_win()
+    local aerial_window = require("aerial.window")
+    local original_open_aerial_in_win = aerial_window.open_aerial_in_win
+
+    ---@param src_bufnr integer source buffer
+    ---@param src_winid integer window containing source buffer
+    ---@param aer_winid integer aerial window
+    aerial_window.open_aerial_in_win = function(src_bufnr, src_winid, aer_winid)
+        local win = aer_winid == 0 and vim.api.nvim_get_current_win() or aer_winid
+        local old_winfixbuf = vim.wo[win].winfixbuf
+
+        vim.wo[win].winfixbuf = false
+        original_open_aerial_in_win(src_bufnr, src_winid, aer_winid)
+        vim.wo[win].winfixbuf = old_winfixbuf
+    end
+end
+
 return {
     "stevearc/aerial.nvim",
     cmd = { "AerialOpen", "AerialToggle" },
@@ -11,6 +28,7 @@ return {
                 { bold = true, italic = true }
             )
         )
+        hijack_open_aerial_in_win()
 
         return {
             backends = { "lsp", "treesitter", "markdown", "asciidoc", "man" },
@@ -19,6 +37,7 @@ return {
                 win_opts = {
                     cursorline = true,
                     cursorcolumn = false,
+                    winfixbuf = true,
                 },
             },
             filter_kind = {

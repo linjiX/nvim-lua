@@ -4,6 +4,7 @@ local scriptname = require("plugins.fugitive").scriptname
 
 vim.opt_local.number = false
 vim.opt_local.buflisted = false
+vim.opt_local.winfixbuf = true
 
 window.set_quit_keymaps("gq", { remap = true })
 

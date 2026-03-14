@@ -41,6 +41,7 @@ return {
 
         api.events.subscribe(api.events.Event.TreeOpen, function()
             vim.opt_local.winfixheight = false
+            vim.opt_local.winfixbuf = true
         end)
 
         local function lsp_rename()
