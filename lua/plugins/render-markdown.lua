@@ -13,5 +13,14 @@ return {
                 enabled = true,
             },
         },
+        overrides = {
+            filetype = {
+                ["Avante"] = {
+                    anti_conceal = {
+                        enabled = false,
+                    },
+                },
+            },
+        },
     },
 }
