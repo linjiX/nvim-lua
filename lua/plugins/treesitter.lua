@@ -22,7 +22,6 @@ return {
                 "python",
                 "regex",
                 "scss",
-                "tmux",
                 "toml",
                 "typescript",
                 "vim",
