@@ -126,6 +126,14 @@ return {
                         ACP_PERMISSION_MODE = "bypassPermissions",
                     },
                 },
+                ["codex"] = {
+                    command = "npx",
+                    args = { "-y", "-g", "@zed-industries/codex-acp" },
+                    env = {
+                        NODE_NO_WARNINGS = "1",
+                        OPENAI_API_KEY = os.getenv("OPENAI_API_KEY"),
+                    },
+                },
             },
             behaviour = {
                 acp_follow_agent_locations = false,
