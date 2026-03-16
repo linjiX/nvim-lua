@@ -131,6 +131,7 @@ return {
             on_attach = my_on_attach,
             view = {
                 width = 32,
+                signcolumn = "no",
             },
             renderer = {
                 special_files = {},
@@ -141,6 +142,8 @@ return {
                 },
                 icons = {
                     git_placement = "right_align",
+                    diagnostics_placement = "after",
+                    bookmarks_placement = "after",
                     glyphs = {
                         modified = " ●",
                         git = {
