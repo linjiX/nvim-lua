@@ -129,6 +129,7 @@ return {
 
         return {
             on_attach = my_on_attach,
+            hijack_cursor = true,
             view = {
                 width = 32,
                 signcolumn = "no",
