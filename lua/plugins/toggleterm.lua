@@ -107,9 +107,16 @@ return {
                 guifg = "#c7c7c7",
                 guibg = "#000000",
             },
+            FloatBorder = {
+                link = "FloatBorder",
+            },
         },
 
         direction = "vertical",
+
+        float_opts = {
+            border = "rounded",
+        },
         winbar = {
             enabled = true,
             -- name_formatter = function(term)
