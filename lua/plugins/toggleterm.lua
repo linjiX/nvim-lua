@@ -1,5 +1,24 @@
 local R = require("config.utility").lazy_require
 
+local superscript_numbers = {
+    ["0"] = "⁰",
+    ["1"] = "¹",
+    ["2"] = "²",
+    ["3"] = "³",
+    ["4"] = "⁴",
+    ["5"] = "⁵",
+    ["6"] = "⁶",
+    ["7"] = "⁷",
+    ["8"] = "⁸",
+    ["9"] = "⁹",
+}
+
+local function raise_number(number)
+    return tostring(number):gsub("%d", function(digit)
+        return superscript_numbers[digit]
+    end)
+end
+
 local function get_term_index(current_id, terms)
     for i, v in ipairs(terms) do
         if v.id == current_id then
@@ -39,6 +58,13 @@ local function go_to(index)
     end
 
     vim.api.nvim_win_set_buf(0, terms[target_index].bufnr)
+end
+
+local function get_display_name(term)
+    local terms = require("toggleterm.terminal").get_all(true)
+    local index = get_term_index(term.id, terms)
+
+    return ("%s  %s"):format(raise_number(index), term:_display_name())
 end
 
 return {
@@ -119,13 +145,7 @@ return {
         },
         winbar = {
             enabled = true,
-            -- name_formatter = function(term)
-            --     return term.name
-            -- end,
-
-            name_formatter = function(term)
-                return string.format(" %d:%s", term.id, term:_display_name())
-            end,
+            name_formatter = get_display_name,
         },
     },
 }
