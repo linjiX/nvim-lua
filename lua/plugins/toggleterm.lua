@@ -67,6 +67,12 @@ local function get_display_name(term)
     return ("%s  %s"):format(raise_number(index), term:_display_name())
 end
 
+local function set_winbar_highlights()
+    local directory_hl = vim.api.nvim_get_hl(0, { name = "Directory", link = false })
+
+    vim.api.nvim_set_hl(0, "WinBarActive", { bold = true, italic = true, fg = directory_hl.fg })
+end
+
 return {
     "akinsho/toggleterm.nvim",
     version = "*",
@@ -148,4 +154,12 @@ return {
             name_formatter = get_display_name,
         },
     },
+    config = function(_, opts)
+        require("toggleterm").setup(opts)
+
+        vim.api.nvim_create_autocmd("ColorScheme", {
+            group = vim.api.nvim_create_augroup("MyToggleTermWinbar", { clear = true }),
+            callback = set_winbar_highlights,
+        })
+    end,
 }
