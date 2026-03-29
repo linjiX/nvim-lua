@@ -1,3 +1,42 @@
+local kind_icons = {
+    Array = "󰅪",
+    Boolean = "󰨙",
+    Class = "𝓒",
+    Constant = "",
+    Constructor = "󰊕",
+    Enum = "𝓔",
+    EnumMember = "",
+    Event = "",
+    Field = "",
+    File = "󰈙",
+    Function = "󰊕",
+    Interface = "",
+    Key = "󰌋",
+    Keyword = "󰌋",
+    Method = "󰊕",
+    Module = "",
+    Namespace = "󰦮",
+    Null = "󰟢",
+    Number = "󰎠",
+    Object = "󰅩",
+    Operator = "󰆕",
+    Package = "",
+    Property = "",
+    String = "",
+    Struct = "󰆼",
+    TypeParameter = "𝙏",
+    Variable = "󰀫",
+    Collapsed = "",
+    Text = "󰉿",
+    Value = "󰎠",
+}
+
+local sources = {
+    nvim_lsp = "[LSP]",
+    buffer = "[Buf]",
+    path = "[Path]",
+}
+
 return {
     "hrsh7th/nvim-cmp",
     event = "InsertEnter",
@@ -56,6 +95,18 @@ return {
             }, {
                 { name = "buffer" },
             }),
+            formatting = {
+                format = function(entry, vim_item)
+                    vim_item.kind = kind_icons[vim_item.kind] or vim_item.kind
+
+                    local source = sources[entry.source.name] or ""
+                    local menu = vim_item.menu or ""
+
+                    vim_item.menu = source ~= "" and ("%-6s %s"):format(source, menu) or menu
+
+                    return vim_item
+                end,
+            },
         })
 
         -- local cmdline_mapping = {
