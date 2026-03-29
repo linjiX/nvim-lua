@@ -13,14 +13,21 @@ return {
     config = function()
         vim.opt.shortmess:append("c")
 
+        vim.api.nvim_set_hl(0, "CmpNormal", { bg = "black" })
+
         local cmp = require("cmp")
         local copilot = require("copilot.suggestion")
 
+        local window_opts = {
+            border = "none",
+            winhighlight = "Normal:CmpNormal,Search:None",
+        }
+
         cmp.setup({
-            -- window = {
-            --     completion = cmp.config.window.bordered(),
-            --     documentation = cmp.config.window.bordered(),
-            -- },
+            window = {
+                completion = cmp.config.window.bordered(window_opts),
+                documentation = cmp.config.window.bordered(window_opts),
+            },
             mapping = cmp.mapping.preset.insert({
                 ["<C-b>"] = cmp.mapping.scroll_docs(-4),
                 ["<C-f>"] = cmp.mapping.scroll_docs(4),
