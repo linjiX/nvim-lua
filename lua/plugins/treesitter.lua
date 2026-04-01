@@ -42,6 +42,7 @@ return {
             pattern = filetypes,
             callback = function()
                 vim.treesitter.start()
+                vim.opt_local.indentexpr = "v:lua.require('nvim-treesitter').indentexpr()"
             end,
         })
 
