@@ -19,6 +19,7 @@ local parsers = {
     "toml",
     "typescript",
     "vim",
+    "vimdoc",
     "vue",
     "yaml",
 }
