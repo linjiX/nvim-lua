@@ -113,38 +113,26 @@ local function go_to(index)
     ui.switch_buf(term.bufnr)
 end
 
-local function new(direction)
+local function new()
     local Terminal = require("toggleterm.terminal").Terminal
     local ui = require("toggleterm.ui")
 
-    local terminal = Terminal:new({ direction = direction })
+    local terminal = Terminal:new()
     create_term_buf_if_needed(terminal)
     ui.hl_term(terminal)
     terminal:spawn()
     ui.switch_buf(terminal.bufnr)
 end
 
-local function vsplit()
-    vim.cmd("rightbelow vsplit")
+local function split(cmd)
+    vim.cmd(cmd)
 
     local terms = get_background_terms()
     if #terms > 0 then
         local ui = require("toggleterm.ui")
         ui.switch_buf(terms[1].bufnr)
     else
-        new("vertical")
-    end
-end
-
-local function split()
-    vim.cmd("rightbelow split")
-
-    local terms = get_background_terms()
-    if #terms > 0 then
-        local ui = require("toggleterm.ui")
-        ui.switch_buf(terms[1].bufnr)
-    else
-        new("horizontal")
+        new()
     end
 end
 
@@ -167,13 +155,17 @@ return {
     keys = {
         {
             "<M-v>",
-            vsplit,
+            function()
+                split("rightbelow vsplit")
+            end,
             desc = "Toggle Terminal Vertically",
             mode = { "n", "t" },
         },
         {
             "<M-s>",
-            split,
+            function()
+                split("rightbelow split")
+            end,
             desc = "Toggle Terminal",
             mode = { "n", "t" },
         },
@@ -191,9 +183,7 @@ return {
         },
         {
             "<M-a>",
-            function()
-                new("vertical")
-            end,
+            new,
             desc = "New Terminal",
             mode = "t",
         },
