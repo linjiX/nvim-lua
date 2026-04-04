@@ -47,6 +47,20 @@ local function get_term_index(current_id, terms)
     end
 end
 
+local function on_exit(term)
+    local terms = require("toggleterm.terminal").get_all(true)
+    local other_terms = vim.tbl_filter(function(t)
+        return t.id ~= term.id
+    end, terms)
+
+    if #other_terms == 0 then
+        vim.cmd.quit()
+        return
+    end
+
+    require("toggleterm.ui").switch_buf(other_terms[1].bufnr)
+end
+
 ---@param index "next" | "prev" | number
 local function go_to(index)
     if vim.b.toggle_number == nil then
@@ -217,7 +231,9 @@ return {
                 vim.opt_local.winfixwidth = false
             end
         end,
+        on_exit = on_exit,
 
+        close_on_exit = false,
         shade_terminals = false,
         -- shading_factor = -100,
 
