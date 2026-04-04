@@ -47,8 +47,26 @@ local function get_term_index(current_id, terms)
     end
 end
 
-local function on_exit(term)
+local function get_background_terms()
     local terms = require("toggleterm.terminal").get_all(true)
+    local has_open, windows = require("toggleterm.ui").find_open_windows()
+
+    if not has_open then
+        return terms
+    end
+
+    local open_term_ids = {}
+    for _, window in ipairs(windows) do
+        open_term_ids[window.term_id] = true
+    end
+
+    return vim.tbl_filter(function(term)
+        return not open_term_ids[term.id]
+    end, terms)
+end
+
+local function on_exit(term)
+    local terms = get_background_terms()
     local other_terms = vim.tbl_filter(function(t)
         return t.id ~= term.id
     end, terms)
@@ -104,24 +122,6 @@ local function new(direction)
     ui.hl_term(terminal)
     terminal:spawn()
     ui.switch_buf(terminal.bufnr)
-end
-
-local function get_background_terms()
-    local terms = require("toggleterm.terminal").get_all(true)
-    local has_open, windows = require("toggleterm.ui").find_open_windows()
-
-    if not has_open then
-        return terms
-    end
-
-    local open_term_ids = {}
-    for _, window in ipairs(windows) do
-        open_term_ids[window.term_id] = true
-    end
-
-    return vim.tbl_filter(function(term)
-        return not open_term_ids[term.id]
-    end, terms)
 end
 
 local function vsplit()
