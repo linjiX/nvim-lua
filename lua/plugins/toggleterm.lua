@@ -164,8 +164,6 @@ end
 return {
     "akinsho/toggleterm.nvim",
     version = "*",
-    lazy = false,
-
     keys = {
         {
             "<M-v>",
@@ -263,6 +261,7 @@ return {
     },
     config = function(_, opts)
         require("toggleterm").setup(opts)
+        set_winbar_highlights()
 
         vim.api.nvim_create_autocmd("ColorScheme", {
             group = vim.api.nvim_create_augroup("MyToggleTermWinbar", { clear = true }),
