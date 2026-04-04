@@ -1,3 +1,6 @@
+local R = require("config.utility").lazy_require
+local aerial = R("aerial")
+
 local function hijack_open_aerial_in_win()
     local aerial_window = require("aerial.window")
     local original_open_aerial_in_win = aerial_window.open_aerial_in_win
@@ -18,6 +21,28 @@ end
 return {
     "stevearc/aerial.nvim",
     cmd = { "AerialOpen", "AerialToggle" },
+    keys = {
+        {
+            "[s",
+            aerial.prev(),
+            desc = "Previous Symbol",
+        },
+        {
+            "]s",
+            aerial.next(),
+            desc = "Next Symbol",
+        },
+        {
+            "[S",
+            aerial.prev_up(),
+            desc = "Previous Higher Symbol",
+        },
+        {
+            "]S",
+            aerial.next_up(),
+            desc = "Next Higher Symbol",
+        },
+    },
     opts = function()
         vim.api.nvim_set_hl(
             0,
