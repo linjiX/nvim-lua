@@ -1,5 +1,25 @@
 local R = require("config.utility").lazy_require
 
+local function tmux_command(command)
+    local tmux_socket = vim.fn.split(vim.env.TMUX, ",")[1]
+    return vim.fn.system(("tmux -S %s %s"):format(tmux_socket, command))
+end
+
+-- this function is copyed from "toggleterm.nvim/lua/toggleterm/ui.lua"
+local function create_term_buf_if_needed(term)
+    local api = vim.api
+    local valid_win = term.window and api.nvim_win_is_valid(term.window)
+    local window = valid_win and term.window or api.nvim_get_current_win()
+    -- If the buffer doesn't exist create a new one
+    local valid_buf = term.bufnr and api.nvim_buf_is_valid(term.bufnr)
+    local bufnr = valid_buf and term.bufnr or api.nvim_create_buf(false, false)
+    -- Assign buf to window to ensure window options are set correctly
+    api.nvim_win_set_buf(window, bufnr)
+    term.window, term.bufnr = window, bufnr
+    term:__set_options()
+    api.nvim_set_current_buf(bufnr)
+end
+
 local superscript_numbers = {
     ["0"] = "⁰",
     ["1"] = "¹",
@@ -34,8 +54,6 @@ local function go_to(index)
     end
 
     local terms = require("toggleterm.terminal").get_all(true)
-    vim.notify(vim.inspect(terms))
-    vim.notify(terms.display_name)
     if #terms <= 1 then
         return
     end
@@ -57,7 +75,63 @@ local function go_to(index)
         return
     end
 
-    vim.api.nvim_win_set_buf(0, terms[target_index].bufnr)
+    local term = terms[target_index]
+
+    local ui = require("toggleterm.ui")
+    ui.switch_buf(term.bufnr)
+end
+
+local function new(direction)
+    local Terminal = require("toggleterm.terminal").Terminal
+    local ui = require("toggleterm.ui")
+
+    local terminal = Terminal:new({ direction = direction })
+    create_term_buf_if_needed(terminal)
+    ui.hl_term(terminal)
+    terminal:spawn()
+    ui.switch_buf(terminal.bufnr)
+end
+
+local function get_background_terms()
+    local terms = require("toggleterm.terminal").get_all(true)
+    local has_open, windows = require("toggleterm.ui").find_open_windows()
+
+    if not has_open then
+        return terms
+    end
+
+    local open_term_ids = {}
+    for _, window in ipairs(windows) do
+        open_term_ids[window.term_id] = true
+    end
+
+    return vim.tbl_filter(function(term)
+        return not open_term_ids[term.id]
+    end, terms)
+end
+
+local function vsplit()
+    vim.cmd("rightbelow vsplit")
+
+    local terms = get_background_terms()
+    if #terms > 0 then
+        local ui = require("toggleterm.ui")
+        ui.switch_buf(terms[1].bufnr)
+    else
+        new("vertical")
+    end
+end
+
+local function split()
+    vim.cmd("rightbelow split")
+
+    local terms = get_background_terms()
+    if #terms > 0 then
+        local ui = require("toggleterm.ui")
+        ui.switch_buf(terms[1].bufnr)
+    else
+        new("horizontal")
+    end
 end
 
 local function get_display_name(term)
@@ -81,18 +155,35 @@ return {
     keys = {
         {
             "<M-v>",
-            R("toggleterm").toggle(0, nil, nil, "vertical"),
+            vsplit,
             desc = "Toggle Terminal Vertically",
+            mode = { "n", "t" },
         },
         {
             "<M-s>",
-            R("toggleterm").toggle(0, nil, nil, "horizontal"),
+            split,
             desc = "Toggle Terminal",
+            mode = { "n", "t" },
         },
         {
             "<M-f>",
             R("toggleterm").toggle(0, nil, nil, "float"),
             desc = "Toggle Terminal",
+        },
+        {
+            "<M-a>",
+            function()
+                tmux_command('new-window -c "#{pane_current_path}"')
+            end,
+            desc = "New Tmux Terminal",
+        },
+        {
+            "<M-a>",
+            function()
+                new("vertical")
+            end,
+            desc = "New Terminal",
+            mode = "t",
         },
         {
             "<M-h>",
