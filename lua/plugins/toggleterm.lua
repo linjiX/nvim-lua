@@ -158,7 +158,7 @@ return {
             function()
                 split("rightbelow vsplit")
             end,
-            desc = "Toggle Terminal Vertically",
+            desc = "Right Split Terminal",
             mode = { "n", "t" },
         },
         {
@@ -166,7 +166,23 @@ return {
             function()
                 split("rightbelow split")
             end,
-            desc = "Toggle Terminal",
+            desc = "Below Split Terminal",
+            mode = { "n", "t" },
+        },
+        {
+            "<M-V>",
+            function()
+                split("botright 70vsplit")
+            end,
+            desc = "Rightmost Split terminal",
+            mode = { "n", "t" },
+        },
+        {
+            "<M-S>",
+            function()
+                split("botright 20split")
+            end,
+            desc = "Bottom Split Terminal",
             mode = { "n", "t" },
         },
         {
