@@ -117,11 +117,10 @@ local function new()
     local Terminal = require("toggleterm.terminal").Terminal
     local ui = require("toggleterm.ui")
 
-    local terminal = Terminal:new()
-    create_term_buf_if_needed(terminal)
-    ui.hl_term(terminal)
-    terminal:spawn()
-    ui.switch_buf(terminal.bufnr)
+    local term = Terminal:new()
+    create_term_buf_if_needed(term)
+    term:spawn()
+    ui.hl_term(term)
 end
 
 local function split(cmd)
