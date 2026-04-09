@@ -150,19 +150,18 @@ local function rename()
         return
     end
 
+    vim.cmd.stopinsert()
     vim.schedule(function()
-        vim.cmd.startinsert({ bang = true })
-    end)
+        vim.ui.input({
+            prompt = "Rename terminal: ",
+            default = term.display_name or "",
+        }, function(input)
+            if input == nil or input == "" then
+                return
+            end
 
-    vim.ui.input({
-        prompt = "Rename terminal: ",
-        default = term.display_name or "",
-    }, function(input)
-        if input == nil or input == "" then
-            return
-        end
-
-        term.display_name = vim.trim(input)
+            term.display_name = vim.trim(input)
+        end)
     end)
 end
 
