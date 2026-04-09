@@ -120,6 +120,10 @@ local function new()
     local term = Terminal:new()
     create_term_buf_if_needed(term)
     term:spawn()
+
+    local parts = vim.split(term:_display_name(), "/", { plain = true, trimempty = true })
+    term.display_name = parts[#parts]
+
     ui.hl_term(term)
 end
 
@@ -133,6 +137,33 @@ local function split(cmd)
     else
         new()
     end
+end
+
+local function rename()
+    local term_id = vim.b.toggle_number
+    if term_id == nil then
+        return
+    end
+
+    local term = require("toggleterm.terminal").get(term_id, true)
+    if term == nil then
+        return
+    end
+
+    vim.schedule(function()
+        vim.cmd.startinsert({ bang = true })
+    end)
+
+    vim.ui.input({
+        prompt = "Rename terminal: ",
+        default = term.display_name or "",
+    }, function(input)
+        if input == nil or input == "" then
+            return
+        end
+
+        term.display_name = vim.trim(input)
+    end)
 end
 
 local function get_display_name(term)
@@ -192,7 +223,7 @@ return {
         {
             "<M-a>",
             function()
-                tmux_command('new-window -c "#{pane_current_path}"')
+                tmux_command([[new-window -c "#{pane_current_path}"]])
             end,
             desc = "New Tmux Terminal",
         },
@@ -216,6 +247,19 @@ return {
                 go_to("next")
             end,
             desc = "Next Terminal",
+            mode = "t",
+        },
+        {
+            "<M-r>",
+            function()
+                tmux_command([[command-prompt -I "#W" 'rename-window "%%"']])
+            end,
+            desc = "Rename Tmux Terminal",
+        },
+        {
+            "<M-r>",
+            rename,
+            desc = "Rename Terminal",
             mode = "t",
         },
     },
