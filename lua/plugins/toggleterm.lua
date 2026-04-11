@@ -65,18 +65,26 @@ local function get_background_terms()
     end, terms)
 end
 
-local function on_exit(term)
-    local terms = get_background_terms()
-    local other_terms = vim.tbl_filter(function(t)
-        return t.id ~= term.id
-    end, terms)
+local function get_candidate_background_term()
+    local candidate = nil
 
-    if #other_terms == 0 then
+    for _, term in ipairs(get_background_terms()) do
+        if candidate == nil or (term.leave_at or 0) > (candidate.leave_at or 0) then
+            candidate = term
+        end
+    end
+
+    return candidate
+end
+
+local function on_exit(term)
+    local candidate = get_candidate_background_term()
+    if candidate == nil or candidate.id == term.id then
         vim.cmd.quit()
         return
     end
 
-    require("toggleterm.ui").switch_buf(other_terms[1].bufnr)
+    require("toggleterm.ui").switch_buf(candidate.bufnr)
 end
 
 ---@param index "next" | "prev" | number
@@ -130,10 +138,9 @@ end
 local function split(cmd)
     vim.cmd(cmd)
 
-    local terms = get_background_terms()
-    if #terms > 0 then
-        local ui = require("toggleterm.ui")
-        ui.switch_buf(terms[1].bufnr)
+    local term = get_candidate_background_term()
+    if term ~= nil then
+        require("toggleterm.ui").switch_buf(term.bufnr)
     else
         new()
     end
@@ -335,9 +342,28 @@ return {
         require("toggleterm").setup(opts)
         set_winbar_highlights()
 
+        local augroup = vim.api.nvim_create_augroup("MyToggleTerm", { clear = true })
         vim.api.nvim_create_autocmd("ColorScheme", {
-            group = vim.api.nvim_create_augroup("MyToggleTermWinbar", { clear = true }),
+            group = augroup,
             callback = set_winbar_highlights,
+        })
+
+        vim.api.nvim_create_autocmd("BufWinLeave", {
+            group = augroup,
+            pattern = "term://*",
+            callback = function(args)
+                local term_id = vim.b[args.buf].toggle_number
+                if term_id == nil then
+                    return
+                end
+
+                local term = require("toggleterm.terminal").get(term_id, true)
+                if term == nil then
+                    return
+                end
+
+                term.leave_at = vim.uv.now()
+            end,
         })
     end,
 }
