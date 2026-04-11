@@ -5,19 +5,13 @@ local function tmux_command(command)
     return vim.fn.system(("tmux -S %s %s"):format(tmux_socket, command))
 end
 
--- this function is copyed from "toggleterm.nvim/lua/toggleterm/ui.lua"
-local function create_term_buf_if_needed(term)
-    local api = vim.api
-    local valid_win = term.window and api.nvim_win_is_valid(term.window)
-    local window = valid_win and term.window or api.nvim_get_current_win()
-    -- If the buffer doesn't exist create a new one
-    local valid_buf = term.bufnr and api.nvim_buf_is_valid(term.bufnr)
-    local bufnr = valid_buf and term.bufnr or api.nvim_create_buf(false, false)
-    -- Assign buf to window to ensure window options are set correctly
-    api.nvim_win_set_buf(window, bufnr)
+local function create_term_buffer(term)
+    local window = vim.api.nvim_get_current_win()
+    local bufnr = vim.api.nvim_create_buf(false, false)
+
+    vim.api.nvim_win_set_buf(window, bufnr)
     term.window, term.bufnr = window, bufnr
     term:__set_options()
-    api.nvim_set_current_buf(bufnr)
 end
 
 local superscript_numbers = {
@@ -126,7 +120,7 @@ local function new()
     local ui = require("toggleterm.ui")
 
     local term = Terminal:new()
-    create_term_buf_if_needed(term)
+    create_term_buffer(term)
     term:spawn()
 
     local parts = vim.split(term:_display_name(), "/", { plain = true, trimempty = true })
@@ -185,6 +179,26 @@ local function set_winbar_highlights()
     vim.api.nvim_set_hl(0, "WinBarActive", { bold = true, italic = true, fg = directory_hl.fg })
 end
 
+local function set_keymaps(bufnr)
+    vim.keymap.set({ "n" }, "<CR>", vim.cmd.startinsert, { buffer = bufnr })
+    vim.keymap.set({ "n", "t" }, "<M-a>", new, { buffer = bufnr, desc = "New Terminal" })
+    vim.keymap.set({ "n", "t" }, "<M-r>", rename, { buffer = bufnr, desc = "Rename Terminal" })
+
+    vim.keymap.set({ "n", "t" }, "<M-h>", function()
+        go_to("prev")
+    end, { buffer = bufnr, desc = "Prev Terminal" })
+
+    vim.keymap.set({ "n", "t" }, "<M-l>", function()
+        go_to("next")
+    end, { buffer = bufnr, desc = "Next Terminal" })
+
+    for i = 1, 10 do
+        vim.keymap.set({ "n", "t" }, ("<M-%d>"):format(i == 10 and 0 or i), function()
+            go_to(i)
+        end, { buffer = bufnr, desc = ("Go To Terminal %d"):format(i) })
+    end
+end
+
 local function get_keys()
     local keys = {
         {
@@ -232,39 +246,11 @@ local function get_keys()
             desc = "New Tmux Terminal",
         },
         {
-            "<M-a>",
-            new,
-            desc = "New Terminal",
-            mode = "t",
-        },
-        {
-            "<M-h>",
-            function()
-                go_to("prev")
-            end,
-            desc = "Prev Terminal",
-            mode = "t",
-        },
-        {
-            "<M-l>",
-            function()
-                go_to("next")
-            end,
-            desc = "Next Terminal",
-            mode = "t",
-        },
-        {
             "<M-r>",
             function()
                 tmux_command([[command-prompt -I "#W" 'rename-window "%%"']])
             end,
             desc = "Rename Tmux Terminal",
-        },
-        {
-            "<M-r>",
-            rename,
-            desc = "Rename Terminal",
-            mode = "t",
         },
     }
 
@@ -275,14 +261,6 @@ local function get_keys()
                 tmux_command(("select-window -t %d"):format(i))
             end,
             desc = ("Go To Tmux Terminal %d"):format(i),
-        })
-        table.insert(keys, {
-            ("<M-%d>"):format(i == 10 and 0 or i),
-            function()
-                go_to(i)
-            end,
-            desc = ("Go To Terminal %d"):format(i),
-            mode = "t",
         })
     end
 
@@ -304,6 +282,7 @@ return {
         end,
         open_mapping = [[<c-\>]],
         on_create = function(term)
+            set_keymaps(term.bufnr)
             if term.direction == "vertical" then
                 vim.opt_local.winfixwidth = false
             end
