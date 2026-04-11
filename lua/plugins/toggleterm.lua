@@ -178,10 +178,8 @@ local function set_winbar_highlights()
     vim.api.nvim_set_hl(0, "WinBarActive", { bold = true, italic = true, fg = directory_hl.fg })
 end
 
-return {
-    "akinsho/toggleterm.nvim",
-    version = "*",
-    keys = {
+local function get_keys()
+    local keys = {
         {
             "<M-v>",
             function()
@@ -261,7 +259,33 @@ return {
             desc = "Rename Terminal",
             mode = "t",
         },
-    },
+    }
+
+    for i = 1, 10 do
+        table.insert(keys, {
+            ("<M-%d>"):format(i == 10 and 0 or i),
+            function()
+                tmux_command(("select-window -t %d"):format(i))
+            end,
+            desc = ("Go To Tmux Terminal %d"):format(i),
+        })
+        table.insert(keys, {
+            ("<M-%d>"):format(i == 10 and 0 or i),
+            function()
+                go_to(i)
+            end,
+            desc = ("Go To Terminal %d"):format(i),
+            mode = "t",
+        })
+    end
+
+    return keys
+end
+
+return {
+    "akinsho/toggleterm.nvim",
+    version = "*",
+    keys = get_keys(),
     opts = {
         size = function(term)
             -- vim.notify(vim.inspect(term))
