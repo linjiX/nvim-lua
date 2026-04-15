@@ -135,8 +135,16 @@ local function new()
     ui.hl_term(term)
 end
 
-local function split(cmd)
-    vim.cmd(cmd)
+---@param modifier string
+local function split(modifier)
+    vim.cmd(("%s split"):format(modifier))
+    if modifier:find("bot", 1, true) or modifier:find("top", 1, true) then
+        if modifier:find("vertical", 1, true) then
+            vim.opt_local.winfixwidth = true
+        else
+            vim.opt_local.winfixheight = true
+        end
+    end
 
     local term = get_candidate_background_term()
     if term ~= nil then
@@ -221,7 +229,7 @@ local function get_keys()
         {
             "<M-v>",
             function()
-                split("rightbelow vsplit")
+                split("rightbelow vertical")
             end,
             desc = "Right Split Terminal",
             mode = { "n", "t" },
@@ -229,7 +237,7 @@ local function get_keys()
         {
             "<M-s>",
             function()
-                split("rightbelow split")
+                split("rightbelow")
             end,
             desc = "Below Split Terminal",
             mode = { "n", "t" },
@@ -237,7 +245,7 @@ local function get_keys()
         {
             "<M-V>",
             function()
-                split("botright 70vsplit")
+                split("botright vertical 70")
             end,
             desc = "Rightmost Split terminal",
             mode = { "n", "t" },
@@ -245,7 +253,7 @@ local function get_keys()
         {
             "<M-S>",
             function()
-                split("botright 20split")
+                split("botright 20")
             end,
             desc = "Bottom Split Terminal",
             mode = { "n", "t" },
@@ -289,14 +297,6 @@ return {
     version = "*",
     keys = get_keys(),
     opts = {
-        size = function(term)
-            -- vim.notify(vim.inspect(term))
-            if term.direction == "horizontal" then
-                return 20
-            elseif term.direction == "vertical" then
-                return vim.api.nvim_win_get_width(0)
-            end
-        end,
         open_mapping = [[<c-\>]],
         on_create = function(term)
             set_keymaps(term.bufnr)
@@ -322,7 +322,7 @@ return {
             },
         },
 
-        direction = "vertical",
+        direction = "customized",
 
         float_opts = {
             border = "rounded",
