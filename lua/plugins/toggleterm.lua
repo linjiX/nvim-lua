@@ -5,6 +5,12 @@ local function tmux_command(command)
     return vim.fn.system(("tmux -S %s %s"):format(tmux_socket, command))
 end
 
+---@param value boolean
+local function set_cursor_marker(value)
+    vim.opt_local.cursorline = value
+    vim.opt_local.cursorcolumn = value
+end
+
 local function create_term_buffer(term)
     local window = vim.api.nvim_get_current_win()
     local bufnr = vim.api.nvim_create_buf(false, false)
@@ -202,6 +208,17 @@ end
 local function get_keys()
     local keys = {
         {
+            "<ESC><ESC>",
+            function()
+                vim.cmd.stopinsert()
+                vim.schedule(function()
+                    set_cursor_marker(true)
+                end)
+            end,
+            desc = "Exit Terminal Mode",
+            mode = "t",
+        },
+        {
             "<M-v>",
             function()
                 split("rightbelow vsplit")
@@ -283,9 +300,7 @@ return {
         open_mapping = [[<c-\>]],
         on_create = function(term)
             set_keymaps(term.bufnr)
-            if term.direction == "vertical" then
-                vim.opt_local.winfixwidth = false
-            end
+            set_cursor_marker(false)
         end,
         on_exit = on_exit,
 
@@ -342,6 +357,14 @@ return {
                 end
 
                 term.leave_at = vim.uv.now()
+            end,
+        })
+
+        vim.api.nvim_create_autocmd("InsertEnter", {
+            group = augroup,
+            pattern = "term://*",
+            callback = function()
+                set_cursor_marker(false)
             end,
         })
     end,
