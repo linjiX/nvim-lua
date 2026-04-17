@@ -22,34 +22,9 @@ return {
             mode = "i",
             desc = "Accept Copilot Suggestion",
         },
-        {
-            "<C-e>",
-            function()
-                if not require("copilot.suggestion").is_visible() then
-                    vim.api.nvim_feedkeys(vim.keycode("<C-e>"), "n", false)
-                    return
-                end
-
-                require("copilot.suggestion").dismiss()
-            end,
-            mode = "i",
-            desc = "Dismiss Copilot Suggestion",
-        },
-        {
-            "[rg",
-            command.enable(),
-            desc = "Enable Copilot",
-        },
-        {
-            "]rg",
-            command.disable(),
-            desc = "Disable Copilot",
-        },
-        {
-            "yrg",
-            command.toggle(),
-            desc = "Toggle Copilot",
-        },
+        { "[rg", command.enable(), desc = "Enable Copilot" },
+        { "]rg", command.disable(), desc = "Disable Copilot" },
+        { "yrg", command.toggle(), desc = "Toggle Copilot" },
     },
     opts = {
         panel = {
@@ -72,7 +47,7 @@ return {
                 accept_line = false,
                 next = "<C-j>",
                 prev = "<C-k>",
-                dismiss = "<C-]>",
+                dismiss = "<C-e>",
             },
         },
         nes = {
