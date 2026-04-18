@@ -95,7 +95,6 @@ return {
         },
         filetypes = {
             gitcommit = true,
-            AvanteInput = false,
         },
     },
 }

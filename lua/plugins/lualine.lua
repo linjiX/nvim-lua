@@ -20,10 +20,6 @@ return {
                         "fugitiveblame",
                         "aerial",
                         "trouble",
-                        "Avante",
-                        "AvanteTodos",
-                        "AvanteSelectedCode",
-                        "AvanteSelectedFiles",
                     },
                 },
             },
@@ -86,14 +82,6 @@ return {
                     sections = {
                         lualine_a = { get_title },
                         lualine_b = { "branch" },
-                        lualine_y = { "selectioncount", "progress" },
-                        lualine_z = { "location" },
-                    },
-                },
-                {
-                    filetypes = { "AvanteInput" },
-                    sections = {
-                        lualine_a = { "mode" },
                         lualine_y = { "selectioncount", "progress" },
                         lualine_z = { "location" },
                     },

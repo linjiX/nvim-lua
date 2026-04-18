@@ -1,4 +1,4 @@
-local filetypes = { "markdown", "Avante" }
+local filetypes = { "markdown" }
 
 return {
     "MeanderingProgrammer/render-markdown.nvim",
@@ -11,15 +11,6 @@ return {
         completions = {
             lsp = {
                 enabled = true,
-            },
-        },
-        overrides = {
-            filetype = {
-                ["Avante"] = {
-                    anti_conceal = {
-                        enabled = false,
-                    },
-                },
             },
         },
     },
