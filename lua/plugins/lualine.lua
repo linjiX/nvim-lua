@@ -11,6 +11,11 @@ return {
             return filetype:sub(1, 1):upper() .. filetype:sub(2):lower()
         end
 
+        local function get_sidekick_cli_name()
+            local sidekick_cli = vim.b.sidekick_cli or vim.w.sidekick_cli
+            return sidekick_cli and sidekick_cli.name or "Sidekick"
+        end
+
         return {
             options = {
                 disabled_filetypes = {
@@ -119,6 +124,12 @@ return {
                         lualine_a = { "mode" },
                         lualine_y = { "selectioncount", "progress" },
                         lualine_z = { "location" },
+                    },
+                },
+                {
+                    filetypes = { "sidekick_terminal" },
+                    sections = {
+                        lualine_a = { get_sidekick_cli_name },
                     },
                 },
             },
