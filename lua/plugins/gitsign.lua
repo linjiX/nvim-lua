@@ -12,8 +12,24 @@ local function iter_upvalues(fn)
     end)
 end
 
-local function hijack_on_cursor_moved()
+local function hijack_blame()
     local blame = require("gitsigns.actions.blame").blame
+    local patched = {
+        on_cursor_moved = false,
+        pmap = false,
+        reblame = false,
+        show_commit = false,
+    }
+
+    --- @return string?
+    local function get_sha(blm_win, entries)
+        local row = vim.api.nvim_win_get_cursor(blm_win)[1]
+        local sha = assert(entries[row]).commit.sha
+        if sha:match("^0+$") ~= nil then
+            return nil
+        end
+        return sha
+    end
 
     for i, name, value in iter_upvalues(blame) do
         if name == "on_cursor_moved" and type(value) == "function" then
@@ -28,6 +44,50 @@ local function hijack_on_cursor_moved()
             end
 
             debug.setupvalue(blame, i, replacement)
+            patched.on_cursor_moved = true
+        elseif name == "pmap" and type(value) == "function" then
+            local original = value
+
+            local replacement = function(mode, lhs, cb, opts)
+                opts = vim.tbl_extend("force", opts or {}, { nowait = true })
+                return original(mode, lhs, cb, opts)
+            end
+
+            debug.setupvalue(blame, i, replacement)
+            patched.pmap = true
+        elseif name == "reblame" and type(value) == "function" then
+            local original = value
+
+            local replacement = function(opts, entries, win, revision, parent)
+                local sha = get_sha(vim.api.nvim_get_current_win(), entries)
+                if not sha then
+                    vim.notify("Cannot reblame an uncommitted line", vim.log.levels.WARN)
+                    return
+                end
+
+                return original(opts, entries, win, revision, parent)
+            end
+
+            debug.setupvalue(blame, i, replacement)
+            patched.reblame = true
+        elseif name == "show_commit" and type(value) == "function" then
+            local original = value
+
+            local replacement = function(win, bwin, open, bcache)
+                local sha = get_sha(bwin, bcache.blame.entries)
+                if not sha then
+                    vim.notify("No commit yet for the current line", vim.log.levels.WARN)
+                    return
+                end
+
+                return original(win, bwin, open, bcache)
+            end
+
+            debug.setupvalue(blame, i, replacement)
+            patched.show_commit = true
+        end
+
+        if patched.on_cursor_moved and patched.pmap and patched.reblame and patched.show_commit then
             return
         end
     end
@@ -99,6 +159,6 @@ return {
     },
     config = function(_, opts)
         require("gitsigns").setup(opts)
-        hijack_on_cursor_moved()
+        hijack_blame()
     end,
 }
