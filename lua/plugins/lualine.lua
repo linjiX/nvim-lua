@@ -25,6 +25,7 @@ return {
                         "snacks_dashboard",
                         "NvimTree",
                         "fugitiveblame",
+                        "gitsigns-blame",
                         "aerial",
                         "trouble",
                     },

@@ -145,6 +145,11 @@ return {
                         text = "Git Blame",
                         highlight = "Title",
                     },
+                    {
+                        filetype = "gitsigns-blame",
+                        text = "Git Blame",
+                        highlight = "Title",
+                    },
                 },
             },
         }
