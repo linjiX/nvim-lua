@@ -1,3 +1,38 @@
+local function iter_upvalues(fn)
+    return coroutine.wrap(function()
+        local i = 1
+        while true do
+            local name, value = debug.getupvalue(fn, i)
+            if not name then
+                return
+            end
+            coroutine.yield(i, name, value)
+            i = i + 1
+        end
+    end)
+end
+
+local function hijack_on_cursor_moved()
+    local blame = require("gitsigns.actions.blame").blame
+
+    for i, name, value in iter_upvalues(blame) do
+        if name == "on_cursor_moved" and type(value) == "function" then
+            local original = value
+
+            local replacement = function(bufnr, blm_win, entries, commit_lines, commit_summaries)
+                local summaries = {}
+                for line in pairs(commit_summaries or {}) do
+                    summaries[line] = false
+                end
+                return original(bufnr, blm_win, entries, commit_lines, summaries)
+            end
+
+            debug.setupvalue(blame, i, replacement)
+            return
+        end
+    end
+end
+
 return {
     "lewis6991/gitsigns.nvim",
     opts = {
@@ -62,4 +97,8 @@ return {
             map({ "o", "x" }, "ac", gs.select_hunk, "Select Change")
         end,
     },
+    config = function(_, opts)
+        require("gitsigns").setup(opts)
+        hijack_on_cursor_moved()
+    end,
 }
