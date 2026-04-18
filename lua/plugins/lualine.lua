@@ -1,3 +1,5 @@
+local capitalize = require("config.utility").capitalize
+
 return {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -8,12 +10,12 @@ return {
 
         local function get_title()
             local filetype = vim.bo.filetype
-            return filetype:sub(1, 1):upper() .. filetype:sub(2):lower()
+            return capitalize(filetype)
         end
 
         local function get_sidekick_cli_name()
-            local sidekick_cli = vim.b.sidekick_cli or vim.w.sidekick_cli
-            return sidekick_cli and sidekick_cli.name or "Sidekick"
+            local cli = vim.b.sidekick_cli or vim.w.sidekick_cli
+            return cli and capitalize(cli.name) or "Sidekick"
         end
 
         return {

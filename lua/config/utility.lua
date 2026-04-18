@@ -75,6 +75,12 @@ function M.get_script_function(name, scriptname)
     error(("Function '%s' not found in script '%s'"):format(name, scriptname))
 end
 
+---@param text string
+---@return string
+function M.capitalize(text)
+    return text:sub(1, 1):upper() .. text:sub(2):lower()
+end
+
 ---@return nil
 function M.tabopen()
     local view = vim.fn.winsaveview()
