@@ -1,4 +1,4 @@
-local function iter_upvalues(fn)
+local function iter_upvalue_functions(fn)
     return coroutine.wrap(function()
         local i = 1
         while true do
@@ -6,14 +6,16 @@ local function iter_upvalues(fn)
             if not name then
                 return
             end
-            coroutine.yield(i, name, value)
+            if type(value) == "function" then
+                coroutine.yield(i, name, value)
+            end
             i = i + 1
         end
     end)
 end
 
-local function get_upvalue(fn, target)
-    for _, name, value in iter_upvalues(fn) do
+local function get_upvalue_function(fn, target)
+    for _, name, value in iter_upvalue_functions(fn) do
         if name == target then
             return value
         end
@@ -43,8 +45,8 @@ local function hijack_blame()
         return sha
     end
 
-    for i, name, value in iter_upvalues(blame) do
-        if name == "on_cursor_moved" and type(value) == "function" then
+    for i, name, value in iter_upvalue_functions(blame) do
+        if name == "on_cursor_moved" then
             local original = value
 
             local replacement = function(bufnr, blm_win, entries, commit_lines, commit_summaries)
@@ -57,7 +59,7 @@ local function hijack_blame()
 
             debug.setupvalue(blame, i, replacement)
             patched.on_cursor_moved = true
-        elseif name == "pmap" and type(value) == "function" then
+        elseif name == "pmap" then
             local original = value
 
             local replacement = function(mode, lhs, cb, opts)
@@ -67,7 +69,7 @@ local function hijack_blame()
 
             debug.setupvalue(blame, i, replacement)
             patched.pmap = true
-        elseif name == "reblame" and type(value) == "function" then
+        elseif name == "reblame" then
             local original = value
 
             local replacement = function(opts, entries, win, revision, parent)
@@ -82,7 +84,7 @@ local function hijack_blame()
 
             debug.setupvalue(blame, i, replacement)
             patched.reblame = true
-        elseif name == "show_commit" and type(value) == "function" then
+        elseif name == "show_commit" then
             local original = value
 
             local replacement = function(win, bwin, open, bcache)
@@ -132,12 +134,8 @@ local function blame_line_in_blame()
     end
 
     local blame_line = require("gitsigns.actions.blame_line")
-    local create_blame_title_linespec = get_upvalue(blame_line, "create_blame_title_linespec")
-
-    if type(create_blame_title_linespec) ~= "function" then
-        vim.notify("Failed to load blame popup formatter", vim.log.levels.WARN)
-        return
-    end
+    local create_blame_title_linespec =
+        assert(get_upvalue_function(blame_line, "create_blame_title_linespec"))
 
     local title = create_blame_title_linespec(result, bcache.git_obj.repo, false)
     popup.create({ title, { { result.summary, "NormalFloat" } } }, config.preview_config, "blame")
