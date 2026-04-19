@@ -33,9 +33,7 @@ local METATABLE = {
 ---@param name string
 ---@return LazyModule
 function M.lazy_require(name)
-    local result = { name = name, keys = {} }
-    setmetatable(result, METATABLE)
-    return result
+    return setmetatable({ name = name, keys = {} }, METATABLE)
 end
 
 local script_functions = {}
