@@ -83,6 +83,7 @@ return {
             vue_ls = {},
             eslint = {},
             html = {},
+            tailwindcss = {},
             bashls = {
                 filetypes = { "bash", "zsh", "sh" },
             },
