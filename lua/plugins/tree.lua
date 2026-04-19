@@ -159,9 +159,6 @@ return {
                     },
                 },
             },
-            system_open = {
-                cmd = "open",
-            },
             git = {
                 enable = true,
                 show_on_open_dirs = false,
