@@ -181,6 +181,11 @@ local function find_blame_source_buf()
 end
 
 local function blame_line_in_blame()
+    local popup = require("gitsigns.popup")
+    if popup.focus_open("blame") then
+        return
+    end
+
     local source_buf = assert(find_blame_source_buf())
     local bcache = assert(require("gitsigns.cache").cache[source_buf])
 
@@ -188,7 +193,6 @@ local function blame_line_in_blame()
     local info = assert(bcache:get_blame(lnum, {}))
 
     local result = require("gitsigns.util").convert_blame_info(info)
-    local popup = require("gitsigns.popup")
     local config = require("gitsigns.config").config
 
     if not is_committed(result.sha) then
