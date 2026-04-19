@@ -29,6 +29,8 @@ local kind_icons = {
     Collapsed = "",
     Text = "󰉿",
     Value = "󰎠",
+    Color = "",
+    Snippet = "",
 }
 
 local sources = {
