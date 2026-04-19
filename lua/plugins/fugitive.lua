@@ -30,7 +30,7 @@ return {
         end
     end,
     config = function()
-        local utility = require("config.utility")
+        local tabopen = require("config.utility").tabopen
 
         vim.api.nvim_create_user_command("Git", function(opts)
             local subcommand = opts.args:match("%w+")
@@ -78,7 +78,8 @@ return {
         })
 
         vim.api.nvim_create_user_command("Gblame", function(opts)
-            utility.tabopen()
+            tabopen()
+            vim.opt_local.winfixbuf = true
             vim.cmd("Git blame --date=short" .. opts.args)
         end, {
             nargs = "?",

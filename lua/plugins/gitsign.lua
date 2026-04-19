@@ -196,6 +196,7 @@ return {
             end, "Blame Line")
             map("n", "<Leader>gM", function()
                 tabopen()
+                vim.opt_local.winfixbuf = true
                 gs.blame()
             end, "Blame Buffer")
 
