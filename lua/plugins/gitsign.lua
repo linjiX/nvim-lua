@@ -1,3 +1,5 @@
+local tabopen = require("config.utility").tabopen
+
 local function iter_upvalue_functions(fn)
     return coroutine.wrap(function()
         local i = 1
@@ -193,6 +195,7 @@ return {
                 gs.blame_line({ full = true })
             end, "Blame Line")
             map("n", "<Leader>gM", function()
+                tabopen()
                 gs.blame()
             end, "Blame Buffer")
 
