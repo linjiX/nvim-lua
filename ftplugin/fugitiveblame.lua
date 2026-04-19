@@ -6,6 +6,7 @@ vim.b.did_ftplugin = true
 vim.fn["fugitive#BlameFileType"]()
 
 vim.opt_local.listchars:remove({ "precedes", "extends" })
+vim.opt_local.cursorbind = true
 
 window.set_quit_keymaps(vim.cmd.tabclose)
 

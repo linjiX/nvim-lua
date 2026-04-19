@@ -1,5 +1,7 @@
+local blame_line_in_blame = require("plugins.gitsign").blame_line_in_blame
 local window = require("config.window")
-local gisign = require("plugins.gitsign")
+
+vim.opt_local.cursorbind = true
 
 window.set_quit_keymaps(vim.cmd.tabclose)
 
@@ -12,7 +14,7 @@ end, {
 })
 
 for _, lhs in ipairs({ "K", "<Leader>gm" }) do
-    vim.keymap.set("n", lhs, gisign.blame_line_in_blame, {
+    vim.keymap.set("n", lhs, blame_line_in_blame, {
         buffer = true,
         nowait = true,
         desc = "Blame line",

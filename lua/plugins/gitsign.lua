@@ -197,6 +197,7 @@ return {
             map("n", "<Leader>gM", function()
                 tabopen()
                 vim.opt_local.winfixbuf = true
+                vim.opt_local.cursorbind = true
                 gs.blame()
             end, "Blame Buffer")
 

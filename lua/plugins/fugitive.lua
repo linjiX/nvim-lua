@@ -80,6 +80,7 @@ return {
         vim.api.nvim_create_user_command("Gblame", function(opts)
             tabopen()
             vim.opt_local.winfixbuf = true
+            vim.opt_local.cursorbind = true
             vim.cmd("Git blame --date=short" .. opts.args)
         end, {
             nargs = "?",
