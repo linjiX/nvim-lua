@@ -131,7 +131,7 @@ return {
             on_attach = my_on_attach,
             hijack_cursor = true,
             view = {
-                width = 32,
+                width = require("config.sidebar").width,
                 signcolumn = "no",
             },
             renderer = {

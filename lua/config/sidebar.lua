@@ -1,4 +1,6 @@
-local M = {}
+local M = {
+    width = 32,
+}
 
 ---@param find_file boolean | nil
 ---@return nil

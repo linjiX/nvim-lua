@@ -58,7 +58,7 @@ return {
         return {
             backends = { "lsp", "treesitter", "markdown", "asciidoc", "man" },
             layout = {
-                width = 32,
+                width = require("config.sidebar").width,
                 win_opts = {
                     cursorline = true,
                     cursorcolumn = false,
