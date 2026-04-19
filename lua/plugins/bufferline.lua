@@ -1,63 +1,65 @@
 local R = require("config.utility").lazy_require
+local groups = R("bufferline.groups")
+local bufferline = R("bufferline")
 
 local function get_keys()
     local keys = {
         {
             "<Leader>bp",
-            R("bufferline.groups").toggle_pin(),
+            groups.toggle_pin(),
             desc = "Toggle Pin Buffer",
         },
         {
             "<Leader>bP",
-            R("bufferline.groups").action("ungrouped", "close"),
+            groups.action("ungrouped", "close"),
             desc = "Close Upgrouped Buffers",
         },
         {
             "<Leader>bl",
-            R("bufferline").close_in_direction("right"),
+            bufferline.close_in_direction("right"),
             desc = "Close Buffers to the Right",
         },
         {
             "<Leader>bh",
-            R("bufferline").close_in_direction("left"),
+            bufferline.close_in_direction("left"),
             desc = "Close Buffers to the Left",
         },
         {
             "<Leader>bo",
-            R("bufferline").close_others(),
+            bufferline.close_others(),
             desc = "Close Other Buffers",
         },
         {
             "<Leader>bb",
-            R("bufferline").pick(),
+            bufferline.pick(),
             desc = "Pick Buffers",
         },
         {
             "<Leader>bB",
-            R("bufferline").close_with_pick(),
+            bufferline.close_with_pick(),
             desc = "Close Buffers with Pick",
         },
         {
             "<M-h>",
-            R("bufferline").cycle(-1),
+            bufferline.cycle(-1),
             mode = { "n", "x" },
             desc = "Prev Buffer",
         },
         {
             "<M-l>",
-            R("bufferline").cycle(1),
+            bufferline.cycle(1),
             mode = { "n", "x" },
             desc = "Next Buffer",
         },
         {
             "<M-H>",
-            R("bufferline").move(-1),
+            bufferline.move(-1),
             mode = { "n", "x" },
             desc = "Move buffer prev",
         },
         {
             "<M-L>",
-            R("bufferline").move(1),
+            bufferline.move(1),
             mode = { "n", "x" },
             desc = "Move buffer next",
         },
@@ -66,7 +68,7 @@ local function get_keys()
     for i = 1, 10 do
         table.insert(keys, {
             ("<Leader>%d"):format(i == 10 and 0 or i),
-            R("bufferline").go_to(i, true),
+            bufferline.go_to(i, true),
             desc = ("Go To Buffer %d"):format(i),
         })
     end

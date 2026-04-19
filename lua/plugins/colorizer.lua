@@ -1,4 +1,5 @@
 local R = require("config.utility").lazy_require
+local colorizer = R("colorizer")
 
 local ft = { "vue", "javascript", "typescript", "html", "css", "lua" }
 
@@ -9,26 +10,29 @@ return {
     keys = {
         {
             "[rh",
-            R("colorizer").attach_to_buffer(0),
+            colorizer.attach_to_buffer(0),
+            desc = "Disable Colorizer",
         },
         {
             "]rh",
-            R("colorizer").detach_from_buffer(0),
+            colorizer.detach_from_buffer(0),
+            desc = "Enable Colorizer",
         },
         {
             "yrh",
             function()
-                local colorizer = require("colorizer")
-                if colorizer.is_buffer_attached(0) then
-                    colorizer.detach_from_buffer(0)
+                if colorizer.is_buffer_attached(0)() then
+                    colorizer.detach_from_buffer(0)()
                 else
-                    colorizer.attach_to_buffer(0)
+                    colorizer.attach_to_buffer(0)()
                 end
             end,
+            desc = "Toggle Colorizer",
         },
         {
             "yrH",
-            R("colorizer").reload_all_buffers(),
+            colorizer.reload_all_buffers(),
+            desc = "Reload Colorizer",
         },
     },
     opts = function()
