@@ -1,4 +1,5 @@
 local window = require("config.window")
+local gisign = require("plugins.gitsign")
 
 window.set_quit_keymaps(vim.cmd.tabclose)
 
@@ -9,6 +10,14 @@ end, {
     nowait = true,
     desc = "Open blame context menu",
 })
+
+for _, lhs in ipairs({ "K", "<Leader>gm" }) do
+    vim.keymap.set("n", lhs, gisign.blame_line_in_blame, {
+        buffer = true,
+        nowait = true,
+        desc = "Blame line",
+    })
+end
 
 -- make sure this keymap is set after the plugin has attached to the buffer
 vim.schedule(function()

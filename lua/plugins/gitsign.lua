@@ -12,6 +12,18 @@ local function iter_upvalues(fn)
     end)
 end
 
+local function get_upvalue(fn, target)
+    for _, name, value in iter_upvalues(fn) do
+        if name == target then
+            return value
+        end
+    end
+end
+
+local function is_committed(sha)
+    return sha and tonumber("0x" .. sha) ~= 0
+end
+
 local function hijack_blame()
     local blame = require("gitsigns.actions.blame").blame
     local patched = {
@@ -25,7 +37,7 @@ local function hijack_blame()
     local function get_sha(blm_win, entries)
         local row = vim.api.nvim_win_get_cursor(blm_win)[1]
         local sha = assert(entries[row]).commit.sha
-        if sha:match("^0+$") ~= nil then
+        if not is_committed(sha) then
             return nil
         end
         return sha
@@ -91,6 +103,44 @@ local function hijack_blame()
             return
         end
     end
+end
+
+local function find_blame_source_buf()
+    local current = vim.api.nvim_get_current_win()
+
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+        if win ~= current and vim.api.nvim_win_is_valid(win) and vim.wo[win].scrollbind then
+            return vim.api.nvim_win_get_buf(win)
+        end
+    end
+end
+
+local function blame_line_in_blame()
+    local source_buf = assert(find_blame_source_buf())
+    local bcache = assert(require("gitsigns.cache").cache[source_buf])
+
+    local lnum = vim.api.nvim_win_get_cursor(0)[1]
+    local info = assert(bcache:get_blame(lnum, {}))
+
+    local result = require("gitsigns.util").convert_blame_info(info)
+    local popup = require("gitsigns.popup")
+    local config = require("gitsigns.config").config
+
+    if not is_committed(result.sha) then
+        popup.create({ { { result.author, "Label" } } }, config.preview_config, "blame")
+        return
+    end
+
+    local blame_line = require("gitsigns.actions.blame_line")
+    local create_blame_title_linespec = get_upvalue(blame_line, "create_blame_title_linespec")
+
+    if type(create_blame_title_linespec) ~= "function" then
+        vim.notify("Failed to load blame popup formatter", vim.log.levels.WARN)
+        return
+    end
+
+    local title = create_blame_title_linespec(result, bcache.git_obj.repo, false)
+    popup.create({ title, { { result.summary, "NormalFloat" } } }, config.preview_config, "blame")
 end
 
 return {
@@ -161,4 +211,5 @@ return {
         require("gitsigns").setup(opts)
         hijack_blame()
     end,
+    blame_line_in_blame = blame_line_in_blame,
 }
