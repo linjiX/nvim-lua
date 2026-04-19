@@ -1,4 +1,5 @@
 local tabopen = require("config.utility").tabopen
+local UNCOMMITTED_AUTHOR = "uncommitted"
 
 local function iter_upvalue_functions(fn)
     return coroutine.wrap(function()
@@ -28,12 +29,57 @@ local function is_committed(sha)
     return sha and tonumber("0x" .. sha) ~= 0
 end
 
+---@param amount integer
+---@param text string
+---@return string
+local function lalign(amount, text)
+    local len = vim.fn.strdisplaywidth(text)
+    return text .. string.rep(" ", math.max(0, amount - len))
+end
+
+local function blame_formatter(_, info, context)
+    local util = require("gitsigns.util")
+
+    local max_author_width = math.max(context.max_author_width, 13)
+    local committed = is_committed(info.sha)
+
+    return {
+        { info.abbrev_sha, context.hash_hl_group },
+        { " " },
+        { lalign(max_author_width, info.author), not committed and "Comment" },
+        { " " },
+        { util.expand_format("<author_time>", info), "Special" },
+    },
+        committed
+end
+
+local function update_uncommitted_author(blame_info)
+    local entries = {}
+
+    for i, entry in ipairs(blame_info.entries or {}) do
+        local commit = entry.commit
+        if commit and not is_committed(commit.sha) then
+            entries[i] = vim.tbl_extend("force", entry, {
+                commit = vim.tbl_extend("force", commit, {
+                    author = UNCOMMITTED_AUTHOR,
+                    committer = UNCOMMITTED_AUTHOR,
+                }),
+            })
+        else
+            entries[i] = entry
+        end
+    end
+
+    return vim.tbl_extend("force", blame_info, { entries = entries })
+end
+
 local function hijack_blame()
     local blame = require("gitsigns.actions.blame").blame
     local patched = {
         on_cursor_moved = false,
         pmap = false,
         reblame = false,
+        render = false,
         show_commit = false,
     }
 
@@ -86,6 +132,15 @@ local function hijack_blame()
 
             debug.setupvalue(blame, i, replacement)
             patched.reblame = true
+        elseif name == "render" then
+            local original = value
+
+            local replacement = function(blame_info, ...)
+                return original(update_uncommitted_author(blame_info), ...)
+            end
+
+            debug.setupvalue(blame, i, replacement)
+            patched.render = true
         elseif name == "show_commit" then
             local original = value
 
@@ -103,7 +158,13 @@ local function hijack_blame()
             patched.show_commit = true
         end
 
-        if patched.on_cursor_moved and patched.pmap and patched.reblame and patched.show_commit then
+        if
+            patched.on_cursor_moved
+            and patched.pmap
+            and patched.reblame
+            and patched.render
+            and patched.show_commit
+        then
             return
         end
     end
@@ -212,6 +273,7 @@ return {
                 desc = "Git blame",
             })
         end,
+        blame_formatter = blame_formatter,
     },
     config = function(_, opts)
         require("gitsigns").setup(opts)
