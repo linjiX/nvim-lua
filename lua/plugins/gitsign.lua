@@ -1,5 +1,6 @@
 local tabopen = require("config.utility").tabopen
 local UNCOMMITTED_AUTHOR = "uncommitted"
+local blame_hijacked = false
 
 local function iter_upvalue_functions(fn)
     return coroutine.wrap(function()
@@ -269,6 +270,11 @@ return {
             map({ "o", "x" }, "ac", gs.select_hunk, "Select Change")
 
             vim.api.nvim_buf_create_user_command(buffer, "Gblame", function()
+                if not blame_hijacked then
+                    hijack_blame()
+                    blame_hijacked = true
+                end
+
                 tabopen()
                 vim.opt_local.winfixbuf = true
                 vim.opt_local.cursorbind = true
@@ -279,9 +285,5 @@ return {
         end,
         blame_formatter = blame_formatter,
     },
-    config = function(_, opts)
-        require("gitsigns").setup(opts)
-        hijack_blame()
-    end,
     blame_line_in_blame = blame_line_in_blame,
 }
