@@ -4,7 +4,7 @@ return {
     "tpope/vim-fugitive",
     scriptname = scriptname,
     dependencies = { "tpope/vim-rhubarb" },
-    cmd = { "Git", "Gw", "Gst", "Gc", "Gca", "Gblame", "Gco" },
+    cmd = { "Git", "Gw", "Gst", "Gc", "Gca", "Gco" },
     keys = {
         {
             "gb",
@@ -34,8 +34,19 @@ return {
 
         vim.api.nvim_create_user_command("Git", function(opts)
             local subcommand = opts.args:match("%w+")
-            local mods = (opts.mods ~= "" or subcommand == "blame") and opts.mods
-                or "botright vertical"
+            local mods = opts.mods
+            local args = opts.args
+
+            if subcommand == "blame" then
+                if not args:match("%-%-date[=%s]") then
+                    args = args:gsub("^(%s*blame)(%s*)", "%1 --date=short%2", 1)
+                end
+                tabopen()
+                vim.opt_local.winfixbuf = true
+                vim.opt_local.cursorbind = true
+            elseif mods == "" then
+                mods = "botright vertical"
+            end
 
             vim.cmd(
                 vim.fn["fugitive#Command"](
@@ -44,7 +55,7 @@ return {
                     opts.range,
                     opts.bang,
                     mods,
-                    opts.args
+                    args
                 )
             )
         end, {
@@ -75,16 +86,6 @@ return {
         end, {
             nargs = "?",
             complete = vim.fn["fugitive#ReadComplete"],
-        })
-
-        vim.api.nvim_create_user_command("Gblame", function(opts)
-            tabopen()
-            vim.opt_local.winfixbuf = true
-            vim.opt_local.cursorbind = true
-            vim.cmd("Git blame --date=short" .. opts.args)
-        end, {
-            nargs = "?",
-            complete = vim.fn["fugitive#BlameComplete"],
         })
     end,
 }

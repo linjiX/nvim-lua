@@ -194,12 +194,6 @@ return {
             map("n", "<Leader>gm", function()
                 gs.blame_line({ full = true })
             end, "Blame Line")
-            map("n", "<Leader>gM", function()
-                tabopen()
-                vim.opt_local.winfixbuf = true
-                vim.opt_local.cursorbind = true
-                gs.blame()
-            end, "Blame Buffer")
 
             map("n", "<Leader>gd", gs.diffthis, "Diff This")
             map("n", "<Leader>gD", function()
@@ -208,6 +202,15 @@ return {
 
             map({ "o", "x" }, "ic", gs.select_hunk, "Select Change")
             map({ "o", "x" }, "ac", gs.select_hunk, "Select Change")
+
+            vim.api.nvim_buf_create_user_command(buffer, "Gblame", function()
+                tabopen()
+                vim.opt_local.winfixbuf = true
+                vim.opt_local.cursorbind = true
+                gs.blame()
+            end, {
+                desc = "Git blame",
+            })
         end,
     },
     config = function(_, opts)
