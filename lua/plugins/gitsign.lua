@@ -171,6 +171,28 @@ local function hijack_blame()
     end
 end
 
+local function open_blame(buffer)
+    if not blame_hijacked then
+        hijack_blame()
+        blame_hijacked = true
+    end
+
+    require("gitsigns.async")
+        .run(function()
+            local opts = {}
+            local bcache = require("gitsigns.cache").cache[buffer]
+            if bcache then
+                bcache:get_blame(nil, opts)
+            end
+
+            tabopen()
+            vim.opt_local.winfixbuf = true
+            vim.opt_local.cursorbind = true
+            require("gitsigns.actions.blame").blame(opts)
+        end)
+        :raise_on_error()
+end
+
 local function find_blame_source_buf()
     local current = vim.api.nvim_get_current_win()
 
@@ -270,15 +292,7 @@ return {
             map({ "o", "x" }, "ac", gs.select_hunk, "Select Change")
 
             vim.api.nvim_buf_create_user_command(buffer, "Gblame", function()
-                if not blame_hijacked then
-                    hijack_blame()
-                    blame_hijacked = true
-                end
-
-                tabopen()
-                vim.opt_local.winfixbuf = true
-                vim.opt_local.cursorbind = true
-                gs.blame()
+                open_blame(buffer)
             end, {
                 desc = "Git blame",
             })
