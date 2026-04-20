@@ -9,31 +9,29 @@ local function attach_default_cli()
     local state = require("sidekick.cli.state")
 
     session.setup()
-    return state.attach({ tool = tool.get(DEFAULT_CLI) }, { focus = true, show = true })
+    return state.attach({ tool = tool.get(DEFAULT_CLI) })
 end
 
-local function get_opened_state()
+local function get_cli_state()
     local states = require("sidekick.cli.state").get({
         attached = true,
         cwd = true,
         terminal = true,
     })
 
-    for _, state in ipairs(states) do
-        if state.terminal and state.terminal:is_open() then
-            return state
-        end
+    if #states > 0 then
+        return states[1]
     end
 end
 
 local function open_cli()
-    local state = get_opened_state()
-
+    local state = get_cli_state()
     if state then
         state.terminal:focus()
-    else
-        attach_default_cli()
+        return
     end
+
+    attach_default_cli()
 end
 
 local function sender(msg)
@@ -43,7 +41,8 @@ local function sender(msg)
             return
         end
 
-        local state = get_opened_state() or attach_default_cli()
+        local state = get_cli_state() or attach_default_cli()
+
         cli.send({ text = text, filter = { session = state.session.id } })()
     end
 end
