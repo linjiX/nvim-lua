@@ -79,8 +79,13 @@ return {
         },
         {
             "<Leader>aq",
+            cli.hide(),
+            desc = "Sidekick Hide",
+        },
+        {
+            "<Leader>aQ",
             cli.close(),
-            desc = "Detach a CLI Session",
+            desc = "Sidekick Close",
         },
         {
             "<Leader>af",
