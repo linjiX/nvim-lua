@@ -1,56 +1,69 @@
-local R = require("config.utility").lazy_require
+local utility = require("config.utility")
+local R = utility.lazy_require
 local cli = R("sidekick.cli")
 
-local DEFAULT_CLI = "codex"
+local CLIS = {
+    "codex",
+    "claude",
+    "copilot",
+}
 
-local function attach_default_cli()
-    local session = require("sidekick.cli.session")
-    local tool = require("sidekick.cli.tool")
-    local state = require("sidekick.cli.state")
+---@param name string
+---@return sidekick.cli.State
+local function attach_cli(name)
+    local Session = require("sidekick.cli.session")
+    local Tool = require("sidekick.cli.tool")
+    local State = require("sidekick.cli.state")
 
-    session.setup()
-    return state.attach({ tool = tool.get(DEFAULT_CLI) })
+    Session.setup()
+    local state, _ = State.attach({ tool = Tool.get(name) })
+    return state
 end
 
-local function get_cli_state()
-    local states = require("sidekick.cli.state").get({
-        attached = true,
-        cwd = true,
-        terminal = true,
-    })
+---@param name? string
+---@return sidekick.cli.State | nil
+local function get_attached_cli(name)
+    local filter = { attached = true, cwd = true, terminal = true, name = name }
+    local states = require("sidekick.cli.state").get(filter)
 
     if #states > 0 then
         return states[1]
     end
 end
 
-local function open_cli()
-    local state = get_cli_state()
-    if state then
-        state.terminal:focus()
-        return
-    end
-
-    attach_default_cli()
+---@param name? string
+---@return sidekick.cli.State
+local function get_state(name)
+    return get_attached_cli(name) or attach_cli(name or CLIS[1])
 end
 
-local function sender(msg)
+---@param name? string
+---@return fun()
+local function opener(name)
+    return function()
+        local state = get_state(name)
+        state.terminal:focus()
+    end
+end
+
+---@param msg string
+---@param name? string
+---@return fun()
+local function sender(msg, name)
     return function()
         local _, text = cli.render({ msg = msg })()
         if not text then
             return
         end
 
-        local state = get_cli_state() or attach_default_cli()
-
+        local state = get_state(name)
         cli.send({ text = text, filter = { session = state.session.id } })()
     end
 end
 
-return {
-    "folke/sidekick.nvim",
-    lazy = false,
-    keys = {
+---@return LazyKeysSpec[]
+local function get_keys()
+    local keys = {
         {
             "<Tab>",
             function()
@@ -62,7 +75,7 @@ return {
         },
         {
             "<Leader>aa",
-            open_cli,
+            opener(),
             mode = "n",
             desc = "Sidekick Open",
         },
@@ -129,7 +142,31 @@ return {
             mode = { "n", "x" },
             desc = "Sidekick Select Prompt",
         },
-    },
+    }
+
+    for i, name in ipairs(CLIS) do
+        local lhs = ("<Leader>a%d"):format(i)
+        local display_name = utility.capitalize(name)
+        table.insert(keys, {
+            lhs,
+            opener(name),
+            desc = ("Sidekick Open %s"):format(display_name),
+        })
+        table.insert(keys, {
+            lhs,
+            sender("{this}", name),
+            desc = ("Sidekick Send To %s"):format(display_name),
+            mode = "x",
+        })
+    end
+
+    return keys
+end
+
+return {
+    "folke/sidekick.nvim",
+    lazy = false,
+    keys = get_keys(),
     opts = {
         cli = {
             mux = {
