@@ -8,6 +8,65 @@ local CLIS = {
     "copilot",
 }
 
+local CLI_PRIORITIES = {}
+for i, name in ipairs(CLIS) do
+    CLI_PRIORITIES[name] = #CLIS - i + 1
+end
+
+---@generic T
+---@param items T[]
+---@param key fun(item: T): number
+---@return T?
+local function max_by(items, key)
+    local best
+    local best_key
+
+    for _, item in ipairs(items) do
+        local item_key = key(item)
+        if best_key == nil or item_key > best_key then
+            best = item
+            best_key = item_key
+        end
+    end
+
+    return best
+end
+
+---@class ConfigSidekickTerminal: sidekick.cli.Terminal
+---@field hijacked? boolean
+---@field win_closed_at? integer
+
+local augroup = vim.api.nvim_create_augroup("MySidekick", { clear = true })
+
+---@param terminal sidekick.cli.Terminal
+local function configure_terminal(terminal)
+    ---@cast terminal ConfigSidekickTerminal
+    if terminal.hijacked then
+        return
+    end
+
+    local open_win = terminal.open_win
+    function terminal:open_win()
+        local was_open = self:is_open()
+        local ret = open_win(self)
+
+        if not was_open and self.win then
+            vim.api.nvim_create_autocmd("WinClosed", {
+                group = augroup,
+                pattern = tostring(self.win),
+                once = true,
+                callback = function()
+                    self.win_closed_at = vim.uv.now()
+                end,
+            })
+        end
+
+        return ret
+    end
+
+    terminal.hijacked = true
+end
+
 ---@param name string
 ---@return sidekick.cli.State
 local function attach_cli(name)
@@ -21,14 +80,40 @@ local function attach_cli(name)
 end
 
 ---@param name? string
----@return sidekick.cli.State | nil
+---@return sidekick.cli.State?
 local function get_attached_cli(name)
     local filter = { attached = true, cwd = true, terminal = true, name = name }
     local states = require("sidekick.cli.state").get(filter)
 
-    if #states > 0 then
-        return states[1]
+    if #states == 0 then
+        return nil
     end
+
+    ---@type sidekick.cli.State[]
+    local opened_states = {}
+    ---@type sidekick.cli.State[]
+    local closed_states = {}
+
+    for _, state in ipairs(states) do
+        local terminal = state.terminal
+        if terminal and terminal:is_open() then
+            table.insert(opened_states, state)
+        else
+            table.insert(closed_states, state)
+        end
+    end
+
+    if #opened_states > 0 then
+        return max_by(opened_states, function(state)
+            return CLI_PRIORITIES[state.tool.name] or 0
+        end)
+    end
+
+    return max_by(closed_states, function(state)
+        local terminal = state.terminal
+        ---@cast terminal ConfigSidekickTerminal?
+        return terminal and terminal.win_closed_at or 0
+    end)
 end
 
 ---@param name? string
@@ -42,7 +127,9 @@ end
 local function opener(name)
     return function()
         local state = get_state(name)
-        state.terminal:focus()
+        if state.terminal then
+            state.terminal:focus()
+        end
     end
 end
 
@@ -169,6 +256,9 @@ return {
     keys = get_keys(),
     opts = {
         cli = {
+            win = {
+                config = configure_terminal,
+            },
             mux = {
                 enabled = true,
                 backend = "tmux",
