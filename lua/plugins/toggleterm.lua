@@ -104,9 +104,9 @@ local function on_exit(term)
     require("toggleterm.ui").switch_buf(candidate.bufnr)
 end
 
----@param index "next" | "prev" | number
+---@param direction "next" | "prev" | number
 ---@return nil
-local function go_to(index)
+local function go_to(direction)
     if vim.b.toggle_number == nil then
         return
     end
@@ -123,14 +123,14 @@ local function go_to(index)
 
     local target_index
 
-    if index == "next" then
-        index = source_index + 1
-        target_index = index > #terms and 1 or index
-    elseif index == "prev" then
-        index = source_index - 1
-        target_index = index < 1 and #terms or index
+    if direction == "next" then
+        direction = source_index + 1
+        target_index = direction > #terms and 1 or direction
+    elseif direction == "prev" then
+        direction = source_index - 1
+        target_index = direction < 1 and #terms or direction
     else
-        target_index = index < 1 and 1 or index > #terms and #terms or index
+        target_index = direction < 1 and 1 or direction > #terms and #terms or direction
     end
 
     if source_index == target_index then
@@ -141,6 +141,14 @@ local function go_to(index)
 
     local ui = require("toggleterm.ui")
     ui.switch_buf(term.bufnr)
+end
+
+---@param direction "next" | "prev" | number
+---@return fun()
+local function switcher(direction)
+    return function()
+        go_to(direction)
+    end
 end
 
 ---@return nil
@@ -225,22 +233,24 @@ end
 ---@param bufnr integer
 ---@return nil
 local function set_keymaps(bufnr)
-    vim.keymap.set({ "n" }, "<CR>", vim.cmd.startinsert, { buffer = bufnr })
-    vim.keymap.set({ "n", "t" }, "<M-a>", new, { buffer = bufnr, desc = "New Terminal" })
-    vim.keymap.set({ "n", "t" }, "<M-r>", rename, { buffer = bufnr, desc = "Rename Terminal" })
+    ---@param mode string[]
+    ---@param lhs string
+    ---@param rhs function
+    ---@param desc? string
+    ---@return nil
+    local function map(mode, lhs, rhs, desc)
+        vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
+    end
 
-    vim.keymap.set({ "n", "t" }, "<M-h>", function()
-        go_to("prev")
-    end, { buffer = bufnr, desc = "Prev Terminal" })
-
-    vim.keymap.set({ "n", "t" }, "<M-l>", function()
-        go_to("next")
-    end, { buffer = bufnr, desc = "Next Terminal" })
+    map({ "n" }, "<CR>", vim.cmd.startinsert)
+    map({ "n", "t" }, "<M-a>", new, "New Terminal")
+    map({ "n", "t" }, "<M-r>", rename, "Rename Terminal")
+    map({ "n", "t" }, "<M-h>", switcher("prev"), "Prev Terminal")
+    map({ "n", "t" }, "<M-l>", switcher("next"), "Next Terminal")
 
     for i = 1, 10 do
-        vim.keymap.set({ "n", "t" }, ("<M-%d>"):format(i == 10 and 0 or i), function()
-            go_to(i)
-        end, { buffer = bufnr, desc = ("Go To Terminal %d"):format(i) })
+        local desc = ("Go To Terminal %d"):format(i)
+        map({ "n", "t" }, ("<M-%d>"):format(i == 10 and 0 or i), switcher(i), desc)
     end
 end
 
