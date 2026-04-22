@@ -79,6 +79,25 @@ function M.capitalize(text)
     return text:sub(1, 1):upper() .. text:sub(2):lower()
 end
 
+---@generic T
+---@param items T[]
+---@param key fun(item: T): number
+---@return T?
+function M.max_by(items, key)
+    local best
+    local best_key
+
+    for _, item in ipairs(items) do
+        local item_key = key(item)
+        if best_key == nil or item_key > best_key then
+            best = item
+            best_key = item_key
+        end
+    end
+
+    return best
+end
+
 ---@return nil
 function M.tabopen()
     local view = vim.fn.winsaveview()

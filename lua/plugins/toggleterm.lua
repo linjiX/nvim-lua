@@ -1,4 +1,5 @@
-local R = require("config.utility").lazy_require
+local utility = require("config.utility")
+local toggleterm = utility.lazy_require("toggleterm")
 
 ---@class MyTerminal: Terminal
 ---@field leave_at? integer
@@ -86,15 +87,9 @@ end
 
 ---@return MyTerminal?
 local function get_candidate_background_term()
-    local candidate ---@type MyTerminal?
-
-    for _, term in ipairs(get_background_terms()) do
-        if candidate == nil or (term.leave_at or 0) > (candidate.leave_at or 0) then
-            candidate = term
-        end
-    end
-
-    return candidate
+    return utility.max_by(get_background_terms(), function(term)
+        return term.leave_at or 0
+    end)
 end
 
 ---@param term Terminal
@@ -297,7 +292,7 @@ local function get_keys()
         },
         {
             "<M-f>",
-            R("toggleterm").toggle(0, nil, nil, "float"),
+            toggleterm.toggle(0, nil, nil, "float"),
             desc = "Toggle Terminal",
         },
         {

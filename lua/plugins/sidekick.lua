@@ -1,6 +1,5 @@
 local utility = require("config.utility")
-local R = utility.lazy_require
-local cli = R("sidekick.cli")
+local cli = utility.lazy_require("sidekick.cli")
 
 local CLIS = {
     "codex",
@@ -11,25 +10,6 @@ local CLIS = {
 local CLI_PRIORITIES = {}
 for i, name in ipairs(CLIS) do
     CLI_PRIORITIES[name] = #CLIS - i + 1
-end
-
----@generic T
----@param items T[]
----@param key fun(item: T): number
----@return T?
-local function max_by(items, key)
-    local best
-    local best_key
-
-    for _, item in ipairs(items) do
-        local item_key = key(item)
-        if best_key == nil or item_key > best_key then
-            best = item
-            best_key = item_key
-        end
-    end
-
-    return best
 end
 
 ---@class ConfigSidekickTerminal: sidekick.cli.Terminal
@@ -104,12 +84,12 @@ local function get_attached_cli(name)
     end
 
     if #opened_states > 0 then
-        return max_by(opened_states, function(state)
+        return utility.max_by(opened_states, function(state)
             return CLI_PRIORITIES[state.tool.name] or 0
         end)
     end
 
-    return max_by(closed_states, function(state)
+    return utility.max_by(closed_states, function(state)
         local terminal = state.terminal
         ---@cast terminal ConfigSidekickTerminal?
         return terminal and terminal.win_closed_at or 0
