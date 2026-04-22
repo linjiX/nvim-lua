@@ -1,25 +1,36 @@
 local R = require("config.utility").lazy_require
 
+---@class MyTerminal: Terminal
+---@field leave_at? integer
+---@field __set_options fun(self: Terminal)
+
+---@param command string
+---@return string
 local function tmux_command(command)
     local tmux_socket = vim.fn.split(vim.env.TMUX, ",")[1]
     return vim.fn.system(("tmux -S %s %s"):format(tmux_socket, command))
 end
 
 ---@param value boolean
+---@return nil
 local function set_cursor_marker(value)
     vim.opt_local.cursorline = value
     vim.opt_local.cursorcolumn = value
 end
 
+---@param term Terminal
+---@return nil
 local function create_term_buffer(term)
     local window = vim.api.nvim_get_current_win()
     local bufnr = vim.api.nvim_create_buf(false, false)
 
     vim.api.nvim_win_set_buf(window, bufnr)
     term.window, term.bufnr = window, bufnr
+    ---@cast term MyTerminal
     term:__set_options()
 end
 
+---@type table<string, string>
 local superscript_numbers = {
     ["0"] = "⁰",
     ["1"] = "¹",
@@ -33,12 +44,18 @@ local superscript_numbers = {
     ["9"] = "⁹",
 }
 
+---@param number number
+---@return string
 local function raise_number(number)
-    return tostring(number):gsub("%d", function(digit)
+    local raised = tostring(number):gsub("%d", function(digit)
         return superscript_numbers[digit]
     end)
+    return raised
 end
 
+---@param current_id number
+---@param terms Terminal[]
+---@return integer?
 local function get_term_index(current_id, terms)
     for i, v in ipairs(terms) do
         if v.id == current_id then
@@ -47,6 +64,7 @@ local function get_term_index(current_id, terms)
     end
 end
 
+---@return MyTerminal[]
 local function get_background_terms()
     local terms = require("toggleterm.terminal").get_all(true)
     local has_open, windows = require("toggleterm.ui").find_open_windows()
@@ -55,6 +73,7 @@ local function get_background_terms()
         return terms
     end
 
+    ---@type table<number, boolean>
     local open_term_ids = {}
     for _, window in ipairs(windows) do
         open_term_ids[window.term_id] = true
@@ -65,8 +84,9 @@ local function get_background_terms()
     end, terms)
 end
 
+---@return MyTerminal?
 local function get_candidate_background_term()
-    local candidate = nil
+    local candidate ---@type MyTerminal?
 
     for _, term in ipairs(get_background_terms()) do
         if candidate == nil or (term.leave_at or 0) > (candidate.leave_at or 0) then
@@ -77,6 +97,8 @@ local function get_candidate_background_term()
     return candidate
 end
 
+---@param term Terminal
+---@return nil
 local function on_exit(term)
     local candidate = get_candidate_background_term()
     if candidate == nil or candidate.id == term.id then
@@ -88,6 +110,7 @@ local function on_exit(term)
 end
 
 ---@param index "next" | "prev" | number
+---@return nil
 local function go_to(index)
     if vim.b.toggle_number == nil then
         return
@@ -99,6 +122,10 @@ local function go_to(index)
     end
 
     local source_index = get_term_index(vim.b.toggle_number, terms)
+    if source_index == nil then
+        return
+    end
+
     local target_index
 
     if index == "next" then
@@ -121,6 +148,7 @@ local function go_to(index)
     ui.switch_buf(term.bufnr)
 end
 
+---@return nil
 local function new()
     local Terminal = require("toggleterm.terminal").Terminal
     local ui = require("toggleterm.ui")
@@ -136,6 +164,7 @@ local function new()
 end
 
 ---@param modifier string
+---@return nil
 local function split(modifier)
     vim.cmd(("%s split"):format(modifier))
     if modifier:find("bot", 1, true) or modifier:find("top", 1, true) then
@@ -154,6 +183,7 @@ local function split(modifier)
     end
 end
 
+---@return nil
 local function rename()
     local term_id = vim.b.toggle_number
     if term_id == nil then
@@ -180,19 +210,25 @@ local function rename()
     end)
 end
 
+---@param term Terminal
+---@return string
 local function get_display_name(term)
     local terms = require("toggleterm.terminal").get_all(true)
     local index = get_term_index(term.id, terms)
+    local raised_index = index and raise_number(index) or "?"
 
-    return ("%s  %s"):format(raise_number(index), term:_display_name())
+    return ("%s  %s"):format(raised_index, term:_display_name())
 end
 
+---@return nil
 local function set_winbar_highlights()
     local directory_hl = vim.api.nvim_get_hl(0, { name = "Directory", link = false })
 
     vim.api.nvim_set_hl(0, "WinBarActive", { bold = true, italic = true, fg = directory_hl.fg })
 end
 
+---@param bufnr integer
+---@return nil
 local function set_keymaps(bufnr)
     vim.keymap.set({ "n" }, "<CR>", vim.cmd.startinsert, { buffer = bufnr })
     vim.keymap.set({ "n", "t" }, "<M-a>", new, { buffer = bufnr, desc = "New Terminal" })
@@ -213,6 +249,7 @@ local function set_keymaps(bufnr)
     end
 end
 
+---@return LazyKeysSpec[]
 local function get_keys()
     local keys = {
         {
@@ -298,6 +335,7 @@ return {
     keys = get_keys(),
     opts = {
         open_mapping = [[<c-\>]],
+        ---@param term Terminal
         on_create = function(term)
             set_keymaps(term.bufnr)
             set_cursor_marker(false)
@@ -356,6 +394,7 @@ return {
                     return
                 end
 
+                ---@cast term MyTerminal
                 term.leave_at = vim.uv.now()
             end,
         })
