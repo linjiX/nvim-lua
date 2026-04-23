@@ -49,9 +49,9 @@ return {
         { "yoJ", vim.cmd.LspRestart },
     },
     config = function()
-        local lua_ls = vim.lsp.config.lua_ls
-        assert(lua_ls, "lua_ls config is not available")
+        local lua_ls = assert(vim.lsp.config.lua_ls, "lua_ls config is not available")
 
+        ---@type table<string, vim.lsp.Config>
         local opts = {
             lua_ls = {
                 root_dir = lua_root_dir_getter(lua_ls.root_markers),
@@ -87,6 +87,7 @@ return {
 
             pyright = {
                 before_init = function(_, config)
+                    ---@diagnostic disable-next-line: inject-field
                     config.settings.python.pythonPath = require("config.utility").get_python_path()
                 end,
             },
