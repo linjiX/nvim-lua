@@ -42,7 +42,7 @@ end
 return {
     "neovim/nvim-lspconfig",
     dependencies = { "mason-org/mason.nvim" },
-    lazy = false,
+    event = { "BufReadPre", "BufNewFile" },
     keys = {
         { "[oj", vim.cmd.LspStart },
         { "]oj", vim.cmd.LspStop },
