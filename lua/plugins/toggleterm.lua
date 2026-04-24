@@ -92,6 +92,15 @@ local function get_candidate_background_term()
     end)
 end
 
+local function get_current_term()
+    local term_id = vim.b.toggle_number
+    if term_id == nil then
+        return nil
+    end
+
+    return require("toggleterm.terminal").get(term_id, true)
+end
+
 ---@param term Terminal
 ---@return nil
 local function on_exit(term)
@@ -107,7 +116,8 @@ end
 ---@param direction "next" | "prev" | number
 ---@return nil
 local function go_to(direction)
-    if vim.b.toggle_number == nil then
+    local source_id = vim.b.toggle_number
+    if source_id == nil then
         return
     end
 
@@ -116,7 +126,7 @@ local function go_to(direction)
         return
     end
 
-    local source_index = get_term_index(vim.b.toggle_number, terms)
+    local source_index = get_term_index(source_id, terms)
     if source_index == nil then
         return
     end
@@ -164,6 +174,7 @@ local function new()
     term.display_name = parts[#parts]
 
     ui.hl_term(term)
+    vim.schedule(vim.cmd.startinsert)
 end
 
 ---@param modifier string
@@ -188,16 +199,12 @@ end
 
 ---@return nil
 local function rename()
-    local term_id = vim.b.toggle_number
-    if term_id == nil then
-        return
-    end
-
-    local term = require("toggleterm.terminal").get(term_id, true)
+    local term = get_current_term()
     if term == nil then
         return
     end
 
+    term:persist_mode()
     vim.cmd.stopinsert()
     vim.schedule(function()
         vim.ui.input({
@@ -388,19 +395,16 @@ return {
         vim.api.nvim_create_autocmd("BufWinLeave", {
             group = augroup,
             pattern = "term://*",
-            callback = function(args)
-                local term_id = vim.b[args.buf].toggle_number
-                if term_id == nil then
-                    return
-                end
-
-                local term = require("toggleterm.terminal").get(term_id, true)
+            callback = function()
+                local term = get_current_term()
                 if term == nil then
                     return
                 end
 
                 ---@cast term MyTerminal
                 term.leave_at = vim.uv.now()
+                term:persist_mode()
+                vim.cmd.stopinsert()
             end,
         })
 
