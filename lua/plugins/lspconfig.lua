@@ -39,6 +39,15 @@ local function get_nvim_lua_library()
     return library
 end
 
+local DISABLED_SERVERS = {
+    ts_ls = true,
+    -- vtsls = true,
+}
+
+local function is_server_enabled(server_name)
+    return not DISABLED_SERVERS[server_name]
+end
+
 return {
     "neovim/nvim-lspconfig",
     dependencies = { "mason-org/mason.nvim" },
@@ -93,26 +102,26 @@ return {
             },
             ruff = {},
 
-            -- ts_ls = {
-            --     settings = {
-            --         typescript = {
-            --             tsserver = {
-            --                 maxTsServerMemory = 8192,
-            --             },
-            --         },
-            --     },
-            --     init_options = {
-            --         hostInfo = "neovim",
-            --         plugins = {
-            --             {
-            --                 name = "@vue/typescript-plugin",
-            --                 location = get_vue_plugin_path(),
-            --                 languages = { "vue" },
-            --             },
-            --         },
-            --     },
-            --     filetypes = { "typescript", "javascript", "vue" },
-            -- },
+            ts_ls = {
+                settings = {
+                    typescript = {
+                        tsserver = {
+                            maxTsServerMemory = 8192,
+                        },
+                    },
+                },
+                init_options = {
+                    hostInfo = "neovim",
+                    plugins = {
+                        {
+                            name = "@vue/typescript-plugin",
+                            location = get_vue_plugin_path(),
+                            languages = { "vue" },
+                        },
+                    },
+                },
+                filetypes = { "typescript", "javascript", "vue" },
+            },
             vtsls = {
                 settings = {
                     typescript = {
@@ -150,6 +159,8 @@ return {
         for name, opt in pairs(opts) do
             vim.lsp.config(name, opt)
         end
-        vim.lsp.enable(vim.tbl_keys(opts))
+
+        local enabled_servers = vim.tbl_filter(is_server_enabled, vim.tbl_keys(opts))
+        vim.lsp.enable(enabled_servers)
     end,
 }
