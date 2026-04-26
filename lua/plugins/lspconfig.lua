@@ -53,9 +53,24 @@ return {
     dependencies = { "mason-org/mason.nvim" },
     event = { "BufReadPre", "BufNewFile" },
     keys = {
-        { "[oj", vim.cmd.LspStart },
-        { "]oj", vim.cmd.LspStop },
-        { "yoJ", vim.cmd.LspRestart },
+        {
+            "[oj",
+            function()
+                vim.cmd.lsp("enable")
+            end,
+        },
+        {
+            "]oj",
+            function()
+                vim.cmd.lsp("disable")
+            end,
+        },
+        {
+            "yoJ",
+            function()
+                vim.cmd.lsp("restart")
+            end,
+        },
     },
     config = function()
         local lua_ls = assert(vim.lsp.config.lua_ls, "lua_ls config is not available")
