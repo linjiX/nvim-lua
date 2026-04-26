@@ -99,6 +99,10 @@ local filetypes = {
         pattern = "requirements*.txt",
         filetype = "requirements",
     },
+    {
+        pattern = "gitconfig",
+        filetype = "gitconfig",
+    },
 }
 
 for _, ft in ipairs(filetypes) do
