@@ -118,6 +118,11 @@ end
 ---@return fun()
 local function sender(msg, name)
     return function()
+        -- Set the visit time if the sidekick is lazy loaded
+        if not vim.w.sidekick_visit then
+            vim.w.sidekick_visit = vim.uv.hrtime()
+        end
+
         local _, text = cli.render({ msg = msg })()
         if not text then
             return
@@ -232,7 +237,7 @@ end
 
 return {
     "folke/sidekick.nvim",
-    lazy = false,
+    event = "InsertEnter",
     keys = get_keys(),
     opts = {
         cli = {
