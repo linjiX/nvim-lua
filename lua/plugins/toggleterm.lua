@@ -318,6 +318,7 @@ local function get_keys()
                 tmux_command([[new-window -c "#{pane_current_path}"]])
             end,
             desc = "New Tmux Terminal",
+            mode = { "n", "t" },
         },
         {
             "<M-r>",
@@ -325,6 +326,7 @@ local function get_keys()
                 tmux_command([[command-prompt -I "#W" 'rename-window "%%"']])
             end,
             desc = "Rename Tmux Terminal",
+            mode = { "n", "t" },
         },
     }
 
@@ -335,6 +337,7 @@ local function get_keys()
                 tmux_command(("select-window -t %d"):format(i))
             end,
             desc = ("Go To Tmux Terminal %d"):format(i),
+            mode = { "n", "t" },
         })
     end
 
