@@ -97,9 +97,14 @@ local function get_attached_cli(name)
 end
 
 ---@param name? string
----@return sidekick.cli.State
+---@return sidekick.cli.State, boolean
 local function get_state(name)
-    return get_attached_cli(name) or attach_cli(name or CLIS[1])
+    local state = get_attached_cli(name)
+    if state then
+        return state, false
+    end
+
+    return attach_cli(name or CLIS[1]), true
 end
 
 ---@param name? string
@@ -111,6 +116,49 @@ local function opener(name)
             state.terminal:focus()
         end
     end
+end
+
+---@param state sidekick.cli.State
+local function block_input_till_sent(state)
+    local terminal = state.terminal
+    if not terminal then
+        return
+    end
+
+    local ns = vim.api.nvim_create_namespace("sidekick_block_input_till_sent")
+    local done = false
+    local seen_queue = false
+
+    vim.on_key(function()
+        if not done and terminal:is_focused() and vim.fn.mode() == "t" then
+            return ""
+        end
+    end, ns)
+
+    local function unblock()
+        if done then
+            return
+        end
+        done = true
+        vim.on_key(nil, ns)
+    end
+
+    local function poll()
+        if done then
+            return
+        end
+
+        if #terminal.send_queue > 0 then
+            seen_queue = true
+        elseif seen_queue then
+            return vim.defer_fn(unblock, 50)
+        end
+
+        vim.defer_fn(poll, 50)
+    end
+
+    vim.defer_fn(unblock, 3000)
+    vim.defer_fn(poll, 50)
 end
 
 ---@param msg string
@@ -128,7 +176,11 @@ local function sender(msg, name)
             return
         end
 
-        local state = get_state(name)
+        local state, attached = get_state(name)
+        if attached then
+            block_input_till_sent(state)
+        end
+
         cli.send({ text = text, filter = { session = state.session.id } })()
     end
 end
