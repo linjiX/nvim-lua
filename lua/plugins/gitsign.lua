@@ -128,7 +128,14 @@ local function hijack_blame()
                     return
                 end
 
-                return original(opts, entries, win, revision, parent)
+                vim.wo[win].winfixbuf = false
+
+                local result = original(opts, entries, win, revision, parent)
+
+                vim.wo[win].winfixbuf = true
+                vim.wo[win].cursorbind = true
+
+                return result
             end
 
             debug.setupvalue(blame, i, replacement)
