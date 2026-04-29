@@ -188,6 +188,7 @@ local function open_blame(buffer)
             tabopen()
             vim.opt_local.winfixbuf = true
             vim.opt_local.cursorbind = true
+            ---@diagnostic disable-next-line: missing-return
             require("gitsigns.actions.blame").blame(opts)
         end)
         :raise_on_error()
