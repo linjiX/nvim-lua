@@ -25,18 +25,8 @@ vim.keymap.set("n", "<CR>", function()
     end
 end, { buffer = true })
 
-local function find_blame_source_win()
-    local current = vim.api.nvim_get_current_win()
-
-    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-        if win ~= current and vim.api.nvim_win_is_valid(win) and vim.wo[win].scrollbind then
-            return win
-        end
-    end
-end
-
 local function reblame(suffix)
-    local win = find_blame_source_win()
+    local win = window.tabpage_get_scrollbind_win()
     local BlameJump = utility.get_script_function("BlameJump", scriptname)
 
     vim.wo[win].winfixbuf = false

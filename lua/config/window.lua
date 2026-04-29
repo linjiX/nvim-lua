@@ -10,19 +10,38 @@ local SMART_QUIT_CONFIGS = {
 }
 
 ---@return integer[]
-local function tabpage_list_buflisted_wins()
+local function tabpage_list_other_wins()
     local wins = {}
     local current_win = api.nvim_get_current_win()
 
     for _, win in ipairs(api.nvim_tabpage_list_wins(0)) do
         if win ~= current_win then
-            local buf = api.nvim_win_get_buf(win)
-            if vim.bo[buf].buflisted then
-                table.insert(wins, win)
-            end
+            table.insert(wins, win)
         end
     end
     return wins
+end
+
+---@return integer[]
+local function tabpage_list_buflisted_wins()
+    local wins = {}
+
+    for _, win in ipairs(tabpage_list_other_wins()) do
+        local buf = api.nvim_win_get_buf(win)
+        if vim.bo[buf].buflisted then
+            table.insert(wins, win)
+        end
+    end
+    return wins
+end
+
+---@return integer | nil
+function M.tabpage_get_scrollbind_win()
+    for _, win in ipairs(tabpage_list_other_wins()) do
+        if vim.wo[win].scrollbind then
+            return win
+        end
+    end
 end
 
 ---@param cmd 'q'|'wq'

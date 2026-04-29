@@ -1,3 +1,4 @@
+local tabpage_get_scrollbind_win = require("config.window").tabpage_get_scrollbind_win
 local tabopen = require("config.utility").tabopen
 local UNCOMMITTED_AUTHOR = "uncommitted"
 local blame_hijacked = false
@@ -201,24 +202,15 @@ local function open_blame(buffer)
         :raise_on_error()
 end
 
-local function find_blame_source_buf()
-    local current = vim.api.nvim_get_current_win()
-
-    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-        if win ~= current and vim.api.nvim_win_is_valid(win) and vim.wo[win].scrollbind then
-            return vim.api.nvim_win_get_buf(win)
-        end
-    end
-end
-
 local function blame_line_in_blame()
     local popup = require("gitsigns.popup")
     if popup.focus_open("blame") then
         return
     end
 
-    local source_buf = assert(find_blame_source_buf())
-    local bcache = assert(require("gitsigns.cache").cache[source_buf])
+    local win = assert(tabpage_get_scrollbind_win())
+    local buf = vim.api.nvim_win_get_buf(win)
+    local bcache = assert(require("gitsigns.cache").cache[buf])
 
     local lnum = vim.api.nvim_win_get_cursor(0)[1]
     local info = assert(bcache:get_blame(lnum, {}))
