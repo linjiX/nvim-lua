@@ -1,9 +1,11 @@
-local M = {}
+local M = {
+    root = vim.fs.joinpath(vim.fn.stdpath("data"), "lazy"),
+}
 
 -- lazy.nvim setup functin is basically copied from https://lazy.folke.io/installation
 ---@return nil
 function M.setup()
-    local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+    local lazypath = vim.fs.joinpath(M.root, "lazy.nvim")
 
     ---@diagnostic disable: undefined-field
     if not vim.uv.fs_stat(lazypath) then
