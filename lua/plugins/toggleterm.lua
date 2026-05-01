@@ -294,7 +294,7 @@ local function get_keys()
         {
             "<M-V>",
             function()
-                split("botright vertical 70")
+                split("botright vertical 80")
             end,
             desc = "Rightmost Split terminal",
             mode = { "n", "t" },
