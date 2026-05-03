@@ -30,7 +30,8 @@ return {
         end
     end,
     config = function()
-        local tabopen = require("config.utility").tabopen
+        local window = require("config.window")
+        local utility = require("config.utility")
 
         vim.api.nvim_create_user_command("Git", function(opts)
             local subcommand = opts.args:match("%w+")
@@ -41,9 +42,9 @@ return {
                 if not args:match("%-%-date[=%s]") then
                     args = args:gsub("^(%s*blame)(%s*)", "%1 --date=short%2", 1)
                 end
-                tabopen()
+                utility.tabopen()
                 vim.opt_local.winfixbuf = true
-                vim.opt_local.cursorbind = true
+                window.bind_cursorline()
             elseif mods == "" then
                 mods = "botright vertical"
             end

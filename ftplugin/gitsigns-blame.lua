@@ -1,7 +1,7 @@
 local blame_line_in_blame = require("plugins.gitsign").blame_line_in_blame
 local window = require("config.window")
 
-vim.opt_local.cursorbind = true
+window.bind_cursorline()
 
 window.set_quit_keymaps(vim.cmd.tabclose)
 

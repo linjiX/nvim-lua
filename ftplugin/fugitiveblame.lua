@@ -6,7 +6,7 @@ vim.b.did_ftplugin = true
 vim.fn["fugitive#BlameFileType"]()
 
 vim.opt_local.listchars:remove({ "precedes", "extends" })
-vim.opt_local.cursorbind = true
+window.bind_cursorline()
 
 window.set_quit_keymaps(vim.cmd.tabclose)
 
@@ -34,7 +34,7 @@ local function reblame(suffix)
     vim.cmd(BlameJump(suffix))
 
     vim.wo[win].winfixbuf = true
-    vim.wo[win].cursorbind = true
+    window.bind_cursorline(win)
 end
 
 for _, lhs in ipairs({ "-", "s", "u" }) do

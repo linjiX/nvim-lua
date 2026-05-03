@@ -9,6 +9,23 @@ local SMART_QUIT_CONFIGS = {
     ["wq"] = { is_write = true },
 }
 
+---@class CursorLineBindState
+---@field autocmd integer
+---@field curswant integer
+---@field lnum integer
+
+---@class CursorLineBind
+---@field active boolean
+---@field group integer
+---@field states table<integer, CursorLineBindState>
+
+---@type CursorLineBind
+local CURSORLINE_BIND = {
+    active = false,
+    group = api.nvim_create_augroup("MyCursorLineBind", {}),
+    states = {},
+}
+
 ---@return integer[]
 local function tabpage_list_other_wins()
     local wins = {}
@@ -42,6 +59,100 @@ function M.tabpage_get_scrollbind_win()
             return win
         end
     end
+end
+
+---@param win integer
+---@return nil
+local function sync_cursorline(win)
+    local state = CURSORLINE_BIND.states[win]
+    if not state then
+        return
+    end
+
+    local view = fn.winsaveview()
+    state.curswant = view.curswant
+
+    if state.lnum == view.lnum then
+        return
+    end
+
+    state.lnum = view.lnum
+
+    local target_win = M.tabpage_get_scrollbind_win()
+    if not target_win then
+        return
+    end
+
+    local target_state = CURSORLINE_BIND.states[target_win]
+    if not target_state then
+        return
+    end
+
+    api.nvim_win_call(target_win, function()
+        fn.winrestview({
+            lnum = view.lnum,
+            col = target_state.curswant,
+            curswant = target_state.curswant,
+        })
+        target_state.lnum = api.nvim_win_get_cursor(target_win)[1]
+    end)
+end
+
+---@param win integer
+---@return nil
+local function clear_cursorline_bind(win)
+    local state = CURSORLINE_BIND.states[win]
+    if state then
+        CURSORLINE_BIND.states[win] = nil
+        api.nvim_del_autocmd(state.autocmd)
+    end
+end
+
+---@param win? integer
+---@return nil
+function M.bind_cursorline(win)
+    win = win or api.nvim_get_current_win()
+
+    clear_cursorline_bind(win)
+
+    local buf = api.nvim_win_get_buf(win)
+    vim.wo[win].cursorbind = false
+
+    local autocmd = api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+        group = CURSORLINE_BIND.group,
+        buffer = buf,
+        callback = function()
+            if
+                CURSORLINE_BIND.active
+                or not api.nvim_win_is_valid(win)
+                or api.nvim_get_current_win() ~= win
+            then
+                return
+            end
+
+            CURSORLINE_BIND.active = true
+
+            pcall(sync_cursorline, win)
+
+            CURSORLINE_BIND.active = false
+        end,
+    })
+
+    local view = api.nvim_win_call(win, fn.winsaveview)
+    CURSORLINE_BIND.states[win] = {
+        autocmd = autocmd,
+        curswant = view.curswant,
+        lnum = view.lnum,
+    }
+
+    api.nvim_create_autocmd("WinClosed", {
+        group = CURSORLINE_BIND.group,
+        pattern = tostring(win),
+        once = true,
+        callback = function()
+            clear_cursorline_bind(win)
+        end,
+    })
 end
 
 ---@param cmd 'q'|'wq'

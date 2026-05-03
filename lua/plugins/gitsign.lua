@@ -1,5 +1,5 @@
-local tabpage_get_scrollbind_win = require("config.window").tabpage_get_scrollbind_win
-local tabopen = require("config.utility").tabopen
+local utility = require("config.utility")
+local window = require("config.window")
 local UNCOMMITTED_AUTHOR = "uncommitted"
 local blame_hijacked = false
 
@@ -134,7 +134,7 @@ local function hijack_blame()
                 local result = original(opts, entries, win, revision, parent)
 
                 vim.wo[win].winfixbuf = true
-                vim.wo[win].cursorbind = true
+                window.bind_cursorline(win)
 
                 return result
             end
@@ -193,9 +193,9 @@ local function open_blame(buffer)
                 bcache:get_blame(nil, opts)
             end
 
-            tabopen()
+            utility.tabopen()
             vim.opt_local.winfixbuf = true
-            vim.opt_local.cursorbind = true
+            window.bind_cursorline()
             ---@diagnostic disable-next-line: missing-return
             require("gitsigns.actions.blame").blame(opts)
         end)
@@ -208,7 +208,7 @@ local function blame_line_in_blame()
         return
     end
 
-    local win = assert(tabpage_get_scrollbind_win())
+    local win = assert(window.tabpage_get_scrollbind_win())
     local buf = vim.api.nvim_win_get_buf(win)
     local bcache = assert(require("gitsigns.cache").cache[buf])
 
