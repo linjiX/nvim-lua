@@ -6,7 +6,9 @@ vim.b.did_ftplugin = true
 vim.fn["fugitive#BlameFileType"]()
 
 vim.opt_local.listchars:remove({ "precedes", "extends" })
+
 window.bind_cursorline()
+vim.api.nvim_clear_autocmds({ group = "fugitive_blame", event = { "WinLeave", "WinEnter" } })
 
 window.set_quit_keymaps(vim.cmd.tabclose)
 

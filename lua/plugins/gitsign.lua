@@ -83,6 +83,7 @@ local function hijack_blame()
         reblame = false,
         render = false,
         show_commit = false,
+        sync_cursors = false,
     }
 
     --- @return string?
@@ -165,6 +166,9 @@ local function hijack_blame()
 
             debug.setupvalue(blame, i, replacement)
             patched.show_commit = true
+        elseif name == "sync_cursors" then
+            debug.setupvalue(blame, i, function() end)
+            patched.sync_cursors = true
         end
 
         if
@@ -173,6 +177,7 @@ local function hijack_blame()
             and patched.reblame
             and patched.render
             and patched.show_commit
+            and patched.sync_cursors
         then
             return
         end
