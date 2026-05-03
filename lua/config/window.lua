@@ -231,11 +231,10 @@ function M.set_quit_keymaps(rhs, opts, check)
         vim.cmd(M.smart_quit("q"))
     end
 
-    opts = opts and vim.deepcopy(opts) or {}
-    opts.buffer = true
-    if not opts.desc then
-        opts.desc = "Quit"
-    end
+    local keymap_opts = vim.tbl_extend("force", opts or {}, {
+        buffer = true,
+        desc = opts and opts.desc or "Quit",
+    })
 
     local keys = QUIT_KEYS
     if check then
@@ -250,7 +249,7 @@ function M.set_quit_keymaps(rhs, opts, check)
     end
 
     for _, key in ipairs(keys) do
-        vim.keymap.set("n", key, rhs, opts)
+        vim.keymap.set("n", key, rhs, keymap_opts)
     end
 end
 

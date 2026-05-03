@@ -9,8 +9,7 @@ M.icons = {
 
 ---@param severity vim.diagnostic.Severity
 local function map_diagnostic_pairs(severity)
-    ---@cast severity string
-    local name = severity:lower()
+    local name = tostring(severity):lower()
     local key = name:sub(1, 1)
 
     vim.keymap.set("n", "]g" .. key, function()
