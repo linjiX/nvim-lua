@@ -299,6 +299,16 @@ return {
         cli = {
             win = {
                 config = configure_terminal,
+                keys = {
+                    shift_enter = {
+                        "<S-CR>",
+                        function(terminal)
+                            vim.api.nvim_chan_send(terminal.job, "\027[13;2u")
+                        end,
+                        mode = "t",
+                        desc = "Send Shift+Enter",
+                    },
+                },
             },
             mux = {
                 enabled = true,
