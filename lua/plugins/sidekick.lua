@@ -18,6 +18,36 @@ end
 
 local augroup = vim.api.nvim_create_augroup("MySidekick", { clear = true })
 
+local function hijack_scrollback()
+    local Scrollback = require("sidekick.cli.scrollback")
+
+    local open = Scrollback.open
+    local close = Scrollback.close
+
+    ---@param win_pos? sidekick.Pos
+    function Scrollback:open(win_pos)
+        local terminal = self.terminal()
+        if not terminal then
+            return
+        end
+
+        vim.wo[terminal.win].winfixbuf = false
+        open(self, win_pos)
+        vim.wo[terminal.win].winfixbuf = true
+    end
+
+    function Scrollback:close()
+        local terminal = self.terminal()
+        if not terminal then
+            return
+        end
+
+        vim.wo[terminal.win].winfixbuf = false
+        close(self)
+        vim.wo[terminal.win].winfixbuf = true
+    end
+end
+
 ---@param terminal sidekick.cli.Terminal
 local function configure_terminal(terminal)
     ---@cast terminal ConfigSidekickTerminal
@@ -295,26 +325,33 @@ return {
     "folke/sidekick.nvim",
     event = "InsertEnter",
     keys = get_keys(),
-    opts = {
-        cli = {
-            win = {
-                config = configure_terminal,
-                keys = {
-                    shift_enter = {
-                        "<S-CR>",
-                        function(terminal)
-                            vim.api.nvim_chan_send(terminal.job, "\027[13;2u")
-                        end,
-                        mode = "t",
-                        desc = "Send Shift+Enter",
+    opts = function()
+        hijack_scrollback()
+
+        return {
+            cli = {
+                win = {
+                    config = configure_terminal,
+                    wo = {
+                        winfixbuf = true,
+                    },
+                    keys = {
+                        shift_enter = {
+                            "<S-CR>",
+                            function(terminal)
+                                vim.api.nvim_chan_send(terminal.job, "\027[13;2u")
+                            end,
+                            mode = "t",
+                            desc = "Send Shift+Enter",
+                        },
                     },
                 },
+                mux = {
+                    enabled = true,
+                    backend = "tmux",
+                },
+                picker = "telescope",
             },
-            mux = {
-                enabled = true,
-                backend = "tmux",
-            },
-            picker = "telescope",
-        },
-    },
+        }
+    end,
 }
