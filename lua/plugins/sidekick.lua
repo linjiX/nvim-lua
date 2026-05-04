@@ -191,11 +191,15 @@ local function get_keys()
         {
             "<Tab>",
             function()
-                if not require("sidekick").nes_jump_or_apply() then
-                    vim.api.nvim_feedkeys(vim.keycode("<Tab>"), "n", false)
+                local nes = require("sidekick.nes")
+                if nes.have() then
+                    nes.jump()
+                    nes.apply()
+                    return
                 end
+                vim.api.nvim_feedkeys(vim.keycode("<Tab>"), "n", false)
             end,
-            desc = "Goto/Apply Next Edit Suggestion",
+            desc = "Apply Next Edit Suggestion",
         },
         {
             "<Leader>aa",
