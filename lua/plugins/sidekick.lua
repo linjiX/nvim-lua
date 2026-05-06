@@ -196,11 +196,6 @@ end
 ---@return fun()
 local function sender(msg, name)
     return function()
-        -- Set the visit time if the sidekick is lazy loaded
-        if not vim.w.sidekick_visit then
-            vim.w.sidekick_visit = vim.uv.hrtime()
-        end
-
         local _, text = cli.render({ msg = msg })()
         if not text then
             return
@@ -327,6 +322,11 @@ return {
     keys = get_keys(),
     opts = function()
         hijack_scrollback()
+
+        -- Set the visit time for the "Send" feature
+        for _, win in ipairs(vim.api.nvim_list_wins()) do
+            vim.w[win].sidekick_visit = vim.uv.hrtime()
+        end
 
         return {
             cli = {
