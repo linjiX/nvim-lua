@@ -5,6 +5,8 @@ return {
     dependencies = { "nvim-tree/nvim-web-devicons" },
     event = "VeryLazy",
     opts = function()
+        local mode = require("noice").api.status.mode
+
         vim.opt.showmode = false
         vim.opt.ruler = false
 
@@ -50,6 +52,11 @@ return {
                     {
                         "diagnostics",
                         symbols = require("config.diagnostic").icons,
+                    },
+                    {
+                        mode.get,
+                        cond = mode.has,
+                        color = { fg = "#ff9e64" },
                     },
                 },
                 lualine_c = { "aerial" },
