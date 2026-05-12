@@ -3,6 +3,7 @@ local toggleterm = utility.lazy_require("toggleterm")
 
 ---@class MyTerminal: Terminal
 ---@field leave_at? integer
+---@field command_name? string
 ---@field __set_options fun(self: Terminal)
 
 ---@param command string
@@ -92,13 +93,16 @@ local function get_candidate_background_term()
     end)
 end
 
+---@return MyTerminal?
 local function get_current_term()
     local term_id = vim.b.toggle_number
     if term_id == nil then
         return nil
     end
 
-    return require("toggleterm.terminal").get(term_id, true)
+    local term = require("toggleterm.terminal").get(term_id, true)
+    ---@cast term MyTerminal?
+    return term
 end
 
 ---@param term Terminal
@@ -167,11 +171,13 @@ local function new()
     local ui = require("toggleterm.ui")
 
     local term = Terminal:new()
+    ---@cast term MyTerminal
     create_term_buffer(term)
     term:spawn()
 
     local parts = vim.split(term:_display_name(), "/", { plain = true, trimempty = true })
-    term.display_name = parts[#parts]
+    term.display_name = nil
+    term.command_name = parts[#parts]
 
     ui.hl_term(term)
     vim.schedule(vim.cmd.startinsert)
@@ -197,6 +203,12 @@ local function split(modifier)
     end
 end
 
+---@param term MyTerminal
+---@return string
+local function get_name(term)
+    return term.display_name or term.command_name or ""
+end
+
 ---@return nil
 local function rename()
     local term = get_current_term()
@@ -209,7 +221,7 @@ local function rename()
     vim.schedule(function()
         vim.ui.input({
             prompt = "Rename terminal: ",
-            default = term.display_name or "",
+            default = get_name(term),
         }, function(input)
             if input == nil or input == "" then
                 return
@@ -220,14 +232,14 @@ local function rename()
     end)
 end
 
----@param term Terminal
+---@param term MyTerminal
 ---@return string
 local function get_display_name(term)
     local terms = require("toggleterm.terminal").get_all(true)
     local index = get_term_index(term.id, terms)
     local raised_index = index and raise_number(index) or "?"
 
-    return ("%s  %s"):format(raised_index, term:_display_name())
+    return ("%s  %s"):format(raised_index, get_name(term))
 end
 
 ---@return nil
@@ -258,6 +270,33 @@ local function set_keymaps(bufnr)
     for i = 1, 10 do
         local desc = ("Go To Terminal %d"):format(i)
         map({ "n", "t" }, ("<M-%d>"):format(i == 10 and 0 or i), switcher(i), desc)
+    end
+end
+
+local name_updater = require("snacks").util.debounce(function()
+    local term = get_current_term()
+    if term == nil or term.display_name ~= nil then
+        return
+    end
+
+    local term_id = term.id
+    utility.get_terminal_command_async(term.bufnr, function(command)
+        if command == nil then
+            return
+        end
+
+        local target_term = require("toggleterm.terminal").get(term_id, true)
+        ---@cast target_term MyTerminal?
+        if target_term and target_term.display_name == nil then
+            target_term.command_name = command
+        end
+    end)
+end, { ms = 100 })
+
+local function name_update_trigger(key)
+    return function()
+        name_updater()
+        vim.api.nvim_feedkeys(vim.keycode(key), "n", false)
     end
 end
 
@@ -329,6 +368,14 @@ local function get_keys()
             mode = { "n", "t" },
         },
     }
+
+    for _, lhs in ipairs({ "<CR>", "<C-c>", "<C-d>" }) do
+        table.insert(keys, {
+            lhs,
+            name_update_trigger(lhs),
+            mode = "t",
+        })
+    end
 
     for i = 1, 10 do
         table.insert(keys, {

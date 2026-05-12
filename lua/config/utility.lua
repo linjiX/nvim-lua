@@ -120,28 +120,9 @@ function M.get_python_path()
     return vim.fn.exepath("python3") or vim.fn.exepath("python") or "python"
 end
 
----@param bufnr number|nil
----@return string|nil
-function M.get_terminal_command(bufnr)
-    if not bufnr or bufnr == 0 then
-        bufnr = vim.api.nvim_get_current_buf()
-    end
-
-    local pid = vim.b[bufnr].terminal_job_pid
-    if not pid then
-        error("Failed to get terminal job pid")
-    end
-
-    local tty = vim.fn.system("ps -o tty= " .. pid)
-    if vim.v.shell_error ~= 0 then
-        error("Failed to get terminal tty")
-    end
-
-    local ps_result = vim.fn.system("ps -o stat= -o command= -t " .. vim.trim(tty))
-    if vim.v.shell_error ~= 0 then
-        error("Failed to get process list")
-    end
-
+---@param ps_result string
+---@return string
+local function parse_terminal_command(ps_result)
     local ps_lines = vim.split(ps_result, "\n", { trimempty = true })
     local fg_command_parts = nil
 
@@ -170,6 +151,67 @@ function M.get_terminal_command(bufnr)
     end
 
     return fg_command
+end
+
+---@param bufnr number|nil
+---@return string|nil
+function M.get_terminal_command(bufnr)
+    if not bufnr or bufnr == 0 then
+        bufnr = vim.api.nvim_get_current_buf()
+    end
+
+    local pid = vim.b[bufnr].terminal_job_pid
+    if not pid then
+        error("Failed to get terminal job pid")
+    end
+
+    local tty = vim.fn.system({ "ps", "-o", "tty=", tostring(pid) })
+    if vim.v.shell_error ~= 0 then
+        error("Failed to get terminal tty")
+    end
+
+    local ps_result = vim.fn.system({ "ps", "-o", "stat=", "-o", "command=", "-t", vim.trim(tty) })
+    if vim.v.shell_error ~= 0 then
+        error("Failed to get process list")
+    end
+
+    return parse_terminal_command(ps_result)
+end
+
+---@param bufnr number|nil
+---@param callback fun(command?: string)
+---@return nil
+function M.get_terminal_command_async(bufnr, callback)
+    if not bufnr or bufnr == 0 then
+        bufnr = vim.api.nvim_get_current_buf()
+    end
+
+    local pid = vim.b[bufnr].terminal_job_pid
+    if not pid then
+        error("Failed to get terminal job pid")
+    end
+
+    vim.system({ "ps", "-o", "tty=", tostring(pid) }, { text = true }, function(tty_result)
+        if tty_result.code ~= 0 then
+            error("Failed to get terminal tty")
+        end
+
+        local tty = vim.trim(assert(tty_result.stdout))
+        vim.system(
+            { "ps", "-o", "stat=", "-o", "command=", "-t", tty },
+            { text = true },
+            function(ps_result)
+                if ps_result.code ~= 0 then
+                    error("Failed to get process list")
+                end
+
+                vim.schedule(function()
+                    local command = parse_terminal_command(assert(ps_result.stdout))
+                    callback(command)
+                end)
+            end
+        )
+    end)
 end
 
 return M
