@@ -11,12 +11,12 @@ return {
             function()
                 local suggestion = require("copilot.suggestion")
                 if not suggestion.is_visible() then
-                    vim.api.nvim_feedkeys(vim.keycode("<Tab>"), "n", false)
-                    return
+                    return "<Tab>"
                 end
 
                 suggestion.accept()
             end,
+            expr = true,
             mode = "i",
             desc = "Accept Copilot Suggestion",
         },

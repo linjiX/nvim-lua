@@ -20,13 +20,13 @@ return {
             if vim.fn["translator#window#float#has_scroll"]() ~= 0 then
                 return vim.fn["translator#window#float#scroll"](1)
             end
-            vim.api.nvim_feedkeys(vim.keycode("<C-u>"), "n", true)
-        end)
+            return "<C-u>"
+        end, { expr = true })
         vim.keymap.set("n", "<C-d>", function()
             if vim.fn["translator#window#float#has_scroll"]() ~= 0 then
                 return vim.fn["translator#window#float#scroll"](0)
             end
-            vim.api.nvim_feedkeys(vim.keycode("<C-d>"), "n", true)
-        end)
+            return "<C-d>"
+        end, { expr = true })
     end,
 }

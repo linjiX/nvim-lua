@@ -296,7 +296,7 @@ end, { ms = 100 })
 local function name_update_trigger(key)
     return function()
         name_updater()
-        vim.api.nvim_feedkeys(vim.keycode(key), "n", false)
+        return key
     end
 end
 
@@ -373,6 +373,7 @@ local function get_keys()
         table.insert(keys, {
             lhs,
             name_update_trigger(lhs),
+            expr = true,
             mode = "t",
         })
     end

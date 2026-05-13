@@ -222,8 +222,9 @@ local function get_keys()
                     nes.apply()
                     return
                 end
-                vim.api.nvim_feedkeys(vim.keycode("<Tab>"), "n", false)
+                return "<Tab>"
             end,
+            expr = true,
             desc = "Apply Next Edit Suggestion",
         },
         {
