@@ -296,7 +296,6 @@ function M.redirect_git_floatwin()
             height = height,
             row = row,
             col = col,
-            border = "rounded",
             zindex = 45,
         },
     }

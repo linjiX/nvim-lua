@@ -8,6 +8,5 @@ return {
         pip = {
             upgrade_pip = true,
         },
-        ui = { border = "rounded" },
     },
 }

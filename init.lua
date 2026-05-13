@@ -8,6 +8,7 @@ vim.opt.confirm = true
 vim.opt.scrolloff = 1
 vim.opt.sidescrolloff = 8
 vim.opt.wildmode = { "longest:full", "full" }
+vim.opt.winborder = "rounded"
 
 vim.opt.cursorline = true
 vim.opt.cursorcolumn = true

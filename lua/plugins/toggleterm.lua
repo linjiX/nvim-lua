@@ -425,9 +425,6 @@ return {
 
         direction = "customized",
 
-        float_opts = {
-            border = "rounded",
-        },
         winbar = {
             enabled = true,
             name_formatter = get_display_name,

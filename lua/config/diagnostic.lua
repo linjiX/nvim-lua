@@ -33,7 +33,6 @@ end
 function M.setup()
     vim.diagnostic.config({
         float = {
-            border = "rounded",
             source = true,
         },
         virtual_text = {
