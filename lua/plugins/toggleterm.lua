@@ -249,23 +249,36 @@ local function set_winbar_highlights()
     vim.api.nvim_set_hl(0, "WinBarActive", { bold = true, italic = true, fg = directory_hl.fg })
 end
 
+local function startinsert_trigger(key)
+    return function()
+        set_cursor_marker(false)
+        return key
+    end
+end
+
 ---@param bufnr integer
 ---@return nil
 local function set_keymaps(bufnr)
     ---@param mode string[]
     ---@param lhs string
-    ---@param rhs function
+    ---@param rhs string | function
     ---@param desc? string
+    ---@param opts? vim.keymap.set.Opts
     ---@return nil
-    local function map(mode, lhs, rhs, desc)
-        vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
+    local function map(mode, lhs, rhs, desc, opts)
+        local keymap_opts = vim.tbl_extend("force", { desc = desc, buffer = bufnr }, opts or {})
+        vim.keymap.set(mode, lhs, rhs, keymap_opts)
     end
 
-    map({ "n" }, "<CR>", vim.cmd.startinsert)
     map({ "n", "t" }, "<M-a>", new, "New Terminal")
     map({ "n", "t" }, "<M-r>", rename, "Rename Terminal")
     map({ "n", "t" }, "<M-h>", switcher("prev"), "Prev Terminal")
     map({ "n", "t" }, "<M-l>", switcher("next"), "Next Terminal")
+
+    map({ "n" }, "<CR>", "i", nil, { remap = true })
+    for _, key in ipairs({ "i", "I", "a", "A" }) do
+        map({ "n" }, key, startinsert_trigger(key), nil, { expr = true })
+    end
 
     for i = 1, 10 do
         local desc = ("Go To Terminal %d"):format(i)
@@ -453,14 +466,6 @@ return {
                 term.leave_at = vim.uv.now()
                 term:persist_mode()
                 vim.cmd.stopinsert()
-            end,
-        })
-
-        vim.api.nvim_create_autocmd("InsertEnter", {
-            group = augroup,
-            pattern = "term://*",
-            callback = function()
-                set_cursor_marker(false)
             end,
         })
     end,
