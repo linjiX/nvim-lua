@@ -1,5 +1,4 @@
 local utility = require("config.utility")
-local toggleterm = utility.lazy_require("toggleterm")
 
 ---@class MyTerminal: Terminal
 ---@field leave_at? integer
@@ -20,16 +19,42 @@ local function set_cursor_marker(value)
     vim.opt_local.cursorcolumn = value
 end
 
----@param term Terminal
----@return nil
-local function create_term_buffer(term)
-    local window = vim.api.nvim_get_current_win()
-    local bufnr = vim.api.nvim_create_buf(false, false)
-
-    vim.api.nvim_win_set_buf(window, bufnr)
-    term.window, term.bufnr = window, bufnr
+---@return MyTerminal
+local function create_term()
+    local Terminal = require("toggleterm.terminal").Terminal
+    local term = Terminal:new()
     ---@cast term MyTerminal
+    term.bufnr = vim.api.nvim_create_buf(false, false)
+
+    return term
+end
+
+---@param term MyTerminal
+---@param win integer
+---@return nil
+local function apply_term_window_options(term, win)
+    term.window = win
     term:__set_options()
+
+    vim.wo[win].signcolumn = "no"
+    vim.wo[win].cursorline = false
+    vim.wo[win].cursorcolumn = false
+
+    local ui = require("toggleterm.ui")
+    ui.hl_term(term)
+    ui.set_winbar(term)
+end
+
+---@param term MyTerminal
+---@return nil
+local function spawn_term(term)
+    term:spawn()
+
+    local parts = vim.split(term:_display_name(), "/", { plain = true, trimempty = true })
+    term.display_name = nil
+    term.command_name = parts[#parts]
+
+    vim.schedule(vim.cmd.startinsert)
 end
 
 ---@type table<string, string>
@@ -155,6 +180,12 @@ local function go_to(direction)
 
     local ui = require("toggleterm.ui")
     ui.switch_buf(term.bufnr)
+
+    local win = vim.api.nvim_get_current_win()
+    if term.window ~= win then
+        ---@cast term MyTerminal
+        apply_term_window_options(term, win)
+    end
 end
 
 ---@param direction "next" | "prev" | number
@@ -167,40 +198,50 @@ end
 
 ---@return nil
 local function new()
-    local Terminal = require("toggleterm.terminal").Terminal
-    local ui = require("toggleterm.ui")
+    local term = create_term()
+    local win = vim.api.nvim_get_current_win()
 
-    local term = Terminal:new()
-    ---@cast term MyTerminal
-    create_term_buffer(term)
-    term:spawn()
-
-    local parts = vim.split(term:_display_name(), "/", { plain = true, trimempty = true })
-    term.display_name = nil
-    term.command_name = parts[#parts]
-
-    ui.hl_term(term)
-    vim.schedule(vim.cmd.startinsert)
+    vim.api.nvim_win_set_buf(win, term.bufnr)
+    spawn_term(term)
+    apply_term_window_options(term, win)
 end
 
----@param modifier string
+---@param opts { float?: boolean, vertical?: boolean, full?: boolean, size?: integer }
 ---@return nil
-local function split(modifier)
-    vim.cmd(("%s split"):format(modifier))
-    if modifier:find("bot", 1, true) or modifier:find("top", 1, true) then
-        if modifier:find("vertical", 1, true) then
-            vim.opt_local.winfixwidth = true
+local function open(opts)
+    local term = get_candidate_background_term()
+    if term == nil then
+        term = create_term()
+    end
+
+    local config
+    if opts.float then
+        config = require("toggleterm.ui")._get_float_config(term, true)
+        config.border = nil
+    else
+        config = {
+            split = opts.vertical and "right" or "below",
+            width = opts.vertical and opts.size or nil,
+            height = not opts.vertical and opts.size or nil,
+            win = opts.full and -1 or 0,
+        }
+    end
+
+    local win = vim.api.nvim_open_win(term.bufnr, true, config)
+    if opts.float then
+        vim.wo[win].sidescrolloff = 0
+    elseif opts.full then
+        if opts.vertical then
+            vim.wo[win].winfixwidth = true
         else
-            vim.opt_local.winfixheight = true
+            vim.wo[win].winfixheight = true
         end
     end
 
-    local term = get_candidate_background_term()
-    if term ~= nil then
-        require("toggleterm.ui").switch_buf(term.bufnr)
-    else
-        new()
+    if term.job_id == nil then
+        spawn_term(term)
     end
+    apply_term_window_options(term, win)
 end
 
 ---@param term MyTerminal
@@ -330,7 +371,7 @@ local function get_keys()
         {
             "<M-v>",
             function()
-                split("rightbelow vertical")
+                open({ vertical = true })
             end,
             desc = "Right Split Terminal",
             mode = { "n", "t" },
@@ -338,7 +379,7 @@ local function get_keys()
         {
             "<M-s>",
             function()
-                split("rightbelow")
+                open({ vertical = false })
             end,
             desc = "Below Split Terminal",
             mode = { "n", "t" },
@@ -346,7 +387,7 @@ local function get_keys()
         {
             "<M-V>",
             function()
-                split("botright vertical 80")
+                open({ vertical = true, full = true, size = 80 })
             end,
             desc = "Rightmost Split terminal",
             mode = { "n", "t" },
@@ -354,15 +395,18 @@ local function get_keys()
         {
             "<M-S>",
             function()
-                split("botright 20")
+                open({ vertical = false, full = true, size = 20 })
             end,
             desc = "Bottom Split Terminal",
             mode = { "n", "t" },
         },
         {
             "<M-f>",
-            toggleterm.toggle(0, nil, nil, "float"),
-            desc = "Toggle Terminal",
+            function()
+                open({ float = true })
+            end,
+            desc = "Open Floating Terminal",
+            mode = { "n", "t" },
         },
         {
             "<M-a>",
@@ -414,7 +458,6 @@ return {
         ---@param term Terminal
         on_create = function(term)
             set_keymaps(term.bufnr)
-            set_cursor_marker(false)
         end,
         on_exit = on_exit,
 
