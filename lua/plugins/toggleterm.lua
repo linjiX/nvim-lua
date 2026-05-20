@@ -511,5 +511,13 @@ return {
                 vim.cmd.stopinsert()
             end,
         })
+
+        vim.api.nvim_create_autocmd("WinLeave", {
+            group = augroup,
+            pattern = "term://*",
+            callback = function()
+                vim.cmd.stopinsert()
+            end,
+        })
     end,
 }

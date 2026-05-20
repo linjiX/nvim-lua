@@ -1,5 +1,5 @@
 local M = {
-    width = 32,
+    width = 36,
 }
 
 ---@param find_file boolean | nil
