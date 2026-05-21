@@ -134,12 +134,24 @@ end
 ---@return nil
 local function on_exit(term)
     local candidate = get_candidate_background_term()
-    if candidate == nil or candidate.id == term.id then
-        vim.cmd.quit()
+    local wins = {}
+
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+        if vim.api.nvim_win_get_buf(win) == term.bufnr then
+            table.insert(wins, win)
+        end
+    end
+
+    if not candidate then
+        for _, win in ipairs(wins) do
+            vim.api.nvim_win_close(win, false)
+        end
         return
     end
 
-    require("toggleterm.ui").switch_buf(candidate.bufnr)
+    for _, win in ipairs(wins) do
+        vim.api.nvim_win_set_buf(win, candidate.bufnr)
+    end
 end
 
 ---@param direction "next" | "prev" | number
@@ -177,11 +189,9 @@ local function go_to(direction)
     end
 
     local term = terms[target_index]
-
-    local ui = require("toggleterm.ui")
-    ui.switch_buf(term.bufnr)
-
     local win = vim.api.nvim_get_current_win()
+    vim.api.nvim_win_set_buf(win, term.bufnr)
+
     if term.window ~= win then
         ---@cast term MyTerminal
         apply_term_window_options(term, win)
