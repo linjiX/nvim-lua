@@ -39,6 +39,7 @@ local function apply_term_window_options(term, win)
     vim.wo[win].signcolumn = "no"
     vim.wo[win].cursorline = false
     vim.wo[win].cursorcolumn = false
+    vim.wo[win].winfixbuf = true
 
     local ui = require("toggleterm.ui")
     ui.hl_term(term)
@@ -130,6 +131,12 @@ local function get_current_term()
     return term
 end
 
+local function switch_term(win, term)
+    vim.wo[win].winfixbuf = false
+    vim.api.nvim_win_set_buf(win, term.bufnr)
+    vim.wo[win].winfixbuf = true
+end
+
 ---@param term Terminal
 ---@return nil
 local function on_exit(term)
@@ -150,7 +157,7 @@ local function on_exit(term)
     end
 
     for _, win in ipairs(wins) do
-        vim.api.nvim_win_set_buf(win, candidate.bufnr)
+        switch_term(win, candidate)
     end
 end
 
@@ -190,7 +197,8 @@ local function go_to(direction)
 
     local term = terms[target_index]
     local win = vim.api.nvim_get_current_win()
-    vim.api.nvim_win_set_buf(win, term.bufnr)
+
+    switch_term(win, term)
 
     if term.window ~= win then
         ---@cast term MyTerminal
@@ -211,7 +219,7 @@ local function new()
     local term = create_term()
     local win = vim.api.nvim_get_current_win()
 
-    vim.api.nvim_win_set_buf(win, term.bufnr)
+    switch_term(win, term)
     spawn_term(term)
     apply_term_window_options(term, win)
 end
