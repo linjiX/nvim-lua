@@ -3,6 +3,7 @@ local utility = require("config.utility")
 ---@class MyTerminal: Terminal
 ---@field leave_at? integer
 ---@field command_name? string
+---@field order integer
 ---@field __set_options fun(self: Terminal)
 
 ---@param command string
@@ -27,6 +28,19 @@ local function create_term()
     term.bufnr = vim.api.nvim_create_buf(false, false)
 
     return term
+end
+
+---@param include_hidden? boolean
+---@return MyTerminal[]
+local function get_sorted_terms(include_hidden)
+    local terms = require("toggleterm.terminal").get_all(include_hidden)
+    ---@cast terms MyTerminal[]
+
+    table.sort(terms, function(a, b)
+        return a.order < b.order
+    end)
+
+    return terms
 end
 
 ---@param term MyTerminal
@@ -54,6 +68,7 @@ local function spawn_term(term)
     local parts = vim.split(term:_display_name(), "/", { plain = true, trimempty = true })
     term.display_name = nil
     term.command_name = parts[#parts]
+    term.order = term.id
 
     vim.schedule(vim.cmd.startinsert)
 end
@@ -92,9 +107,43 @@ local function get_term_index(current_id, terms)
     end
 end
 
+---@param term MyTerminal
+---@return string
+local function get_name(term)
+    return term.display_name or term.command_name or ""
+end
+
+---@param term MyTerminal
+---@param terms? MyTerminal[]
+---@return string
+local function get_display_name(term, terms)
+    terms = terms or get_sorted_terms(true)
+    local index = get_term_index(term.id, terms)
+    local raised_index = index and raise_number(index) or "?"
+
+    return ("%s  %s"):format(raised_index, get_name(term))
+end
+
+---@param active_id integer
+---@return string
+local function winbar(active_id)
+    local terms = get_sorted_terms()
+    local parts = { " " }
+
+    for _, term in ipairs(terms) do
+        local highlight = active_id == term.id and "WinBarActive" or "WinBarInactive"
+        local name = get_display_name(term, terms):gsub("%%", "%%%%")
+
+        table.insert(parts, ("%%#%s#%s%%*"):format(highlight, name))
+        table.insert(parts, " ")
+    end
+
+    return table.concat(parts)
+end
+
 ---@return MyTerminal[]
 local function get_background_terms()
-    local terms = require("toggleterm.terminal").get_all(true)
+    local terms = get_sorted_terms(true)
     local has_open, windows = require("toggleterm.ui").find_open_windows()
 
     if not has_open then
@@ -162,14 +211,14 @@ local function on_exit(term)
 end
 
 ---@param direction "next" | "prev" | number
----@return nil
-local function go_to(direction)
+---@return {source: MyTerminal, target: MyTerminal}?
+local function get_direction_terms(direction)
     local source_id = vim.b.toggle_number
     if source_id == nil then
         return
     end
 
-    local terms = require("toggleterm.terminal").get_all(true)
+    local terms = get_sorted_terms(true)
     if #terms <= 1 then
         return
     end
@@ -195,15 +244,40 @@ local function go_to(direction)
         return
     end
 
-    local term = terms[target_index]
+    return {
+        source = terms[source_index],
+        target = terms[target_index],
+    }
+end
+
+---@param direction "next" | "prev" | number
+---@return nil
+local function go_to(direction)
+    local terms = get_direction_terms(direction)
+    if not terms then
+        return
+    end
+
     local win = vim.api.nvim_get_current_win()
 
-    switch_term(win, term)
+    switch_term(win, terms.target)
 
-    if term.window ~= win then
-        ---@cast term MyTerminal
-        apply_term_window_options(term, win)
+    if terms.target.window ~= win then
+        apply_term_window_options(terms.target, win)
     end
+end
+
+---@param direction "next" | "prev"
+---@return nil
+local function move_term(direction)
+    local terms = get_direction_terms(direction)
+    if not terms then
+        return
+    end
+
+    terms.source.order, terms.target.order = terms.target.order, terms.source.order
+
+    require("toggleterm.ui").set_winbar(terms.source)
 end
 
 ---@param direction "next" | "prev" | number
@@ -211,6 +285,14 @@ end
 local function switcher(direction)
     return function()
         go_to(direction)
+    end
+end
+
+---@param direction "next" | "prev"
+---@return fun()
+local function mover(direction)
+    return function()
+        move_term(direction)
     end
 end
 
@@ -262,12 +344,6 @@ local function open(opts)
     apply_term_window_options(term, win)
 end
 
----@param term MyTerminal
----@return string
-local function get_name(term)
-    return term.display_name or term.command_name or ""
-end
-
 ---@return nil
 local function rename()
     local term = get_current_term()
@@ -289,16 +365,6 @@ local function rename()
             term.display_name = vim.trim(input)
         end)
     end)
-end
-
----@param term MyTerminal
----@return string
-local function get_display_name(term)
-    local terms = require("toggleterm.terminal").get_all(true)
-    local index = get_term_index(term.id, terms)
-    local raised_index = index and raise_number(index) or "?"
-
-    return ("%s  %s"):format(raised_index, get_name(term))
 end
 
 ---@return nil
@@ -333,6 +399,8 @@ local function set_keymaps(bufnr)
     map({ "n", "t" }, "<M-r>", rename, "Rename Terminal")
     map({ "n", "t" }, "<M-h>", switcher("prev"), "Prev Terminal")
     map({ "n", "t" }, "<M-l>", switcher("next"), "Next Terminal")
+    map({ "n", "t" }, "<M-H>", mover("prev"), "Move Terminal Prev")
+    map({ "n", "t" }, "<M-L>", mover("next"), "Move Terminal Next")
 
     map({ "n" }, "<CR>", "i", nil, { remap = true })
     for _, key in ipairs({ "i", "I", "a", "A" }) do
@@ -506,6 +574,7 @@ return {
     },
     config = function(_, opts)
         require("toggleterm").setup(opts)
+        require("toggleterm.ui").winbar = winbar
         set_winbar_highlights()
 
         local augroup = vim.api.nvim_create_augroup("MyToggleTerm", { clear = true })
