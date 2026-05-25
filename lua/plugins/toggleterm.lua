@@ -6,6 +6,12 @@ local utility = require("config.utility")
 ---@field order integer
 ---@field __set_options fun(self: Terminal)
 
+---@class TermWindowOpts
+---@field float? boolean
+---@field vertical? boolean
+---@field full? boolean
+---@field size? integer
+
 ---@param command string
 ---@return string
 local function tmux_command(command)
@@ -20,20 +26,20 @@ local function set_cursor_marker(value)
     vim.opt_local.cursorcolumn = value
 end
 
+---@param opts? TermCreateArgs
 ---@return MyTerminal
-local function create_term()
+local function create_term(opts)
     local Terminal = require("toggleterm.terminal").Terminal
-    local term = Terminal:new()
+    local term = Terminal:new(opts)
     ---@cast term MyTerminal
     term.bufnr = vim.api.nvim_create_buf(false, false)
 
     return term
 end
 
----@param include_hidden? boolean
 ---@return MyTerminal[]
-local function get_sorted_terms(include_hidden)
-    local terms = require("toggleterm.terminal").get_all(include_hidden)
+local function get_sorted_terms()
+    local terms = require("toggleterm.terminal").get_all()
     ---@cast terms MyTerminal[]
 
     table.sort(terms, function(a, b)
@@ -117,7 +123,7 @@ end
 ---@param terms? MyTerminal[]
 ---@return string
 local function get_display_name(term, terms)
-    terms = terms or get_sorted_terms(true)
+    terms = terms or get_sorted_terms()
     local index = get_term_index(term.id, terms)
     local raised_index = index and raise_number(index) or "?"
 
@@ -143,7 +149,7 @@ end
 
 ---@return MyTerminal[]
 local function get_background_terms()
-    local terms = get_sorted_terms(true)
+    local terms = get_sorted_terms()
     local has_open, windows = require("toggleterm.ui").find_open_windows()
 
     if not has_open then
@@ -189,7 +195,7 @@ end
 ---@param term Terminal
 ---@return nil
 local function on_exit(term)
-    local candidate = get_candidate_background_term()
+    local candidate = term.hidden and nil or get_candidate_background_term()
     local wins = {}
 
     for _, win in ipairs(vim.api.nvim_list_wins()) do
@@ -218,7 +224,7 @@ local function get_direction_terms(direction)
         return
     end
 
-    local terms = get_sorted_terms(true)
+    local terms = get_sorted_terms()
     if #terms <= 1 then
         return
     end
@@ -306,14 +312,10 @@ local function new()
     apply_term_window_options(term, win)
 end
 
----@param opts { float?: boolean, vertical?: boolean, full?: boolean, size?: integer }
+---@param opts TermWindowOpts
+---@param term MyTerminal
 ---@return nil
-local function open(opts)
-    local term = get_candidate_background_term()
-    if term == nil then
-        term = create_term()
-    end
-
+local function open_term_window(opts, term)
     local config
     if opts.float then
         config = require("toggleterm.ui")._get_float_config(term, true)
@@ -342,6 +344,78 @@ local function open(opts)
         spawn_term(term)
     end
     apply_term_window_options(term, win)
+end
+
+---@param opts TermWindowOpts
+---@return nil
+local function open(opts)
+    local term = get_candidate_background_term()
+    if term == nil then
+        term = create_term()
+    end
+
+    open_term_window(opts, term)
+end
+
+---@param command string
+---@return MyTerminal?
+local function get_tool_term(command)
+    local terms = require("toggleterm.terminal").get_all(true)
+    ---@cast terms MyTerminal[]
+
+    for _, term in ipairs(terms) do
+        if
+            term.hidden
+            and term.cmd == command
+            and term.job_id ~= nil
+            and term.bufnr ~= nil
+            and vim.api.nvim_buf_is_valid(term.bufnr)
+        then
+            return term
+        end
+    end
+end
+
+---@param command string
+---@return nil
+local function open_tool(command)
+    local term = get_tool_term(command)
+    if term == nil then
+        term = create_term({
+            cmd = command,
+            close_on_exit = true,
+            direction = "float",
+            hidden = true,
+        })
+    end
+
+    open_term_window({ float = true }, term)
+end
+
+---@return nil
+local function input_tool()
+    local term = get_current_term()
+    if term ~= nil then
+        term:persist_mode()
+    end
+
+    vim.cmd.stopinsert()
+    vim.schedule(function()
+        vim.ui.input({
+            prompt = "Open terminal tool: ",
+        }, function(input)
+            if input == nil then
+                return
+            end
+
+            local command = vim.trim(input)
+            if command == "" then
+                return
+            end
+
+            open_tool(command)
+        end)
+    end)
 end
 
 ---@return nil
@@ -495,6 +569,12 @@ local function get_keys()
             mode = { "n", "t" },
         },
         {
+            "<M-F>",
+            input_tool,
+            desc = "Open Terminal Tool",
+            mode = { "n", "t" },
+        },
+        {
             "<M-a>",
             function()
                 tmux_command([[new-window -c "#{pane_current_path}"]])
@@ -543,7 +623,9 @@ return {
         open_mapping = [[<c-\>]],
         ---@param term Terminal
         on_create = function(term)
-            set_keymaps(term.bufnr)
+            if not term.hidden then
+                set_keymaps(term.bufnr)
+            end
         end,
         on_exit = on_exit,
 
