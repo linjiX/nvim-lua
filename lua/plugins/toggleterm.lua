@@ -487,9 +487,8 @@ local function format_repl_text(command, text)
     return text
 end
 
----@param text string
----@return nil
-local function send_text_to_repl(text)
+---@return MyTerminal?
+local function open_repl()
     local command = REPL_COMMANDS[vim.bo.filetype]
     if command == nil then
         vim.notify(
@@ -499,16 +498,27 @@ local function send_text_to_repl(text)
         return
     end
 
-    if text == "" then
-        return
-    end
-
     local term = get_repl_term(command)
     if not term:is_open() then
         active_repl_term(term)
     end
 
-    term:send(format_repl_text(command, text), false)
+    return term
+end
+
+---@param text string
+---@return nil
+local function send_text_to_repl(text)
+    if text == "" then
+        return
+    end
+
+    local term = open_repl()
+    if term == nil then
+        return
+    end
+
+    term:send(format_repl_text(term.command_name, text), false)
 end
 
 ---@return nil
@@ -731,6 +741,12 @@ local function get_keys()
             end,
             desc = "Rename Tmux Terminal",
             mode = { "n", "t" },
+        },
+        {
+            "<Leader>E",
+            open_repl,
+            desc = "Open Repl",
+            mode = "n",
         },
         {
             "<Leader>ee",
