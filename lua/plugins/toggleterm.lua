@@ -392,6 +392,116 @@ local function open_tool(command)
     open_term_window({ float = true }, term)
 end
 
+---@type table<string, string>
+local REPL_COMMANDS = {
+    lua = "lua",
+    python = "ipython",
+    javascript = "node",
+    javascriptreact = "node",
+    typescript = "node",
+    typescriptreact = "node",
+    vue = "node",
+    bash = "bash",
+    zsh = "zsh",
+}
+
+local BRACKETED_PASTE_START = "\x1b[200~"
+local BRACKETED_PASTE_STOP = "\x1b[201~"
+
+---@param command string
+---@return MyTerminal
+local function get_repl_term(command)
+    local terms = require("toggleterm.terminal").get_all(true)
+    local candidates = vim.tbl_filter(function(term)
+        return term.command_name == command
+    end, terms)
+
+    if #candidates == 0 then
+        return create_term({ cmd = command })
+    end
+
+    local open_terms = vim.tbl_filter(function(term)
+        return term:is_open()
+    end, candidates)
+
+    candidates = #open_terms > 0 and open_terms or candidates
+
+    return assert(utility.max_by(candidates, function(term)
+        return term.leave_at or 0
+    end))
+end
+
+---@param term MyTerminal
+---@return nil
+local function active_repl_term(term)
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+        local bufnr = vim.api.nvim_win_get_buf(win)
+        if vim.b[bufnr].toggle_number ~= nil then
+            switch_term(win, term)
+            if term.job_id == nil then
+                spawn_term(term)
+            end
+            return
+        end
+    end
+
+    open_term_window({ vertical = true }, term)
+end
+
+---@return string
+local function get_visual_text()
+    local mode = vim.fn.mode()
+    vim.cmd.normal(vim.keycode("<ESC>"))
+
+    local start = vim.fn.getpos("'<")
+    local stop = vim.fn.getpos("'>")
+    local lines = vim.fn.getregion(start, stop, { type = mode })
+
+    return table.concat(lines, "\n")
+end
+
+---@param command string
+---@param text string
+---@return string
+local function format_repl_text(command, text)
+    if command == "ipython" and text:find("\n", 1, true) then
+        return ("%s%s%s"):format(BRACKETED_PASTE_START, text, BRACKETED_PASTE_STOP)
+    end
+
+    return text
+end
+
+---@param text string
+---@return nil
+local function send_text_to_repl(text)
+    local command = REPL_COMMANDS[vim.bo.filetype]
+    if command == nil then
+        vim.notify(
+            ("No REPL configured for filetype '%s'"):format(vim.bo.filetype),
+            vim.log.levels.WARN
+        )
+        return
+    end
+
+    if text == "" then
+        return
+    end
+
+    local term = get_repl_term(command)
+    if not term:is_open() then
+        active_repl_term(term)
+    end
+
+    term:send(format_repl_text(command, text), false)
+end
+
+---@param selection "line" | "visual"
+---@return nil
+local function send_to_repl(selection)
+    local text = selection == "visual" and get_visual_text() or vim.api.nvim_get_current_line()
+    send_text_to_repl(text)
+end
+
 ---@return nil
 local function input_tool()
     local term = get_current_term()
@@ -589,6 +699,22 @@ local function get_keys()
             end,
             desc = "Rename Tmux Terminal",
             mode = { "n", "t" },
+        },
+        {
+            "<Leader>ee",
+            function()
+                send_to_repl("line")
+            end,
+            desc = "Send Line To REPL",
+            mode = "n",
+        },
+        {
+            "<Leader>e",
+            function()
+                send_to_repl("visual")
+            end,
+            desc = "Send Selection To REPL",
+            mode = "x",
         },
     }
 
