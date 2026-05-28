@@ -414,6 +414,12 @@ local OPERATOR_TYPE_TO_REGION_TYPE = {
     block = "\x16",
 }
 
+local VISUAL_MODES = {
+    v = true,
+    V = true,
+    ["\x16"] = true,
+}
+
 ---@param command string
 ---@return MyTerminal
 local function get_repl_term(command)
@@ -455,8 +461,12 @@ local function active_repl_term(term)
 end
 
 ---@return string
-local function get_visual_text()
+local function get_repl_text()
     local mode = vim.fn.mode()
+    if not VISUAL_MODES[mode] then
+        return vim.api.nvim_get_current_line()
+    end
+
     vim.cmd.normal(vim.keycode("<ESC>"))
 
     local start = vim.fn.getpos("'<")
@@ -501,11 +511,9 @@ local function send_text_to_repl(text)
     term:send(format_repl_text(command, text), false)
 end
 
----@param selection "line" | "visual"
 ---@return nil
-local function send_to_repl(selection)
-    local text = selection == "visual" and get_visual_text() or vim.api.nvim_get_current_line()
-    send_text_to_repl(text)
+local function send_to_repl()
+    send_text_to_repl(get_repl_text())
 end
 
 ---@param operator_type "line" | "char" | "block"
@@ -522,7 +530,7 @@ local function operator(operator_type)
 end
 
 ---@return nil
-local function set_repl_operatorfunc()
+local function set_operatorfunc()
     vim.go.operatorfunc = "v:lua.require'plugins.toggleterm'.operator"
 end
 
@@ -726,16 +734,14 @@ local function get_keys()
         },
         {
             "<Leader>ee",
-            function()
-                send_to_repl("line")
-            end,
+            send_to_repl,
             desc = "Send Line To REPL",
             mode = "n",
         },
         {
             "<Leader>e",
             function()
-                set_repl_operatorfunc()
+                set_operatorfunc()
                 return "g@"
             end,
             desc = "Send Text Object To REPL",
@@ -745,7 +751,7 @@ local function get_keys()
         {
             "<Leader>ep",
             function()
-                set_repl_operatorfunc()
+                set_operatorfunc()
                 return "g@ip"
             end,
             desc = "Send Paragraph To REPL",
@@ -754,9 +760,7 @@ local function get_keys()
         },
         {
             "<Leader>e",
-            function()
-                send_to_repl("visual")
-            end,
+            send_to_repl,
             desc = "Send Selection To REPL",
             mode = "x",
         },
