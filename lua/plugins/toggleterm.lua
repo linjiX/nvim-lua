@@ -408,6 +408,12 @@ local REPL_COMMANDS = {
 local BRACKETED_PASTE_START = "\x1b[200~"
 local BRACKETED_PASTE_STOP = "\x1b[201~"
 
+local OPERATOR_TYPE_TO_REGION_TYPE = {
+    line = "V",
+    char = "v",
+    block = "\x16",
+}
+
 ---@param command string
 ---@return MyTerminal
 local function get_repl_term(command)
@@ -500,6 +506,24 @@ end
 local function send_to_repl(selection)
     local text = selection == "visual" and get_visual_text() or vim.api.nvim_get_current_line()
     send_text_to_repl(text)
+end
+
+---@param operator_type "line" | "char" | "block"
+---@return nil
+local function operator(operator_type)
+    local region_type = assert(OPERATOR_TYPE_TO_REGION_TYPE[operator_type])
+    local start = vim.fn.getpos("'[")
+    local stop = vim.fn.getpos("']")
+    local lines = vim.fn.getregion(start, stop, { type = region_type })
+
+    local text = table.concat(lines, "\n")
+
+    send_text_to_repl(text)
+end
+
+---@return nil
+local function set_repl_operatorfunc()
+    vim.go.operatorfunc = "v:lua.require'plugins.toggleterm'.operator"
 end
 
 ---@return nil
@@ -711,6 +735,26 @@ local function get_keys()
         {
             "<Leader>e",
             function()
+                set_repl_operatorfunc()
+                return "g@"
+            end,
+            desc = "Send Text Object To REPL",
+            expr = true,
+            mode = "n",
+        },
+        {
+            "<Leader>ep",
+            function()
+                set_repl_operatorfunc()
+                return "g@ip"
+            end,
+            desc = "Send Paragraph To REPL",
+            expr = true,
+            mode = "n",
+        },
+        {
+            "<Leader>e",
+            function()
                 send_to_repl("visual")
             end,
             desc = "Send Selection To REPL",
@@ -743,6 +787,7 @@ end
 
 return {
     "akinsho/toggleterm.nvim",
+    operator = operator,
     version = "*",
     keys = get_keys(),
     opts = {
