@@ -443,21 +443,32 @@ local function get_repl_term(command)
     end))
 end
 
+---@param target? MyTerminal
+---@return integer?
+local function find_current_tab_term_window(target)
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+        local bufnr = vim.api.nvim_win_get_buf(win)
+        local term_id = vim.b[bufnr].toggle_number
+        if term_id ~= nil and (target == nil or term_id == target.id) then
+            return win
+        end
+    end
+end
+
 ---@param term MyTerminal
 ---@return nil
 local function active_repl_term(term)
-    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-        local bufnr = vim.api.nvim_win_get_buf(win)
-        if vim.b[bufnr].toggle_number ~= nil then
-            switch_term(win, term)
-            if term.job_id == nil then
-                spawn_term(term)
-            end
-            return
-        end
+    local win = find_current_tab_term_window()
+    if win == nil then
+        open_term_window({ vertical = true }, term)
+        return
     end
 
-    open_term_window({ vertical = true }, term)
+    switch_term(win, term)
+    if term.job_id == nil then
+        spawn_term(term)
+    end
+    vim.api.nvim_set_current_win(win)
 end
 
 ---@return string
@@ -501,6 +512,8 @@ local function open_repl()
     local term = get_repl_term(command)
     if not term:is_open() then
         active_repl_term(term)
+    else
+        vim.api.nvim_set_current_win(term.window)
     end
 
     return term
@@ -568,6 +581,114 @@ local function input_tool()
             open_tool(command)
         end)
     end)
+end
+
+---@param term MyTerminal
+---@return nil
+local function open_picker_term(term)
+    local target_win = find_current_tab_term_window(term)
+    if target_win ~= nil then
+        vim.api.nvim_set_current_win(target_win)
+        return
+    end
+
+    if term.hidden then
+        open_term_window({ float = true }, term)
+        return
+    end
+
+    active_repl_term(term)
+end
+
+---@return MyTerminal[]
+local function get_picker_terms()
+    local terms = require("toggleterm.terminal").get_all(true)
+    ---@cast terms MyTerminal[]
+
+    table.sort(terms, function(a, b)
+        if a.hidden ~= b.hidden then
+            return not a.hidden
+        end
+
+        return a.order < b.order
+    end)
+
+    return terms
+end
+
+---@return nil
+local function find_terminals_by_telescope()
+    local actions = require("telescope.actions")
+    local action_state = require("telescope.actions.state")
+    local finders = require("telescope.finders")
+    local pickers = require("telescope.pickers")
+    local previewers = require("telescope.previewers")
+    local conf = require("telescope.config").values
+
+    pickers
+        .new({}, {
+            prompt_title = "Terminals",
+            finder = finders.new_table({
+                results = get_picker_terms(),
+                entry_maker = function(term)
+                    local display_name = get_display_name(term)
+                    return {
+                        value = term,
+                        display = display_name,
+                        ordinal = ("%d %s"):format(term.hidden and 1 or 0, display_name),
+                    }
+                end,
+            }),
+            previewer = previewers.new_buffer_previewer({
+                title = "Terminal",
+                define_preview = function(self, entry)
+                    local bufnr = entry.value.bufnr
+                    if bufnr == nil or not vim.api.nvim_buf_is_valid(bufnr) then
+                        return
+                    end
+
+                    local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+                    vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, lines)
+                end,
+            }),
+            sorter = conf.generic_sorter({}),
+            attach_mappings = function(prompt_bufnr, map)
+                ---@param opener fun(term: MyTerminal): nil
+                local function open_selected(opener)
+                    local entry = action_state.get_selected_entry()
+                    actions.close(prompt_bufnr)
+
+                    if entry ~= nil then
+                        opener(entry.value)
+                    end
+                end
+
+                actions.select_default:replace(function()
+                    open_selected(open_picker_term)
+                end)
+
+                map({ "i", "n" }, "<C-v>", function()
+                    open_selected(function(term)
+                        open_term_window({ vertical = true }, term)
+                    end)
+                end)
+
+                map({ "i", "n" }, "<C-x>", function()
+                    open_selected(function(term)
+                        open_term_window({ vertical = false }, term)
+                    end)
+                end)
+
+                map({ "i", "n" }, "<C-f>", function()
+                    open_selected(function(term)
+                        open_term_window({ float = true }, term)
+                    end)
+                end)
+
+                return true
+            end,
+        })
+        :find()
 end
 
 ---@return nil
@@ -808,6 +929,7 @@ end
 return {
     "akinsho/toggleterm.nvim",
     operator = operator,
+    find_terminals_by_telescope = find_terminals_by_telescope,
     version = "*",
     keys = get_keys(),
     opts = {

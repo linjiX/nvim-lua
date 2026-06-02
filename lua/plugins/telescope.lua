@@ -1,6 +1,7 @@
 local R = require("config.utility").lazy_require
 local telescope = R("telescope")
 local builtin = R("telescope.builtin")
+local toggleterm = R("plugins.toggleterm")
 
 -- local symbols =
 --     { "class", "constructor", "enum", "function", "interface", "module", "method", "struct" }
@@ -37,6 +38,7 @@ return {
         { "<Leader>fD", builtin.diagnostics(), desc = "Diagnostics (all)" },
         { "<Leader>fl", builtin.current_buffer_fuzzy_find(), desc = "Lines" },
         { "<Leader>fr", builtin.resume(), desc = "Resume" },
+        { "<Leader>ft", toggleterm.find_terminals_by_telescope(), desc = "Terminals" },
         { "<Leader>fn", telescope.extensions.noice.noice(), desc = "Noice" },
         { "<Leader>fy", telescope.extensions.yank_history.yank_history(), desc = "Yank" },
 
