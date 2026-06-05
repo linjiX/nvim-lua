@@ -467,6 +467,7 @@ local function active_repl_term(term)
     switch_term(win, term)
     if term.job_id == nil then
         spawn_term(term)
+        apply_term_window_options(term, win)
     end
     vim.api.nvim_set_current_win(win)
 end
