@@ -1,4 +1,3 @@
-local scriptname = "vim-fugitive/autoload/fugitive.vim"
 local utility = require("config.utility")
 
 local STASH_PATTERN = "%f[%a]Git!?%s+stash%s"
@@ -8,6 +7,10 @@ local ASYNC_GIT_COMMANDS = {
     pull = "pulling",
     fetch = "fetching",
 }
+
+local function get_script_function(name)
+    return utility.get_script_function(name, "vim-fugitive", "autoload/fugitive.vim")
+end
 
 local function echo_git_result(result)
     local command = ("Git %s"):format(table.concat(result.args or {}, " "))
@@ -41,9 +44,8 @@ local function git_complete(lead, cmdline, cursorpos)
         return vim.fn["fugitive#Complete"](lead, cmdline, cursorpos)
     end
 
-    vim.cmd.runtime("autoload/fugitive.vim")
-    local ChompDefault = utility.get_script_function("ChompDefault", scriptname)
-    local FilterEscape = utility.get_script_function("FilterEscape", scriptname)
+    local ChompDefault = get_script_function("ChompDefault")
+    local FilterEscape = get_script_function("FilterEscape")
     local args = is_option and { "stash", subcommand or "push", "--git-completion-helper" }
         or { "stash", "--git-completion-helper" }
 
@@ -52,7 +54,7 @@ end
 
 return {
     "tpope/vim-fugitive",
-    scriptname = scriptname,
+    get_script_function = get_script_function,
     dependencies = { "tpope/vim-rhubarb" },
     cmd = { "Git", "Gw", "Gst", "Gc", "Gca", "Gco" },
     keys = {

@@ -1,6 +1,5 @@
-local utility = require("config.utility")
 local window = require("config.window")
-local scriptname = require("plugins.fugitive").scriptname
+local get_script_function = require("plugins.fugitive").get_script_function
 
 vim.b.did_ftplugin = true
 vim.fn["fugitive#BlameFileType"]()
@@ -16,7 +15,7 @@ vim.keymap.set("n", "<CR>", function()
     local splitbelow = vim.o.splitbelow
     vim.opt.splitbelow = true
 
-    local BlameCommit = utility.get_script_function("BlameCommit", scriptname)
+    local BlameCommit = get_script_function("BlameCommit")
     local ok, result = pcall(function()
         vim.cmd(BlameCommit("vsplit"))
     end)
@@ -29,7 +28,7 @@ end, { buffer = true })
 
 local function reblame(suffix)
     local win = window.tabpage_get_scrollbind_win()
-    local BlameJump = utility.get_script_function("BlameJump", scriptname)
+    local BlameJump = get_script_function("BlameJump")
 
     vim.wo[win].winfixbuf = false
 

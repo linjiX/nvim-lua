@@ -52,22 +52,29 @@ local function get_script_snr(scriptname)
 end
 
 ---@param name string
----@param scriptname string
+---@param plugin string
+---@param file string
 ---@return function
-function M.get_script_function(name, scriptname)
-    if script_functions[name] then
-        return script_functions[name]
+function M.get_script_function(name, plugin, file)
+    local scriptname = vim.fs.joinpath(plugin, file)
+    local key = scriptname .. "\0" .. name
+    if script_functions[key] then
+        return script_functions[key]
     end
 
     local snr = get_script_snr(scriptname)
     if not snr then
-        error(("Script not found '%s'"):format(scriptname))
+        vim.cmd.runtime(file)
+        snr = get_script_snr(scriptname)
+        if not snr then
+            error(("Script not found '%s'"):format(scriptname))
+        end
     end
 
     local function_name = ("<SNR>%s_%s"):format(snr, name)
     if vim.fn.exists("*" .. function_name) == 1 then
-        script_functions[name] = vim.fn[function_name]
-        return script_functions[name]
+        script_functions[key] = vim.fn[function_name]
+        return script_functions[key]
     end
 
     error(("Function '%s' not found in script '%s'"):format(name, scriptname))
