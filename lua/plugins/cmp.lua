@@ -64,6 +64,7 @@ return {
             winhighlight = "Normal:CmpNormal,Search:None",
         }
 
+        ---@diagnostic disable-next-line: redundant-parameter
         cmp.setup({
             window = {
                 completion = cmp.config.window.bordered(window_opts),
