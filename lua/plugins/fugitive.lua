@@ -1,5 +1,8 @@
 local scriptname = "vim-fugitive/autoload/fugitive.vim"
+local utility = require("config.utility")
 
+local STASH_PATTERN = "%f[%a]Git!?%s+stash%s"
+local STASH_SUBCOMMAND_PATTERN = STASH_PATTERN .. "+([^%s-]+)%s"
 local ASYNC_GIT_COMMANDS = {
     push = "pushing",
     pull = "pulling",
@@ -24,6 +27,27 @@ local function run_async_git(subcommand, fargs)
     local label = ASYNC_GIT_COMMANDS[subcommand]
     vim.notify(("Git %s"):format(label), vim.log.levels.INFO, { title = "Git" })
     vim.fn.FugitiveExecute(fargs, echo_git_result)
+end
+
+local function git_complete(lead, cmdline, cursorpos)
+    local before_cursor = cmdline:sub(1, cursorpos)
+    if not before_cursor:match(STASH_PATTERN) then
+        return vim.fn["fugitive#Complete"](lead, cmdline, cursorpos)
+    end
+
+    local subcommand = before_cursor:match(STASH_SUBCOMMAND_PATTERN)
+    local is_option = vim.startswith(lead, "-")
+    if subcommand and not is_option then
+        return vim.fn["fugitive#Complete"](lead, cmdline, cursorpos)
+    end
+
+    vim.cmd.runtime("autoload/fugitive.vim")
+    local ChompDefault = utility.get_script_function("ChompDefault", scriptname)
+    local FilterEscape = utility.get_script_function("FilterEscape", scriptname)
+    local args = is_option and { "stash", subcommand or "push", "--git-completion-helper" }
+        or { "stash", "--git-completion-helper" }
+
+    return FilterEscape(vim.split(ChompDefault("", args), " "), lead)
 end
 
 return {
@@ -57,7 +81,6 @@ return {
     end,
     config = function()
         local window = require("config.window")
-        local utility = require("config.utility")
 
         vim.api.nvim_create_user_command("Git", function(opts)
             local subcommand = opts.args:match("%w+")
@@ -92,7 +115,7 @@ return {
             nargs = "*",
             range = true,
             bang = true,
-            complete = vim.fn["fugitive#Complete"],
+            complete = git_complete,
         })
 
         vim.api.nvim_create_user_command("Gst", "Git", {})
