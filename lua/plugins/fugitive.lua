@@ -1,5 +1,31 @@
 local scriptname = "vim-fugitive/autoload/fugitive.vim"
 
+local ASYNC_GIT_COMMANDS = {
+    push = "pushing",
+    pull = "pulling",
+    fetch = "fetching",
+}
+
+local function echo_git_result(result)
+    local command = ("Git %s"):format(table.concat(result.args or {}, " "))
+    local chunks = { ("%s exited with status %d"):format(command, result.exit_status) }
+
+    vim.list_extend(chunks, result.stdout)
+    vim.list_extend(chunks, result.stderr)
+
+    local message = table.concat(chunks, "\n"):gsub("\r", "\n")
+    local hl = result.exit_status == 0 and "None" or "ErrorMsg"
+
+    vim.api.nvim_echo({ { message, hl } }, false, {})
+    vim.fn.FugitiveDidChange(result)
+end
+
+local function run_async_git(subcommand, fargs)
+    local label = ASYNC_GIT_COMMANDS[subcommand]
+    vim.notify(("Git %s"):format(label), vim.log.levels.INFO, { title = "Git" })
+    vim.fn.FugitiveExecute(fargs, echo_git_result)
+end
+
 return {
     "tpope/vim-fugitive",
     scriptname = scriptname,
@@ -45,6 +71,9 @@ return {
                 utility.tabopen()
                 vim.opt_local.winfixbuf = true
                 window.bind_cursorline()
+            elseif ASYNC_GIT_COMMANDS[subcommand] then
+                run_async_git(subcommand, opts.fargs)
+                return
             elseif mods == "" then
                 mods = "botright vertical"
             end
@@ -60,7 +89,7 @@ return {
                 )
             )
         end, {
-            nargs = "?",
+            nargs = "*",
             range = true,
             bang = true,
             complete = vim.fn["fugitive#Complete"],
