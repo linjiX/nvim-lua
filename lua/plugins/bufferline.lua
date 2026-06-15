@@ -11,8 +11,18 @@ local function get_keys()
         },
         {
             "<Leader>bP",
+            groups.action("pinned", "close"),
+            desc = "Close Pinned Buffers",
+        },
+        {
+            "<Leader>bU",
             groups.action("ungrouped", "close"),
-            desc = "Close Upgrouped Buffers",
+            desc = "Close Ungrouped Buffers",
+        },
+        {
+            "<Leader>bE",
+            groups.action("external", "close"),
+            desc = "Close External Buffers",
         },
         {
             "<Leader>bl",
