@@ -117,6 +117,8 @@ return {
             end,
         })
 
+        local bufferline_groups = require("bufferline.groups")
+
         return {
             options = {
                 numbers = function(opts)
@@ -131,6 +133,25 @@ return {
                 show_buffer_close_icons = false,
                 separator_style = "slant",
                 diagnostics = "nvim_lsp",
+                groups = {
+                    items = {
+                        bufferline_groups.builtin.ungrouped,
+                        {
+                            name = "external",
+                            icon = " ",
+                            separator = {
+                                style = bufferline_groups.separator.none,
+                            },
+                            matcher = function(buf)
+                                local cwd = vim.fn.getcwd()
+                                local root = vim.fs.root(cwd, ".git") or cwd
+                                return buf.buftype == ""
+                                    and buf.path ~= ""
+                                    and vim.fs.relpath(root, buf.path) == nil
+                            end,
+                        },
+                    },
+                },
                 offsets = {
                     {
                         filetype = "NvimTree",
