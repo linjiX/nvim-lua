@@ -865,6 +865,22 @@ local function get_keys()
             mode = { "n", "t" },
         },
         {
+            "<M-o>",
+            vim.cmd.quit,
+            desc = "Detach Terminal",
+            mode = "t",
+        },
+        {
+            "<M-o>",
+            function()
+                if vim.bo.buftype == "terminal" then
+                    vim.cmd.quit()
+                end
+            end,
+            desc = "Detach Terminal",
+            mode = "n",
+        },
+        {
             "<Leader>E",
             open_repl,
             desc = "Open Repl",
