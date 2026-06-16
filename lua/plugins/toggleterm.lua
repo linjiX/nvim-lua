@@ -56,9 +56,11 @@ local function apply_term_window_options(term, win)
     term.window = win
     term:__set_options()
 
+    local marker = term.__state.mode == "n"
+
+    vim.wo[win].cursorline = marker
+    vim.wo[win].cursorcolumn = marker
     vim.wo[win].signcolumn = "no"
-    vim.wo[win].cursorline = false
-    vim.wo[win].cursorcolumn = false
     vim.wo[win].winfixbuf = true
 
     local ui = require("toggleterm.ui")
