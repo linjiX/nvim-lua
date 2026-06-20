@@ -73,10 +73,5 @@ return {
                 vim.cmd.Hi(map.cmd)
             end, { desc = map.desc })
         end
-
-        vim.keymap.set("n", "<BS>", function()
-            vim.cmd.nohlsearch()
-            vim.cmd.Hi("clear")
-        end, { desc = "Clear All Highlight" })
     end,
 }
