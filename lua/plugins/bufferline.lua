@@ -54,17 +54,17 @@ local function get_keys()
             desc = "Close External Buffers",
         },
         {
-            "<Leader>bl",
+            "<Leader>bL",
             bufferline.close_in_direction("right"),
             desc = "Close Buffers to the Right",
         },
         {
-            "<Leader>bh",
+            "<Leader>bH",
             bufferline.close_in_direction("left"),
             desc = "Close Buffers to the Left",
         },
         {
-            "<Leader>bo",
+            "<Leader>bO",
             bufferline.close_others(),
             desc = "Close Other Buffers",
         },
