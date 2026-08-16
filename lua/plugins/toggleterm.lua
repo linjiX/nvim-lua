@@ -405,7 +405,18 @@ local REPL_COMMANDS = {
     vue = "node",
     bash = "bash",
     zsh = "zsh",
+    sh = "sh",
 }
+
+---@return string?
+local function get_repl_command()
+    local filetype = vim.bo.filetype
+    if filetype == "sh" and vim.b.is_bash then
+        filetype = "bash"
+    end
+
+    return REPL_COMMANDS[filetype]
+end
 
 local BRACKETED_PASTE_START = "\x1b[200~"
 local BRACKETED_PASTE_STOP = "\x1b[201~"
@@ -503,7 +514,7 @@ end
 
 ---@return MyTerminal?
 local function open_repl()
-    local command = REPL_COMMANDS[vim.bo.filetype]
+    local command = get_repl_command()
     if command == nil then
         vim.notify(
             ("No REPL configured for filetype '%s'"):format(vim.bo.filetype),
