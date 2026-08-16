@@ -26,6 +26,9 @@ return {
             scss = { "prettierd" },
             markdown = { "prettierd" },
             sql = { "sql_formatter" },
+            sh = { "shfmt" },
+            bash = { "shfmt" },
+            zsh = { "shfmt" },
         },
     },
 }
