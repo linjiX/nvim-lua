@@ -2,6 +2,35 @@ local R = require("config.utility").lazy_require
 local groups = R("bufferline.groups")
 local bufferline = R("bufferline")
 
+local function close_group(name)
+    return function()
+        local state = require("bufferline.state")
+        local target = {}
+        local replacement
+
+        for _, component in ipairs(state.components) do
+            if component.group == name then
+                target[component.id] = true
+            elseif not replacement then
+                replacement = component.id
+            end
+        end
+
+        local wins = vim.tbl_filter(function(win)
+            return target[vim.api.nvim_win_get_buf(win)]
+        end, vim.api.nvim_list_wins())
+
+        if #wins > 0 then
+            replacement = replacement or vim.api.nvim_create_buf(true, false)
+            for _, win in ipairs(wins) do
+                vim.api.nvim_win_set_buf(win, replacement)
+            end
+        end
+
+        require("bufferline.groups").action(name, "close")
+    end
+end
+
 local function get_keys()
     local keys = {
         {
@@ -11,17 +40,17 @@ local function get_keys()
         },
         {
             "<Leader>bP",
-            groups.action("pinned", "close"),
+            close_group("pinned"),
             desc = "Close Pinned Buffers",
         },
         {
             "<Leader>bU",
-            groups.action("ungrouped", "close"),
+            close_group("ungrouped"),
             desc = "Close Ungrouped Buffers",
         },
         {
             "<Leader>bE",
-            groups.action("external", "close"),
+            close_group("external"),
             desc = "Close External Buffers",
         },
         {
