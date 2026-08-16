@@ -49,6 +49,18 @@ local function get_sorted_terms()
     return terms
 end
 
+---@return integer
+local function get_next_term_order()
+    local terms = require("toggleterm.terminal").get_all()
+    ---@cast terms MyTerminal[]
+
+    local last = utility.max_by(terms, function(term)
+        return term.order
+    end)
+
+    return (last and last.order or 0) + 1
+end
+
 ---@param term MyTerminal
 ---@param win integer
 ---@return nil
@@ -71,12 +83,13 @@ end
 ---@param term MyTerminal
 ---@return nil
 local function spawn_term(term)
+    local order = get_next_term_order()
     term:spawn()
 
     local parts = vim.split(term:_display_name(), "/", { plain = true, trimempty = true })
     term.display_name = nil
     term.command_name = parts[#parts]
-    term.order = term.id
+    term.order = order
 
     vim.schedule(vim.cmd.startinsert)
 end
