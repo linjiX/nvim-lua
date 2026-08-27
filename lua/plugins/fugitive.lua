@@ -6,6 +6,7 @@ local ASYNC_GIT_COMMANDS = {
     push = "pushing",
     pull = "pulling",
     fetch = "fetching",
+    review = "fetching",
 }
 
 local function get_script_function(name)

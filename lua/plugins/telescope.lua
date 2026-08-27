@@ -7,6 +7,25 @@ local toggleterm = R("plugins.toggleterm")
 --     { "class", "constructor", "enum", "function", "interface", "module", "method", "struct" }
 local ts_ignore = { ".d.ts$" }
 
+local function git_branches(opts)
+    return function()
+        builtin.git_branches(opts)()
+
+        local prompt_bufnr = require("telescope.state").get_existing_prompt_bufnrs()[1]
+        vim.keymap.set({ "i", "n" }, "<C-h>", function()
+            local actions = require("telescope.actions")
+            local selection = require("telescope.actions.state").get_selected_entry()
+
+            if not selection then
+                return
+            end
+
+            actions.close(prompt_bufnr)
+            vim.cmd({ cmd = "Git", args = { "review", selection.value } })
+        end, { buffer = prompt_bufnr, desc = "Git review branch" })
+    end
+end
+
 return {
     "nvim-telescope/telescope.nvim",
     branch = "0.1.x",
@@ -44,10 +63,10 @@ return {
 
         {
             "<Leader>gb",
-            builtin.git_branches({ show_remote_tracking_branches = false }),
+            git_branches({ show_remote_tracking_branches = false }),
             desc = "Git Branch",
         },
-        { "<Leader>gB", builtin.git_branches(), desc = "Git Branch (all)" },
+        { "<Leader>gB", git_branches(), desc = "Git Branch (all)" },
         { "<Leader>gl", builtin.git_bcommits(), desc = "Git Log (buffer)" },
         { "<Leader>gl", builtin.git_bcommits_range(), mode = "x", desc = "Git Log (range)" },
         { "<Leader>gL", builtin.git_commits(), desc = "Git Log" },
