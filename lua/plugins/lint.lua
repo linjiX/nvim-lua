@@ -28,6 +28,17 @@ return {
             python_path_getter,
         }
 
+        local dmypy_parser = lint.linters.dmypy.parser
+        lint.linters.dmypy.parser = function(output, bufnr, cwd)
+            local diagnostics = dmypy_parser(output, bufnr, cwd)
+
+            for _, diagnostic in ipairs(diagnostics) do
+                diagnostic.source = "mypy"
+            end
+
+            return diagnostics
+        end
+
         lint.linters_by_ft = {
             lua = { "luacheck" },
             python = { "dmypy" },
