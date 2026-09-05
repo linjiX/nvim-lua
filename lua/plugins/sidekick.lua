@@ -127,11 +127,27 @@ local function get_attached_cli(name)
 end
 
 ---@param name? string
+---@return sidekick.cli.State?
+local function get_background_cli(name)
+    local filter = { attached = false, external = false, cwd = true, name = name }
+    local states = require("sidekick.cli.state").get(filter)
+
+    return utility.max_by(states, function(state)
+        return CLI_PRIORITIES[state.tool.name] or 0
+    end)
+end
+
+---@param name? string
 ---@return sidekick.cli.State, boolean
 local function get_state(name)
     local state = get_attached_cli(name)
     if state then
         return state, false
+    end
+
+    state = get_background_cli(name)
+    if state then
+        return require("sidekick.cli.state").attach(state)
     end
 
     return attach_cli(name or CLIS[1]), true
