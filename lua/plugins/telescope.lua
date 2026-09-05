@@ -26,6 +26,19 @@ local function git_branches(opts)
     end
 end
 
+local function noice_all()
+    local config = require("noice.config")
+    local filter = config.options.commands.history.filter
+
+    config.options.commands.history.filter = config.options.commands.all.filter
+    local ok, err = xpcall(telescope.extensions.noice.noice(), debug.traceback)
+    config.options.commands.history.filter = filter
+
+    if not ok then
+        error(err)
+    end
+end
+
 return {
     "nvim-telescope/telescope.nvim",
     branch = "0.1.x",
@@ -59,6 +72,7 @@ return {
         { "<Leader>fr", builtin.resume(), desc = "Resume" },
         { "<Leader>ft", toggleterm.find_terminals_by_telescope(), desc = "Terminals" },
         { "<Leader>fn", telescope.extensions.noice.noice(), desc = "Noice" },
+        { "<Leader>fN", noice_all, desc = "Noice (all)" },
         { "<Leader>fy", telescope.extensions.yank_history.yank_history(), desc = "Yank" },
 
         {
