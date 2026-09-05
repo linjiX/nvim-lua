@@ -210,6 +210,16 @@ local function sender(msg, name)
     end
 end
 
+--- Only the diagnostics under the cursor, or inside the selection
+---@param ctx sidekick.context.ctx
+---@return sidekick.Text[]?
+local function get_diagnostic(ctx)
+    local Diag = require("sidekick.cli.context.diagnostics")
+
+    -- `Diag.get` already narrows down to `ctx.range` when there is a selection
+    return Diag.get(ctx, not ctx.range and { lnum = ctx.row - 1 } or nil)
+end
+
 ---@return LazyKeysSpec[]
 local function get_keys()
     local keys = {
@@ -267,13 +277,19 @@ local function get_keys()
         },
         {
             "<Leader>ad",
-            sender("{diagnostics}"),
-            desc = "Sidekick Send Diagnostics",
+            sender("{diagnostic}"),
+            mode = { "n", "x" },
+            desc = "Sidekick Send Diagnostic",
         },
         {
             "<Leader>aD",
+            sender("{diagnostics}"),
+            desc = "Sidekick Send Buffer Diagnostics",
+        },
+        {
+            "<Leader>aw",
             sender("{diagnostics_all}"),
-            desc = "Sidekick Send All Diagnostics",
+            desc = "Sidekick Send Workspace Diagnostics",
         },
         {
             "<Leader>am",
@@ -373,6 +389,9 @@ return {
                         nav_up = false,
                         nav_right = false,
                     },
+                },
+                context = {
+                    diagnostic = get_diagnostic,
                 },
                 mux = {
                     enabled = true,
