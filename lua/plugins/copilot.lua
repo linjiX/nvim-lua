@@ -52,4 +52,10 @@ return {
             gitcommit = true,
         },
     },
+    config = function(_, opts)
+        -- keymaps.validate assumes every key is insert mode, so panel keys always false-positive
+        ---@diagnostic disable-next-line: duplicate-set-field
+        require("copilot.keymaps").validate = function() end
+        require("copilot").setup(opts)
+    end,
 }
