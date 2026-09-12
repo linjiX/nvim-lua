@@ -4,7 +4,7 @@ local colorizer = R("colorizer")
 local ft = { "vue", "javascript", "typescript", "html", "css", "lua" }
 
 return {
-    "norcalli/nvim-colorizer.lua",
+    "catgoose/nvim-colorizer.lua",
     ft = ft,
     cmd = "Colorizer",
     keys = {
@@ -38,6 +38,6 @@ return {
     opts = function()
         vim.opt.termguicolors = true
 
-        return ft
+        return { filetypes = ft }
     end,
 }
