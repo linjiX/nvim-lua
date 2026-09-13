@@ -818,7 +818,7 @@ end
 local function get_keys()
     local keys = {
         {
-            "<ESC><ESC>",
+            "<M-w><ESC>",
             function()
                 vim.cmd.stopinsert()
                 vim.schedule(function()
