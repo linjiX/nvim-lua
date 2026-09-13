@@ -6,17 +6,22 @@ local ft = { "vue", "javascript", "typescript", "html", "css", "lua" }
 return {
     "catgoose/nvim-colorizer.lua",
     ft = ft,
-    cmd = "Colorizer",
+    cmd = {
+        "ColorizerAttachToBuffer",
+        "ColorizerDetachFromBuffer",
+        "ColorizerReloadAllBuffers",
+        "ColorizerToggle",
+    },
     keys = {
         {
             "[rh",
             colorizer.attach_to_buffer(0),
-            desc = "Disable Colorizer",
+            desc = "Enable Colorizer",
         },
         {
             "]rh",
             colorizer.detach_from_buffer(0),
-            desc = "Enable Colorizer",
+            desc = "Disable Colorizer",
         },
         {
             "yrh",
