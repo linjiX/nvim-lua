@@ -48,6 +48,17 @@ local function hijack_scrollback()
     end
 end
 
+---@return integer?
+local function get_last_cli_window()
+    local wins = vim.tbl_filter(function(win)
+        return vim.w[win].sidekick_cli ~= nil and vim.api.nvim_win_get_config(win).relative == ""
+    end, vim.api.nvim_tabpage_list_wins(0))
+
+    return utility.max_by(wins, function(win)
+        return vim.api.nvim_win_get_position(win)[1]
+    end)
+end
+
 ---@param terminal sidekick.cli.Terminal
 local function configure_terminal(terminal)
     ---@cast terminal ConfigSidekickTerminal
@@ -58,7 +69,35 @@ local function configure_terminal(terminal)
     local open_win = terminal.open_win
     function terminal:open_win()
         local was_open = self:is_open()
-        local ret = open_win(self)
+        local win = not was_open and self.opts.layout == "right" and get_last_cli_window() or nil
+        local ret
+        if win then
+            local split = self.opts.split
+            local original = {
+                win = split.win,
+                width = split.width,
+                height = split.height,
+            }
+
+            self.opts.layout = "bottom"
+            split.win = win
+            split.width = vim.api.nvim_win_get_width(win)
+            split.height = 0
+
+            local ok, result = pcall(open_win, self)
+
+            self.opts.layout = "right"
+            split.win = original.win
+            split.width = original.width
+            split.height = original.height
+
+            if not ok then
+                error(result, 0)
+            end
+            ret = result
+        else
+            ret = open_win(self)
+        end
 
         if not was_open and self.win then
             vim.api.nvim_create_autocmd("WinClosed", {
@@ -367,6 +406,8 @@ return {
                     config = configure_terminal,
                     wo = {
                         winfixbuf = true,
+                        winfixheight = false,
+                        winfixwidth = true,
                     },
                     keys = {
                         shift_enter = {
