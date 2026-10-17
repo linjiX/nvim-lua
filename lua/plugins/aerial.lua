@@ -19,6 +19,50 @@ local function hijack_open_aerial_in_win()
     end
 end
 
+--- `aerial.backends.lsp.on_attach` asks `backends.attach` to refresh, but that call short
+--- circuits whenever the *backend* is unchanged. So when a slow client attaches after the
+--- `lsp` backend is already active, aerial keeps the symbols it fetched from whichever
+--- client happened to win the startup race and never queries the new one.
+---
+--- On vue files `vtsls` attaches first and answers `textDocument/documentSymbol` with
+--- `nil`, so the outline keeps whatever treesitter put there. Re-fetch whenever the client
+--- that just attached is the one aerial would actually ask.
+local function hijack_lsp_on_attach()
+    local lsp = require("aerial.backends.lsp")
+    local lsp_util = require("aerial.backends.lsp.util")
+    local backends = require("aerial.backends")
+
+    local on_attach = lsp.on_attach
+
+    ---@param client vim.lsp.Client
+    ---@param bufnr? integer
+    ---@diagnostic disable-next-line: duplicate-set-field
+    lsp.on_attach = function(client, bufnr)
+        on_attach(client, bufnr)
+
+        bufnr = bufnr or vim.api.nvim_get_current_buf()
+        if not lsp_util.client_supports_symbols(client) then
+            return
+        end
+
+        -- `on_attach` schedules the backend attach, so this has to run after it
+        vim.schedule(function()
+            if not vim.api.nvim_buf_is_valid(bufnr) then
+                return
+            end
+
+            local preferred = lsp_util.get_client(bufnr)
+            if
+                preferred
+                and preferred.id == client.id
+                and backends.is_backend_attached(bufnr, "lsp")
+            then
+                lsp.fetch_symbols(bufnr)
+            end
+        end)
+    end
+end
+
 return {
     "stevearc/aerial.nvim",
     cmd = { "AerialOpen", "AerialToggle" },
@@ -55,6 +99,7 @@ return {
             )
         )
         hijack_open_aerial_in_win()
+        hijack_lsp_on_attach()
 
         return {
             backends = { "lsp", "treesitter", "markdown", "asciidoc", "man" },
@@ -119,7 +164,6 @@ return {
                 whitespace = "  ",
             },
             lsp = {
-                diagnostics_trigger_update = true,
                 priority = {
                     copilot = 0,
                     vue_ls = 20,
