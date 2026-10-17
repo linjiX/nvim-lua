@@ -7,6 +7,7 @@ local ASYNC_GIT_COMMANDS = {
     pull = "pulling",
     fetch = "fetching",
     review = "fetching",
+    ["delete-branch"] = "deleting branch",
 }
 
 local function get_script_function(name)
@@ -86,7 +87,7 @@ return {
         local window = require("config.window")
 
         vim.api.nvim_create_user_command("Git", function(opts)
-            local subcommand = opts.args:match("%w+")
+            local subcommand = opts.fargs[1]
             local mods = opts.mods
             local args = opts.args
 
