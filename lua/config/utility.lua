@@ -118,6 +118,26 @@ function M.is_commit_id(target)
     return target and #target >= 7 and #target <= 40 and target:match("^[0-9a-f]+$")
 end
 
+---@param buf integer
+---@return boolean
+local function is_file_buffer(buf)
+    return vim.api.nvim_buf_is_loaded(buf)
+        and vim.bo[buf].buflisted
+        and vim.bo[buf].buftype == ""
+        and vim.api.nvim_buf_get_name(buf) ~= ""
+end
+
+--- Reload unmodified file buffers whose files changed on disk. A bare `:checktime` run from a
+--- callback is postponed until a typed command is processed, so check the buffers one by one.
+---@return nil
+function M.reload_buffers()
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if is_file_buffer(buf) and not vim.bo[buf].modified then
+            pcall(vim.cmd, ("checktime %d"):format(buf))
+        end
+    end
+end
+
 ---@return string
 function M.get_python_path()
     if vim.env.VIRTUAL_ENV then

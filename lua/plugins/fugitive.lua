@@ -25,6 +25,9 @@ local function echo_git_result(result)
     local hl = result.exit_status == 0 and "None" or "ErrorMsg"
 
     vim.api.nvim_echo({ { message, hl } }, false, {})
+    -- Some async commands (`pull`, `review`) rewrite the working tree. Reloading after the
+    -- others is harmless, since `checktime` leaves unchanged files alone.
+    utility.reload_buffers()
     vim.fn.FugitiveDidChange(result)
 end
 
