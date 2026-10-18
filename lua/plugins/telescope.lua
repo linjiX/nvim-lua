@@ -12,7 +12,7 @@ local function git_branches(opts)
         builtin.git_branches(opts)()
 
         local prompt_bufnr = require("telescope.state").get_existing_prompt_bufnrs()[1]
-        vim.keymap.set({ "i", "n" }, "<C-h>", function()
+        vim.keymap.set({ "i", "n" }, "<C-g>", function()
             local actions = require("telescope.actions")
             local selection = require("telescope.actions.state").get_selected_entry()
 
@@ -130,7 +130,7 @@ return {
                         ["<C-n>"] = "cycle_history_next",
                         ["<C-p>"] = "cycle_history_prev",
 
-                        ["<C-l>"] = open_with_trouble,
+                        ["<C-o>"] = open_with_trouble,
                     },
                     n = {
                         ["<C-j>"] = "move_selection_next",
