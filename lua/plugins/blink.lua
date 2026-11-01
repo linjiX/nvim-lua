@@ -1,38 +1,3 @@
-local kind_icons = {
-    Array = "󰅪",
-    Boolean = "󰨙",
-    Class = "𝓒",
-    Constant = "",
-    Constructor = "󰊕",
-    Enum = "𝓔",
-    EnumMember = "",
-    Event = "",
-    Field = "",
-    File = "󰈙",
-    Function = "󰊕",
-    Interface = "",
-    Key = "󰌋",
-    Keyword = "󰌋",
-    Method = "󰊕",
-    Module = "",
-    Namespace = "󰦮",
-    Null = "󰟢",
-    Number = "󰎠",
-    Object = "󰅩",
-    Operator = "󰆕",
-    Package = "",
-    Property = "",
-    String = "",
-    Struct = "󰆼",
-    TypeParameter = "𝙏",
-    Variable = "󰀫",
-    Collapsed = "",
-    Text = "󰉿",
-    Value = "󰎠",
-    Color = "",
-    Snippet = "",
-}
-
 ---@param action "next" | "prev" | "dismiss"
 ---@return fun(): boolean?
 local function copilot_action(action)
@@ -75,7 +40,7 @@ return {
     opts = {
         appearance = {
             nerd_font_variant = "mono",
-            kind_icons = kind_icons,
+            kind_icons = require("config.icon").kinds,
         },
         keymap = {
             preset = "none",
