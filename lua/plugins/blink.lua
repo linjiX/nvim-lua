@@ -67,7 +67,6 @@ local source_labels = {
 
 return {
     "saghen/blink.cmp",
-    enabled = false,
     dependencies = { "saghen/blink.lib" },
     build = function()
         require("blink.cmp").build():pwait()

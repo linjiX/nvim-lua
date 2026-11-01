@@ -43,19 +43,14 @@ return {
                 accept = false,
                 accept_word = false,
                 accept_line = false,
-                next = "<C-j>",
-                prev = "<C-k>",
-                dismiss = "<C-e>",
+                -- blink.cmp owns these; it falls back to copilot when its menu is closed
+                next = false,
+                prev = false,
+                dismiss = false,
             },
         },
         filetypes = {
             gitcommit = true,
         },
     },
-    config = function(_, opts)
-        -- keymaps.validate assumes every key is insert mode, so panel keys always false-positive
-        ---@diagnostic disable-next-line: duplicate-set-field
-        require("copilot.keymaps").validate = function() end
-        require("copilot").setup(opts)
-    end,
 }
