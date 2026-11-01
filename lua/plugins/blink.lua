@@ -83,7 +83,7 @@ return {
             ["<C-b>"] = { "scroll_documentation_up", "fallback" },
             ["<C-f>"] = { "scroll_documentation_down", "fallback" },
             ["<C-e>"] = { "cancel", copilot_action("dismiss"), "fallback" },
-            ["<C-j>"] = { "select_next", copilot_action("next"), "fallback" },
+            ["<C-j>"] = { "select_next", copilot_action("next"), "insert_next" },
             ["<C-k>"] = { "select_prev", copilot_action("prev"), "fallback" },
             ["<Tab>"] = {
                 function(cmp)
