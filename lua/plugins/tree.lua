@@ -56,13 +56,16 @@ return {
         })
 
         local function lsp_rename()
-            local snacks = require("snacks")
             local node = api.tree.get_node_under_cursor()
+            if not node then
+                return
+            end
 
-            snacks.rename.rename_file({ from = node.absolute_path })
+            require("snacks").rename.rename_file({ from = node.absolute_path })
         end
 
         local function my_on_attach(bufnr)
+            ---@type [string, function, string][]
             local keys = {
                 { "g?", api.tree.toggle_help, "Help" },
 
