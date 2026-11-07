@@ -4,7 +4,7 @@ local M = {}
 
 local SETTLE_DELAY_MS = 150
 local MAX_SETTLE_DELAY_MS = 1000
-local FUGITIVE_RELOAD_INTERVAL_MS = 1000
+local GIT_STATUS_RELOAD_INTERVAL_MS = 1000
 
 local FUGITIVE_CURRENT_WINDOW_ONLY = 0
 
@@ -107,8 +107,17 @@ local function reload_fugitive_status(paths)
     end
 end
 
+--- The watchers nvim-tree runs cover the directories it has explored, and a change below the
+--- rest leaves their git status stale even after they get expanded
+local function reload_nvim_tree_git()
+    local api = package.loaded["nvim-tree.api"]
+    if api then
+        api.tree.reload_git()
+    end
+end
+
 --- `Snacks.util.throttle` drops the arguments, so the paths wait in the closure instead
-local schedule_fugitive_reload
+local schedule_git_status_reload
 do
     ---@type table<string, boolean>
     local changed_paths = {}
@@ -118,10 +127,11 @@ do
         changed_paths = {}
 
         reload_fugitive_status(paths)
-    end, { ms = FUGITIVE_RELOAD_INTERVAL_MS })
+        reload_nvim_tree_git()
+    end, { ms = GIT_STATUS_RELOAD_INTERVAL_MS })
 
     ---@param paths string[]
-    function schedule_fugitive_reload(paths)
+    function schedule_git_status_reload(paths)
         for _, path in ipairs(paths) do
             changed_paths[path] = true
         end
@@ -146,11 +156,11 @@ local flush = vim.schedule_wrap(function()
     utility.reload_buffers()
     notify_lsp_files_changed(paths)
 
-    -- Fugitive reloads its status synchronously, so keep it out of this refresh
-    schedule_fugitive_reload(paths)
+    -- The git status views reload synchronously, so keep them out of this refresh
+    schedule_git_status_reload(paths)
 end)
 
---- Refreshes the buffers, the LSP clients and the fugitive status windows once the file system
+--- Refreshes the buffers, the LSP clients and the git status views once the file system
 --- events settle down. Stays fast event safe, so a `uv_fs_event_t` callback can call it.
 ---@param paths string[]
 function M.schedule(paths)
