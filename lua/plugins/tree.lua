@@ -44,6 +44,17 @@ return {
             vim.opt_local.winfixbuf = true
         end)
 
+        -- The renderer draws into the tree buffer of the current tabpage only
+        vim.api.nvim_create_autocmd("TabEnter", {
+            group = vim.api.nvim_create_augroup("MyNvimTree", { clear = true }),
+            callback = function()
+                local explorer = require("nvim-tree.core").get_explorer()
+                if explorer and api.tree.is_visible() then
+                    explorer.renderer:draw()
+                end
+            end,
+        })
+
         local function lsp_rename()
             local snacks = require("snacks")
             local node = api.tree.get_node_under_cursor()
