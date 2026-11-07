@@ -1,6 +1,6 @@
 return {
-    "echasnovski/mini.ai",
-    dependencies = "echasnovski/mini.extra",
+    "nvim-mini/mini.ai",
+    dependencies = "nvim-mini/mini.extra",
     event = "VeryLazy",
     opts = function()
         local gen_ai_spec = require("mini.extra").gen_ai_spec
