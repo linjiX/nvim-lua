@@ -109,15 +109,15 @@ return {
                 { "RR", api.tree.reload, "Refresh" },
 
                 { "s", api.tree.search_node, "Search" },
-                { "f", api.live_filter.start, "Live Filter: Start" },
-                { "F", api.live_filter.clear, "Live Filter: Clean" },
+                { "f", api.filter.live.start, "Live Filter: Start" },
+                { "F", api.filter.live.clear, "Live Filter: Clean" },
 
-                { "H", api.tree.toggle_hidden_filter, "Toggle Filter: Hidden" },
-                { "B", api.tree.toggle_no_buffer_filter, "Toggle Filter: Buffer" },
-                { "M", api.tree.toggle_no_bookmark_filter, "Toggle Filter: Bookmark" },
-                { "I", api.tree.toggle_gitignore_filter, "Toggle Filter: Git Ignore" },
-                { "G", api.tree.toggle_git_clean_filter, "Toggle Filter: Git Clean" },
-                { "C", api.tree.toggle_custom_filter, "Toggle Filter: Custom" },
+                { "H", api.filter.dotfiles.toggle, "Toggle Filter: Hidden" },
+                { "B", api.filter.no_buffer.toggle, "Toggle Filter: Buffer" },
+                { "M", api.filter.no_bookmark.toggle, "Toggle Filter: Bookmark" },
+                { "I", api.filter.git.ignored.toggle, "Toggle Filter: Git Ignore" },
+                { "G", api.filter.git.clean.toggle, "Toggle Filter: Git Clean" },
+                { "C", api.filter.custom.toggle, "Toggle Filter: Custom" },
 
                 { "zO", api.tree.expand_all, "Expand All" },
                 { "zC", api.tree.collapse_all, "Collapse All" },
