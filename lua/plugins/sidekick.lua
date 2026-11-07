@@ -7,12 +7,6 @@ local CLIS = {
     "copilot",
 }
 
---- Time to wait for the file system events to settle down, in milliseconds
-local REFRESH_DELAY = 150
-
---- Longest the refresh can be deferred while the events keep coming, in milliseconds
-local MAX_REFRESH_DELAY = 1000
-
 local CLI_PRIORITIES = {}
 for i, name in ipairs(CLIS) do
     CLI_PRIORITIES[name] = #CLIS - i + 1
@@ -252,122 +246,22 @@ local function block_input_till_sent(state)
     vim.defer_fn(poll, 50)
 end
 
---- Neovim starts its own watcher for every registration of the method, but the servers only
---- register it where Neovim advertises the support (macOS and Windows, see
---- `vim.lsp.protocol`). Nothing registers on Linux, so every server needs the notification
---- there, while on macOS only the ones that never registered do (`lua_ls` for example).
----@param client vim.lsp.Client
----@param method string
----@return boolean
-local function is_watched_by_nvim(client, method)
-    local supported = vim.tbl_get(
-        client.capabilities,
-        "workspace",
-        "didChangeWatchedFiles",
-        "dynamicRegistration"
-    )
-    -- The method only supports dynamic registration, so `supports_method` is false until the
-    -- server registers a watcher
-    return supported and client:supports_method(method) or false
-end
-
---- The servers keep the contents of the opened files from `textDocument/didOpen`, which
---- `utility.reload_buffers` refreshes on its own
----@return table<string, boolean>
-local function get_opened_files()
-    local names = {}
-
-    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-        local name = vim.api.nvim_buf_is_loaded(buf)
-            and vim.bo[buf].buftype == ""
-            and vim.api.nvim_buf_get_name(buf)
-
-        if name and name ~= "" then
-            names[name] = true
-        end
-    end
-
-    return names
-end
-
---- Buffers are handled by `utility.reload_buffers`, but the AI tools also touch the files
---- next to them that are not opened. Those only reach the servers through
---- `workspace/didChangeWatchedFiles`.
----@param paths string[]
-local function notify_lsp_files_changed(paths)
-    local method = vim.lsp.protocol.Methods.workspace_didChangeWatchedFiles
-    local FileChangeType = vim.lsp.protocol.FileChangeType
-
-    local opened = get_opened_files()
-
-    ---@type lsp.FileEvent[]
-    local changes = {}
-    for _, path in ipairs(paths) do
-        local stat = vim.uv.fs_stat(path)
-        -- The file system events also report the directories created next to the files
-        if not opened[path] and not (stat and stat.type == "directory") then
-            table.insert(changes, {
-                uri = vim.uri_from_fname(path),
-                type = stat and FileChangeType.Changed or FileChangeType.Deleted,
-            })
-        end
-    end
-
-    if #changes == 0 then
-        return
-    end
-
-    for _, client in ipairs(vim.lsp.get_clients()) do
-        -- The servers ignore the files they do not care about, so the events go out unfiltered
-        if not is_watched_by_nvim(client, method) then
-            client:notify(method, { changes = changes })
-        end
-    end
-end
-
---- Sidekick watches the directories of the loaded buffers and calls
---- `Watch.refresh` for every file system event. Wrap it to collect the changed
---- paths and to run our own refresh once the events settle down.
+--- Sidekick calls `Watch.refresh` for every file system event in the directories of the
+--- loaded buffers
 local function hijack_watch()
     local Watch = require("sidekick.cli.watch")
 
-    local refresh = Watch.refresh
-    local timer = assert(vim.uv.new_timer())
-
-    ---@type table<string, boolean>
-    local changes = {}
-    ---@type integer?
-    local pending_since = nil
-
-    local flush = vim.schedule_wrap(function()
-        local paths = vim.tbl_keys(changes)
-        changes = {}
-        pending_since = nil
-
-        -- The `:checktime` sidekick runs from its file watcher never reloads anything while the
-        -- CLI terminal keeps the focus. Reloading the buffers right away also makes the attached
-        -- LSP clients resend `textDocument/didOpen` with the new contents.
-        utility.reload_buffers()
-        notify_lsp_files_changed(paths)
-    end)
+    local sidekick_refresh = Watch.refresh
+    -- `require` reads from disk, which the fast event callback below cannot do
+    local refresh = require("config.refresh")
 
     --- Runs inside a `uv_fs_event_t` callback, so it has to stay fast event safe
     ---@diagnostic disable-next-line: duplicate-set-field
     function Watch.refresh()
-        for path in pairs(Watch.changes) do
-            changes[path] = true
-        end
+        -- Sidekick clears `Watch.changes` on its own schedule, so copy the whole table
+        refresh.schedule(vim.tbl_keys(Watch.changes))
 
-        -- Sidekick debounces its own refresh, which keeps the debug log and clears
-        -- `Watch.changes` on its own schedule, so copy the whole table every time
-        refresh()
-
-        -- A tool that keeps writing would defer the refresh forever, so cap the wait
-        local now = vim.uv.now()
-        pending_since = pending_since or now
-        local left = pending_since + MAX_REFRESH_DELAY - now
-
-        timer:start(math.max(math.min(REFRESH_DELAY, left), 0), 0, flush)
+        sidekick_refresh()
     end
 end
 
