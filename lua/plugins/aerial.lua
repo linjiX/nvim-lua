@@ -128,6 +128,8 @@ return {
                     Module = "󰅩",
                 },
             },
+            -- A reload after a change outside Neovim fires `BufReadPost`, not `TextChanged`
+            update_events = "TextChanged,InsertLeave,BufReadPost",
             show_guides = true,
             guides = {
                 mid_item = "│ ",
