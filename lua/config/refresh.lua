@@ -1,3 +1,4 @@
+local lsp_files = require("config.lsp_files")
 local utility = require("config.utility")
 
 local M = {}
@@ -8,72 +9,7 @@ local GIT_STATUS_RELOAD_INTERVAL_MS = 1000
 
 local FUGITIVE_CURRENT_WINDOW_ONLY = 0
 
---- Neovim watches the files itself only where it advertises the support (macOS and Windows),
---- so the servers it leaves out need the notification
----@param client vim.lsp.Client
----@param method string
----@return boolean
-local function is_watched_by_nvim(client, method)
-    local dynamic_registration = vim.tbl_get(
-        client.capabilities,
-        "workspace",
-        "didChangeWatchedFiles",
-        "dynamicRegistration"
-    )
-    -- Dynamic registration only, so `supports_method` stays false until the server registers
-    return dynamic_registration and client:supports_method(method) or false
-end
-
----@return table<string, boolean>
-local function get_loaded_file_paths()
-    local paths = {}
-
-    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-        local path = vim.api.nvim_buf_is_loaded(buf)
-            and vim.bo[buf].buftype == ""
-            and vim.api.nvim_buf_get_name(buf)
-
-        if path and path ~= "" then
-            paths[path] = true
-        end
-    end
-
-    return paths
-end
-
---- The loaded files reach the servers through their buffers, the rest only through this
----@param paths string[]
-local function notify_lsp_files_changed(paths)
-    local method = vim.lsp.protocol.Methods.workspace_didChangeWatchedFiles
-    local FileChangeType = vim.lsp.protocol.FileChangeType
-
-    local loaded = get_loaded_file_paths()
-
-    ---@type lsp.FileEvent[]
-    local events = {}
-    for _, path in ipairs(paths) do
-        local stat = vim.uv.fs_stat(path)
-        -- The file system events also report directories
-        if not loaded[path] and not (stat and stat.type == "directory") then
-            table.insert(events, {
-                uri = vim.uri_from_fname(path),
-                type = stat and FileChangeType.Changed or FileChangeType.Deleted,
-            })
-        end
-    end
-
-    if #events == 0 then
-        return
-    end
-
-    for _, client in ipairs(vim.lsp.get_clients()) do
-        if not is_watched_by_nvim(client, method) then
-            client:notify(method, { changes = events })
-        end
-    end
-end
-
---- A change behind Neovim's back triggers none of the events fugitive refreshes its status on
+--- A change behind Neovim's back fires none of the events fugitive refreshes on
 ---@param paths string[]
 local function reload_fugitive_status(paths)
     ---@type table<integer, integer>
@@ -107,8 +43,8 @@ local function reload_fugitive_status(paths)
     end
 end
 
---- The watchers nvim-tree runs cover the directories it has explored, and a change below the
---- rest leaves their git status stale even after they get expanded
+--- nvim-tree watches only the directories it has explored, so the rest keep a stale git
+--- status even once they get expanded
 local function reload_nvim_tree_git()
     local api = package.loaded["nvim-tree.api"]
     if api then
@@ -154,14 +90,14 @@ local flush = vim.schedule_wrap(function()
 
     -- A `:checktime` from a file watcher reloads nothing while a terminal keeps the focus
     utility.reload_buffers()
-    notify_lsp_files_changed(paths)
+    lsp_files.notify_changed(paths)
 
     -- The git status views reload synchronously, so keep them out of this refresh
     schedule_git_status_reload(paths)
 end)
 
---- Refreshes the buffers, the LSP clients and the git status views once the file system
---- events settle down. Stays fast event safe, so a `uv_fs_event_t` callback can call it.
+--- Refreshes the buffers, the LSP clients and the git status views once the events settle
+--- down. Stays fast event safe, so a `uv_fs_event_t` callback can call it.
 ---@param paths string[]
 function M.schedule(paths)
     for _, path in ipairs(paths) do
