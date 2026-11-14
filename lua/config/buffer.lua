@@ -80,8 +80,60 @@ local function wipe_empty_buffer(args)
     end
 end
 
+--- `<C-o>` and `<C-i>` stop at every jump, most of which stay in the same file
+---@param backward boolean
+---@return nil
+local function jump_to_other_buffer(backward)
+    -- A sidebar pins its buffer, and its jump list came from the window it was split from
+    if vim.bo.buftype ~= "" or vim.wo.winfixbuf then
+        return
+    end
+
+    local jumps, current = unpack(vim.fn.getjumplist())
+    local buf = vim.api.nvim_get_current_buf()
+    local step = backward and -1 or 1
+    local remaining = vim.v.count1
+
+    -- `getjumplist` numbers the entries from zero, and the current position sits past the end
+    local index = current + 1
+    local jump_count = 0
+
+    for count = 1, #jumps do
+        index = index + step
+        if index < 1 or index > #jumps then
+            break
+        end
+
+        if jumps[index].bufnr ~= buf then
+            -- A count asks for that many files, and the list may run out before then
+            buf = jumps[index].bufnr
+            jump_count = count
+            remaining = remaining - 1
+
+            if remaining == 0 then
+                break
+            end
+        end
+    end
+
+    if jump_count == 0 then
+        vim.notify(("No %s file in the jump list"):format(backward and "older" or "newer"))
+        return
+    end
+
+    vim.cmd.normal({ jump_count .. vim.keycode(backward and "<C-o>" or "<C-i>"), bang = true })
+end
+
 ---@return nil
 function M.setup()
+    vim.keymap.set("n", "<Leader>o", function()
+        jump_to_other_buffer(true)
+    end, { desc = "Previous File" })
+
+    vim.keymap.set("n", "<Leader>i", function()
+        jump_to_other_buffer(false)
+    end, { desc = "Next File" })
+
     vim.keymap.set("n", "<Leader>u", reopen_buffer)
 
     local augroup = vim.api.nvim_create_augroup("MyBuffer", { clear = true })
