@@ -138,6 +138,17 @@ function M.setup()
 
     local augroup = vim.api.nvim_create_augroup("MyBuffer", { clear = true })
 
+    -- The shada file restores the jump list into every window open at startup
+    vim.api.nvim_create_autocmd("VimEnter", {
+        group = augroup,
+        pattern = "*",
+        callback = function()
+            for _, win in ipairs(vim.api.nvim_list_wins()) do
+                vim.api.nvim_win_call(win, vim.cmd.clearjumps)
+            end
+        end,
+    })
+
     vim.api.nvim_create_autocmd("BufUnload", {
         group = augroup,
         pattern = "*",
