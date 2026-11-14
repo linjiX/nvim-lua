@@ -9,9 +9,17 @@ local GIT_STATUS_RELOAD_INTERVAL_MS = 1000
 
 local FUGITIVE_CURRENT_WINDOW_ONLY = 0
 
---- A change behind Neovim's back fires none of the events fugitive refreshes on
----@param paths string[]
-local function reload_fugitive_status(paths)
+--- The basenames of the git directory entries fugitive's status depends on
+local WATCHED_GIT_FILES = {
+    FETCH_HEAD = true,
+    HEAD = true,
+    ORIG_HEAD = true,
+    index = true,
+    ["packed-refs"] = true,
+}
+
+---@return table<integer, integer> the first window of every fugitive status buffer
+local function get_fugitive_status_windows()
     ---@type table<integer, integer>
     local window_by_status_buf = {}
     for _, win in ipairs(vim.api.nvim_list_wins()) do
@@ -21,26 +29,47 @@ local function reload_fugitive_status(paths)
         end
     end
 
-    if vim.tbl_isempty(window_by_status_buf) then
-        return
-    end
+    return window_by_status_buf
+end
 
-    paths = vim.tbl_map(vim.fn.resolve, paths)
+---@param buf integer
+---@param win integer
+local function reload_fugitive_buffer(buf, win)
+    -- The repository may be gone by now
+    pcall(vim.api.nvim_win_call, win, function()
+        vim.fn["fugitive#DidChange"](buf, FUGITIVE_CURRENT_WINDOW_ONLY)
+    end)
+end
 
-    for buf, win in pairs(window_by_status_buf) do
-        local worktree = vim.fn.resolve(vim.fn.FugitiveWorkTree(buf))
-        local has_changes = worktree ~= ""
-            and vim.iter(paths):any(function(path)
-                return vim.fs.relpath(worktree, path) ~= nil
-            end)
-
-        if has_changes then
-            -- The repository may be gone by now
-            pcall(vim.api.nvim_win_call, win, function()
-                vim.fn["fugitive#DidChange"](buf, FUGITIVE_CURRENT_WINDOW_ONLY)
-            end)
+---@param matches fun(buf: integer): boolean
+local function reload_fugitive_status_where(matches)
+    for buf, win in pairs(get_fugitive_status_windows()) do
+        if matches(buf) then
+            reload_fugitive_buffer(buf, win)
         end
     end
+end
+
+--- A change behind Neovim's back fires none of the events fugitive refreshes on
+---@param paths string[]
+local function reload_fugitive_status(paths)
+    reload_fugitive_status_where(function(buf)
+        -- A symbolic link spells the worktree and the paths differently
+        local worktree = vim.fn.resolve(vim.fn.FugitiveWorkTree(buf))
+
+        return worktree ~= ""
+            and vim.iter(paths):any(function(path)
+                return vim.fs.relpath(worktree, vim.fn.resolve(path)) ~= nil
+            end)
+    end)
+end
+
+--- A `git` command touches the git directory only
+---@param common_dirs table<string, boolean>
+local function reload_fugitive_status_at(common_dirs)
+    reload_fugitive_status_where(function(buf)
+        return common_dirs[vim.fn.FugitiveCommonDir(buf)] or false
+    end)
 end
 
 --- nvim-tree watches only the directories it has explored, so the rest keep a stale git
@@ -52,29 +81,35 @@ local function reload_nvim_tree_git()
     end
 end
 
---- `Snacks.util.throttle` drops the arguments, so the paths wait in the closure instead
-local schedule_git_status_reload
-do
+--- `Snacks.util.throttle` drops the arguments, so the keys wait in the closure
+---@param reload fun(keys: table<string, boolean>)
+---@return fun(keys: string[])
+local function throttle_by_keys(reload)
     ---@type table<string, boolean>
-    local changed_paths = {}
+    local pending = {}
 
-    local reload = require("snacks").util.throttle(function()
-        local paths = vim.tbl_keys(changed_paths)
-        changed_paths = {}
+    local throttled = require("snacks").util.throttle(function()
+        local keys = pending
+        pending = {}
 
-        reload_fugitive_status(paths)
-        reload_nvim_tree_git()
+        reload(keys)
     end, { ms = GIT_STATUS_RELOAD_INTERVAL_MS })
 
-    ---@param paths string[]
-    function schedule_git_status_reload(paths)
-        for _, path in ipairs(paths) do
-            changed_paths[path] = true
+    return function(keys)
+        for _, key in ipairs(keys) do
+            pending[key] = true
         end
 
-        reload()
+        throttled()
     end
 end
+
+local schedule_git_status_reload = throttle_by_keys(function(paths)
+    reload_fugitive_status(vim.tbl_keys(paths))
+    reload_nvim_tree_git()
+end)
+
+local schedule_fugitive_reload = throttle_by_keys(reload_fugitive_status_at)
 
 local timer = assert(vim.uv.new_timer())
 
@@ -112,6 +147,71 @@ function M.schedule(paths)
     local remaining = math.max(settle_deadline - now, 0)
 
     timer:start(math.min(SETTLE_DELAY_MS, remaining), 0, flush)
+end
+
+---@type table<string, uv.uv_fs_event_t>
+local git_watchers = {}
+
+---@param filename string
+---@return boolean
+local function is_watched_git_file(filename)
+    return WATCHED_GIT_FILES[filename] or false
+end
+
+--- A push that changed nothing leaves only the lock behind
+---@param filename string
+---@return boolean
+local function is_ref_update(filename)
+    return not vim.endswith(filename, ".lock")
+end
+
+---@param path string
+---@param common_dir string
+---@param is_watched fun(filename: string): boolean
+---@param flags table? the `vim.uv.fs_event_start` flags
+local function watch_git_path(path, common_dir, is_watched, flags)
+    if git_watchers[path] then
+        return
+    end
+
+    local watcher = vim.uv.new_fs_event()
+    if not watcher then
+        return
+    end
+
+    git_watchers[path] = watcher
+
+    local ok = watcher:start(path, flags or {}, function(_, filename)
+        -- Stays fast event safe, as a `uv_fs_event_t` callback
+        if filename and is_watched(filename) then
+            schedule_fugitive_reload({ common_dir })
+        end
+    end)
+
+    if not ok then
+        git_watchers[path] = nil
+        watcher:close()
+    end
+end
+
+--- Refreshes the fugitive status views after a `git` command Neovim never sees
+---@param git_dir string
+---@param common_dir string the git directory a linked worktree shares
+function M.watch_git_dir(git_dir, common_dir)
+    -- `vim.fs.joinpath` would turn an empty directory into a relative path
+    if git_dir == "" or common_dir == "" then
+        return
+    end
+
+    watch_git_path(git_dir, common_dir, is_watched_git_file)
+
+    -- A linked worktree leaves the shared `packed-refs` in the common directory, which the
+    -- call above registers in a plain repository, so both have to accept the same entries
+    watch_git_path(common_dir, common_dir, is_watched_git_file)
+
+    -- A `git push` writes the remote ref only, which a slash in its branch name nests
+    local remotes = vim.fs.joinpath(common_dir, "refs", "remotes")
+    watch_git_path(remotes, common_dir, is_ref_update, { recursive = true })
 end
 
 return M

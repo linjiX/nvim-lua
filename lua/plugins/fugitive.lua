@@ -89,6 +89,18 @@ return {
     config = function()
         local window = require("config.window")
 
+        -- An agent CLI running `git` refreshes nothing
+        vim.api.nvim_create_autocmd("User", {
+            group = vim.api.nvim_create_augroup("MyFugitive", { clear = true }),
+            pattern = "FugitiveIndex",
+            callback = function()
+                require("config.refresh").watch_git_dir(
+                    vim.fn.FugitiveGitDir(),
+                    vim.fn.FugitiveCommonDir()
+                )
+            end,
+        })
+
         vim.api.nvim_create_user_command("Git", function(opts)
             local subcommand = opts.fargs[1]
             local mods = opts.mods
